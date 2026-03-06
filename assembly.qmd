@@ -86,7 +86,7 @@ An assembly instruction has four components:
 | **operands** | Source/destination data   | `W0, W1`, `#0xFF`, etc.   |
 | **comment**  | Documentation (after `;`) | `; Read ADC value`        |
 
-The sytax can be formally defined as:
+The syntax can be formally defined as:
 
 ```md
 STATEMENT := [label] mnemonic [operands] [comment]
@@ -627,7 +627,7 @@ ZAP    A, [W2++]       ; Clear accumulator and increment
 FIR Filter Inner Loop
 :::
 
-Here is a complete, practical example showing the FIR filter computation that we discussed in our  [Appplied DSP](https://celsasser.github.io/ucsd-appdsp-notes/) notebook. This computes one output sample:
+Here is a complete, practical example showing the FIR filter computation that we discussed in our  [Applied DSP](https://celsasser.github.io/ucsd-appdsp-notes/) notebook. This computes one output sample:
 
 $$
 y[n] = \sum_{k=0}^{N-1} a_k \cdot x[n-k]
@@ -719,6 +719,7 @@ Let's trace through the assembly:
 ; Save registers we'll modify (calling convention)
 PUSH    W0                  ; Save W0 (we'll use it for return value)
 PUSH.D  W4                  ; Save W4 and W5 together
+PUSH    SR                  ; Save status register (MAC affects flags)
 
 ; Clear the DSP accumulator (40 bits, all zero)
 CLR     A
@@ -743,6 +744,7 @@ SAC.R   A, W0               ; W0 = saturate(round(A >> 15))
 ; Restore and return
 POP     SR                  ; Restore status flags
 POP.D   W4                  ; Restore W4, W5
+POP     W1                  ; Pop saved W0 into W1 (W0 holds our return value)
 RETURN                      ; Return to caller
 ```
 
@@ -772,9 +774,9 @@ int16_t sum_array(int16_t *arr) {
 ##### Assembly Equivalent
 ```asm
 sum_array:
+    MOV     W0, W2            ; W2 = arr (argument passed in W0)
     MOV     #0, W0            ; sum = 0
     MOV     #10, W1           ; counter = 10
-    MOV     W0, W2            ; W2 = arr (argument passed in W0)
 
 sum_loop:
     ADD     [W2++], W0, W0    ; sum += *arr; arr++

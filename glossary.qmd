@@ -3,7 +3,7 @@ title: "Glossary"
 ---
 
 ## Overview
-Our stock pile of terms. We are structured in that the terms are alphabetical. For each term, attempt to include:
+Our stockpile of terms. We are structured in that the terms are alphabetical. For each term, attempt to include:
 
 1. A rigorous definition.
 2. An example, if applicable.
@@ -506,7 +506,7 @@ DSP saturation is primarily done by the hardware processor itself, but it is ena
 
 - **Processor Hardware:** When the processor is in "saturation mode," it automatically restricts results to valid ranges (e.g., $0x7FFFFFFF$ in a 32-bit system).
 - **Programmer/Software:** The programmer must explicitly configure this behavior, usually by setting a control register, enabling a flag, or using specific instructions (e.g., in assembly or intrinsics) to turn on saturation arithmetic.
-- **Alternatives:** If the processor does not support hardware saturation or the programmer does not enable it, the programmer must implement saturation using software logic (e.g., ), which is slower.
+- **Alternatives:** If the processor does not support hardware saturation or the programmer does not enable it, the programmer must implement saturation using software logic (e.g., manual clamping with if/else), which is slower.
 :::
 
 With saturation enabled, overflow is handled by clamping to the boundary:

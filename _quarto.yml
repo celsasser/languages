@@ -16,7 +16,7 @@ website:
     show-item-context: true
 
   navbar:
-    title: "Computer Languager Notebook"
+    title: "Computer Language Notebook"
     search: true
 
   sidebar:

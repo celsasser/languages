@@ -149,7 +149,7 @@ window.Quarto = {
     <a href="./index.html" class="navbar-brand navbar-brand-logo">
     </a>
     <a class="navbar-brand" href="./index.html">
-    <span class="navbar-title">Computer Languager Notebook</span>
+    <span class="navbar-title">Computer Language Notebook</span>
     </a>
   </div>
         <div class="quarto-navbar-tools tools-end">
@@ -162,7 +162,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./introduction.html">Languages</a></li><li class="breadcrumb-item"><a href="./assembly.html">Assembly Language</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Languages</a></li><li class="breadcrumb-item"><a href="./assembly.html">Assembly Language</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -174,8 +174,8 @@ window.Quarto = {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
       <a href="./index.html" class="sidebar-logo-link">
-      <img src="././images/logo-large.png" alt="" class="sidebar-logo light-content py-0 d-lg-inline d-none">
-      <img src="././images/logo-large.png" alt="" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
+      <img src="././images/logo.png" alt="" class="sidebar-logo light-content py-0 d-lg-inline d-none">
+      <img src="././images/logo.png" alt="" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
       </a>
       </div>
     <div class="sidebar-menu-container"> 
@@ -191,7 +191,7 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./introduction.html" class="sidebar-item-text sidebar-link">
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Introduction</span></a>
   </div>
 </li>
@@ -336,7 +336,7 @@ window.Quarto = {
 <!-- main -->
 <main class="content column-body" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./introduction.html">Languages</a></li><li class="breadcrumb-item"><a href="./assembly.html">Assembly Language</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Languages</a></li><li class="breadcrumb-item"><a href="./assembly.html">Assembly Language</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">The Assembly Language</h1>
 <p class="subtitle lead">Direct Hardware Control for DSP Applications</p>
@@ -529,7 +529,7 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
-<p>The sytax can be formally defined as:</p>
+<p>The syntax can be formally defined as:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode md code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>STATEMENT := <span class="co">[</span><span class="ot">label</span><span class="co">]</span> mnemonic <span class="co">[</span><span class="ot">operands</span><span class="co">] [comment]</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>LABEL := identifier | identifier ":"</span>
@@ -1065,7 +1065,7 @@ y[n] = \sum_{k=0}^{N-1} h[k] \cdot x[n-k]
 <div class="subheading">
 <p>FIR Filter Inner Loop</p>
 </div>
-<p>Here is a complete, practical example showing the FIR filter computation that we discussed in our <a href="https://celsasser.github.io/ucsd-appdsp-notes/">Appplied DSP</a> notebook. This computes one output sample:</p>
+<p>Here is a complete, practical example showing the FIR filter computation that we discussed in our <a href="https://celsasser.github.io/ucsd-appdsp-notes/">Applied DSP</a> notebook. This computes one output sample:</p>
 <p><span class="math display">\[
 y[n] = \sum_{k=0}^{N-1} a_k \cdot x[n-k]
 \]</span></p>
@@ -1167,31 +1167,33 @@ y[n] = \sum_{k=0}^{N-1} a_k \cdot x[n-k]
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co">; Save registers we'll modify (calling convention)</span></span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="bu">PUSH</span>    W0                  <span class="co">; Save W0 (we'll use it for return value)</span></span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="bu">PUSH</span><span class="op">.</span>D  W4                  <span class="co">; Save W4 and W5 together</span></span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="co">; Clear the DSP accumulator (40 bits, all zero)</span></span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>CLR     A</span>
-<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="co">; Copy pointer arguments to working registers</span></span>
-<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>     W8<span class="op">,</span> W4              <span class="co">; W4 points to input buffer</span></span>
-<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>     W9<span class="op">,</span> W5              <span class="co">; W5 points to coefficients</span></span>
-<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a><span class="co">; REPEAT executes the next instruction (N) times</span></span>
-<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a><span class="co">; REPEAT #N-1 means: execute MAC N times (iterations 0 to N-1)</span></span>
-<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a><span class="bu">DEC</span>     W10<span class="op">,</span> W10            <span class="co">; W10 = N - 1</span></span>
-<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a><span class="pp">REPEAT</span>  W10</span>
-<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a><span class="co">; The MAC instruction does FOUR things in ONE cycle:</span></span>
-<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>MAC     <span class="op">[</span>W4<span class="op">++]*[</span>W5<span class="op">++],</span> A    <span class="co">;   A += *W4 * *W5; W4++; W5++;</span></span>
-<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a><span class="co">;                            ;   Multiply, Accumulate, increment both pointers</span></span>
-<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a><span class="co">; After loop, scale and saturate result</span></span>
-<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a><span class="co">; Q15 format: accumulator has 32-bit result, need 16-bit</span></span>
-<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a>SAC<span class="op">.</span>R   A<span class="op">,</span> W0               <span class="co">; W0 = saturate(round(A &gt;&gt; 15))</span></span>
-<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a><span class="co">; Restore and return</span></span>
-<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a><span class="bu">POP</span>     SR                  <span class="co">; Restore status flags</span></span>
-<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a><span class="bu">POP</span><span class="op">.</span>D   W4                  <span class="co">; Restore W4, W5</span></span>
-<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a>RETURN                      <span class="co">; Return to caller</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="bu">PUSH</span>    SR                  <span class="co">; Save status register (MAC affects flags)</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="co">; Clear the DSP accumulator (40 bits, all zero)</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>CLR     A</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="co">; Copy pointer arguments to working registers</span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>     W8<span class="op">,</span> W4              <span class="co">; W4 points to input buffer</span></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>     W9<span class="op">,</span> W5              <span class="co">; W5 points to coefficients</span></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a><span class="co">; REPEAT executes the next instruction (N) times</span></span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a><span class="co">; REPEAT #N-1 means: execute MAC N times (iterations 0 to N-1)</span></span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a><span class="bu">DEC</span>     W10<span class="op">,</span> W10            <span class="co">; W10 = N - 1</span></span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a><span class="pp">REPEAT</span>  W10</span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a><span class="co">; The MAC instruction does FOUR things in ONE cycle:</span></span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>MAC     <span class="op">[</span>W4<span class="op">++]*[</span>W5<span class="op">++],</span> A    <span class="co">;   A += *W4 * *W5; W4++; W5++;</span></span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a><span class="co">;                            ;   Multiply, Accumulate, increment both pointers</span></span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a><span class="co">; After loop, scale and saturate result</span></span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a><span class="co">; Q15 format: accumulator has 32-bit result, need 16-bit</span></span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>SAC<span class="op">.</span>R   A<span class="op">,</span> W0               <span class="co">; W0 = saturate(round(A &gt;&gt; 15))</span></span>
+<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a><span class="co">; Restore and return</span></span>
+<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a><span class="bu">POP</span>     SR                  <span class="co">; Restore status flags</span></span>
+<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a><span class="bu">POP</span><span class="op">.</span>D   W4                  <span class="co">; Restore W4, W5</span></span>
+<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a><span class="bu">POP</span>     W1                  <span class="co">; Pop saved W0 into W1 (W0 holds our return value)</span></span>
+<span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a>RETURN                      <span class="co">; Return to caller</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 </section>
 <section id="c-vs.-assembly" class="level2">
@@ -1218,9 +1220,9 @@ y[n] = \sum_{k=0}^{N-1} a_k \cdot x[n-k]
 <section id="assembly-equivalent" class="level5">
 <h5 class="anchored" data-anchor-id="assembly-equivalent">Assembly Equivalent</h5>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum_array:</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">MOV</span>     <span class="op">#</span><span class="dv">0</span><span class="op">,</span> W0            <span class="co">; sum = 0</span></span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">MOV</span>     <span class="op">#</span><span class="dv">10</span><span class="op">,</span> W1           <span class="co">; counter = 10</span></span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">MOV</span>     W0<span class="op">,</span> W2            <span class="co">; W2 = arr (argument passed in W0)</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">MOV</span>     W0<span class="op">,</span> W2            <span class="co">; W2 = arr (argument passed in W0)</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">MOV</span>     <span class="op">#</span><span class="dv">0</span><span class="op">,</span> W0            <span class="co">; sum = 0</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">MOV</span>     <span class="op">#</span><span class="dv">10</span><span class="op">,</span> W1           <span class="co">; counter = 10</span></span>
 <span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sum_loop:</span></span>
 <span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">ADD</span>     <span class="op">[</span>W2<span class="op">++],</span> W0<span class="op">,</span> W0    <span class="co">; sum += *arr; arr++</span></span>
