@@ -1,0 +1,9 @@
+version: 0.1
+
+curtis:
+   D605:
+      notes: "[Computational Mathematics](https://celsasser.github.io/sps-605-notes/){target=_blank}"
+   D606:
+      notes: "[Probability and Statistics](https://celsasser.github.io/sps-606-notes/){target=_blank}"
+   D624:
+      notes: "[Predictive Analytics](https://celsasser.github.io/sps-624-notes/){target=_blank}"

@@ -1,0 +1,1057 @@
+---
+title: "The Assembly Language"
+subtitle: "Direct Hardware Control for DSP Applications"
+---
+
+## Overview
+Assembly language is the closest humans have ever come to speaking directly to a machine. Before we get to the dsPIC specifics, it helps to understand where assembly sits in the history of programming languages — because that context explains *why* assembly works the way it does and why it still matters.
+
+In the earliest days of computing (1940s–1950s), programmers wrote in **machine code** — raw binary or hexadecimal opcodes entered by hand, switch by switch. `0x778210` is a MOV instruction. Good luck remembering that. This was first-generation programming. Assembly language arrived as the **second-generation language**: instead of writing `0x778210`, you write `MOV W0, W1`. The assembler — a program — translates those human-readable mnemonics one-for-one into the binary opcodes the processor actually executes. One mnemonic, one machine instruction. That 1:1 relationship is the defining characteristic of assembly. There is no abstraction, no compilation strategy, no runtime. What you write is what the CPU runs.
+
+**Third-generation languages** — C, Fortran, Pascal — introduced real abstraction. One line of C might become dozens of assembly instructions. This is both the power and the cost of high-level languages. The C compiler does the translation for you, and it does it well, but you lose direct visibility into what the processor is actually doing. Here is the insight that makes assembly worth studying even today: *C is compiled to assembly*. Every `for` loop, every `if` statement, every function call — the compiler turns all of it into the same register loads, branches, and arithmetic that you will write by hand in this chapter. Learning assembly means learning what C actually *does*, not just what it says.
+
+The relationship between assembly and processor architecture is tight and interesting. When processor designers shifted from **CISC** (Complex Instruction Set Computing) to **RISC** (Reduced Instruction Set Computing) architectures in the 1980s and 1990s, assembly language changed with them. CISC processors like x86 accumulated hundreds of instructions over decades — there are x86 instructions for computing BCD arithmetic and string comparisons that no C compiler has touched in thirty years. RISC architectures took the opposite philosophy: a small, uniform set of simple instructions, each completing in one clock cycle. The dsPIC33F is a RISC-influenced architecture. Its instruction set is clean and regular: 16-bit registers, load-store memory model, predictable timing. That predictability is not an accident — it is what makes the dsPIC suitable for real-time DSP, where you need to know *exactly* how many cycles your filter will take.
+
+In C, you write `for(int i = 0; i < N; i++)` and the compiler generates the assembly to load, compare, decrement, and branch. In assembly, you manage every step explicitly.
+
+This guide covers assembly language fundamentals with specific focus on the dsPIC33F architecture used in this course. You will learn the instruction set, addressing modes, and DSP-specific features that enable real-time signal processing.
+
+## Why Learn Assembly?
+Even when programming in C, understanding assembly is valuable:
+
+- **Debugging**: Read disassembly when your debugger shows `0x1234` instead of your function name
+- **Performance**: Identify bottlenecks and understand compiler output
+- **Hardware access**: Some features (configuration bits, special registers) require direct assembly
+- **DSP optimization**: Critical inner loops (filters, FFT) often benefit from hand-tuned assembly
+
+## The dsPIC33F Architecture
+Before writing instructions, understand the hardware you're controlling.
+
+### Register File
+The dsPIC33F has 16 working registers, each 16 bits wide:
+
+| Register   | Purpose                        | Notes                                     |
+|:-----------|:-------------------------------|:------------------------------------------|
+| **W0**     | General purpose / Return value | Default accumulator for many instructions |
+| **W1-W13** | General purpose                | Available for computation                 |
+| **W14**    | Frame pointer                  | Used by C compiler for stack frames       |
+| **W15**    | Stack pointer                  | **Do not use** for general computation    |
+
+### DSP Accumulators
+Beyond the working registers, the dsPIC has two **40-bit accumulators** for multiply-accumulate operations:
+
+- **AccA**: Primary accumulator (32 bits + 8 guard bits)
+- **AccB**: Secondary accumulator (32 bits + 8 guard bits)
+
+The guard bits prevent overflow during long summations (critical for FIR filters). Here is how they work mechanically, and why they matter enormously for DSP.
+
+A 16-bit × 16-bit multiply produces a 32-bit result. The accumulator holds 32 bits of "real" data, which is enough for a single multiply. But a FIR filter does not compute one multiply — it computes *N* multiplies and adds them all together. If each product can be up to 32 bits wide, and you are summing up to 128 of them, the sum could grow beyond 32 bits before you are done. Without protection, the accumulator would simply wrap around or [saturate](glossary.qmd#saturate), silently corrupting your output sample.
+
+The **8 guard bits** are 8 additional high-order bits sitting above the 32-bit accumulator, extending it to 40 bits total. They absorb the overflow that would otherwise destroy your result. Mathematically, 8 guard bits give you $2^8 = 256$ headroom: the running sum can grow up to 256× larger than the maximum single-product value before the accumulator overflows. For a 128-tap FIR filter with full-scale inputs, the worst-case sum is 128× the maximum product — comfortably within the 256× headroom the guard bits provide.
+
+Without guard bits, you would have to scale your coefficients down to prevent overflow, sacrificing precision. With them, you accumulate at full precision throughout the entire summation and only convert ([saturate](glossary.qmd#saturate) and round) to 16 bits at the very end with `SAC.R`. This is not a minor optimization — it is the difference between a filter that sounds correct and one that clips on loud audio transients.
+
+:::{.callout-note title="Why exactly 8 guard bits?"}
+Eight guard bits give $2^8 = 256\times$ overflow headroom. A practical FIR filter rarely exceeds 256 taps at full scale, so 8 bits covers virtually all real-world cases. Fewer bits would require coefficient scaling on large filters; more bits would waste silicon area on a constraint that never binds.
+:::
+
+### Program Counter
+:::{.subheading}
+PC
+:::
+
+A 24-bit register holding the address of the next instruction. Branch and jump instructions modify this register to change execution flow.
+
+### Status Register
+:::{.subheading}
+SR
+:::
+
+Contains *flags* affected by arithmetic operations:
+
+| Bit | Name     | Set When...                  |
+|:---:|:---------|:-----------------------------|
+| Z   | Zero     | Result equals zero           |
+| N   | Negative | Result is negative (MSB = 1) |
+| C   | Carry    | Unsigned overflow occurred   |
+| OV  | Overflow | Signed overflow occurred     |
+
+## Instruction Format
+An assembly instruction has four components:
+
+| Part         | Purpose                   | Example                   |
+|:-------------|:--------------------------|:--------------------------|
+| **label**    | Marker for branch targets | `loop_start:`             |
+| **mnemonic** | Operation to perform      | `MOV`, `ADD`, `MAC`, etc. |
+| **operands** | Source/destination data   | `W0, W1`, `#0xFF`, etc.   |
+| **comment**  | Documentation (after `;`) | `; Read ADC value`        |
+
+The syntax can be formally defined as:
+
+```md
+STATEMENT := [label] mnemonic [operands] [comment]
+
+LABEL := identifier | identifier ":"
+MNEMONIC := "MOV" | "ADD" | "MAC" | etc.
+OPERANDS := OPERAND | OPERAND "," OPERANDs
+OPERAND := "W0" | "W1" | "#0xFF" | etc.
+COMMENT := ";" TEXT
+```
+
+This grammar is a simplified **BNF** (Backus-Naur Form) description — the same notation used to define programming language syntax. Square brackets mean optional; the vertical bar means "or." What it is telling you is that a statement must have a mnemonic, may optionally be preceded by a label, may optionally have operands, and may optionally be followed by a comment.
+
+Notice something important about this grammar: it is much simpler than the grammar for any high-level language. There is no recursion, no nesting, no expression tree. Every line is flat — one operation, one destination. That simplicity is not a limitation; it is the point. Assemblers do not need a complex parser because the language is not complex. A real assembler reads each line left-to-right, identifies the mnemonic, looks it up in a table to get the binary opcode, encodes the operands into the instruction word, and moves on. The assembler for a RISC processor like the dsPIC can be written in a few thousand lines of C. By contrast, a C compiler's front-end parser alone is orders of magnitude larger. Every level of abstraction you add above assembly requires more parsing, more analysis, more code generation — assembly exposes the bedrock that everything else is built on.
+
+One practical consequence: **assembler error messages are usually about the tokens on a single line**, not about multi-line logic. If you mistype an operand, the assembler tells you exactly which line is wrong. There is no "undefined behavior at runtime" in assembly — either the instruction is valid and the processor executes it, or it is not and the assembler rejects it.
+
+### Operands
+:::{.subheading}
+Destination Order
+:::
+
+The dsPIC uses **destination-last** ordering for most instructions:
+
+```asm
+ADD  W0, W1, W2    ; W2 = W0 + W1  (dest is W2, the last operand)
+MOV  W0, W1        ; W1 = W0        (dest is W1, the last operand)
+```
+
+Compare to x86 (Intel): `MOV EAX, EBX` puts EBX into EAX (destination first).
+
+## Assembly Directives
+Directives are instructions to the **assembler**, not the CPU. They don't become machine instructions.
+
+This distinction is worth sitting with, because it can be confusing at first. Think of it this way: when the program runs on hardware, the CPU executes a sequence of binary opcodes. Every `MOV`, `ADD`, `MAC`, and `BRA` you write becomes one of those opcodes — a real instruction the CPU fetches, decodes, and executes. These are **CPU instructions**.
+
+Directives, by contrast, are commands addressed to the assembler *program itself*, not to the CPU. They are processed before any code runs — during the assembly phase — and they control how the assembler does its job. A directive like `.section .text` tells the assembler "put the following machine code into the text segment of the object file." A directive like `.equ BUFFER_SIZE, 128` tells the assembler "whenever you see the symbol `BUFFER_SIZE`, substitute the value 128." Neither of these directives produces a machine opcode. When the CPU eventually runs your program, there is no trace of them — they were consumed entirely by the assembler.
+
+Are they like macros? Somewhat, but not exactly. Macros in C are preprocessed text substitutions: the preprocessor expands them before the compiler even sees the code. Directives are different — they are parsed by the assembler itself as part of its normal processing pass, not as a separate preprocessing step. A `.equ` directive is more like a compile-time constant than a macro: it defines a name that the assembler replaces with a value wherever it appears in operand fields. There is no text substitution happening; the assembler simply knows the numeric value of the symbol when it encodes the instruction.
+
+The bottom line: every line in your assembly source is either a **CPU instruction** (becomes an opcode the processor runs) or an **assembler directive** (consumed by the assembler to control layout, define symbols, or allocate space). Directives are the assembler's configuration language; instructions are the CPU's command language.
+
+| Directive  | Purpose                 | Example                |
+|:-----------|:------------------------|:-----------------------|
+| `.section` | Specify memory section  | `.section .text`       |
+| `.global`  | Export symbol to linker | `.global _T1Interrupt` |
+| `.equ`     | Define constant         | `.MAX_SAMPLES  128`    |
+| `.word`    | Allocate 16-bit data    | `.word  0x1234`        |
+| `.space`   | Allocate bytes          | `.space  256`          |
+| `.set`     | Set symbol value        | `count  .set  0`       |
+
+### Example
+:::{.subheading}
+Defining Constants
+:::
+
+```asm
+; Define constants at top of file
+.equ    BUFFER_SIZE,   128
+.equ    ADC_CHANNEL,   5
+
+; Use in code
+MOV     #BUFFER_SIZE, W0     ; Load 128 into W0
+```
+
+### Example
+:::{.subheading}
+Data Section
+:::
+
+```asm
+.section .data                    ; Data section (RAM)
+input_buffer:  .space  256        ; Reserve 256 bytes
+output_buffer: .space  256
+coefficients:  .word   1, 2, 3, 4, 5   ; Initialized data
+
+.section .text                    ; Code section (Flash)
+```
+
+## Data Movement Instructions
+Before diving into specific instructions, it is worth asking: what does "moving data" actually mean inside a processor, and where can data even live?
+
+At any moment in a running dsPIC program, your data might be in one of several places:
+
+- **Registers (W0–W15, AccA, AccB)**: The fastest storage on the chip. Arithmetic happens here exclusively. There are only 16 general-purpose registers, so this is precious, limited space — but accessing a register takes zero additional cycles.
+- **RAM (Data Memory)**: Hundreds or thousands of bytes of on-chip SRAM, accessible by address. Slower than registers, but much larger. Your audio buffers, filter delay lines, and stack all live here.
+- **Flash (Program Memory)**: Non-volatile storage where your code lives. On the dsPIC you can also store constant data here (coefficient tables, lookup tables) using special table-read instructions. It is slower to read than RAM and cannot be written at runtime in normal operation.
+- **Peripheral Registers (SFRs — Special Function Registers)**: Every peripheral on the chip — ADC, DAC, UART, Timer — has its own memory-mapped registers that appear at fixed addresses. Writing to `DAC1RDAT` sends a sample to the DAC output. Reading `ADC1BUF0` retrieves the latest ADC conversion. These look like memory accesses but they actually toggle hardware signals inside the chip.
+
+"Moving" data means transferring a value from one of these locations to another. The key constraint is that **the CPU can only perform arithmetic on data that is in registers**. You cannot add two values that are sitting in RAM — you must first load them into registers, add them, then optionally store the result back. This load-compute-store pattern is the fundamental rhythm of all assembly programming.
+
+The kinds of moves you will encounter are:
+
+- **Immediate to register**: Load a constant value directly into a register (`MOV #42, W0`)
+- **Register to register**: Copy between two working registers (`MOV W0, W1`)
+- **Register to memory**: Store a register value out to RAM or a peripheral (`MOV W0, [W4]`)
+- **Memory to register**: Load a value from RAM or a peripheral into a register (`MOV [W4], W0`)
+
+There is no direct memory-to-memory move in a single instruction on the dsPIC — to copy a block of data from one RAM location to another, you load into a register first, then store. This is the load-store architecture philosophy, and it is shared by most RISC processors.
+
+### MOV
+:::{.subheading}
+Copy Data
+:::
+
+**Syntax:** `MOV source, destination`
+
+The most fundamental instruction. Copies data from source to destination.
+
+```asm
+; Register to register
+MOV  W0, W1          ; W1 = W0
+
+; Immediate to register
+MOV  #0xFF, W0       ; W0 = 255 (decimal)
+
+; Register to memory
+MOV  W0, 0x1000      ; Memory[0x1000] = W0
+
+; Memory to register
+MOV  0x1000, W0      ; W0 = Memory[0x1000]
+
+; Register indirect (pointer)
+MOV  W0, W1          ; W1 = address to read
+MOV  [W1], W0        ; W0 = Memory[W1]
+```
+
+### PUSH/POP
+:::{.subheading}
+Stack Operations
+:::
+
+Save/restore registers to the stack (pointed to by W15).
+
+##### Syntax
+- `PUSH register`: Save to stack
+- `POP register`: Restore from stack
+
+```asm
+PUSH  W0             ; Decrement W15, store W0 to [W15]
+POP   W0             ; Read from [W15], store to W0, increment W15
+```
+
+## Arithmetic and Logical Instructions
+
+### Basic Arithmetic
+
+##### Syntax
+- `ADD source, destination`: Add source to destination
+- `ADD source1, source2, destination`: Add source1 + source2, store in destination
+- `SUB source, destination`: Subtract source from destination
+- `SUB source1, source2, destination`: Subtract source2 - source1, store in destination
+- `MUL.UU source1, source2, destination`: Unsigned multiply (32-bit result in destination:destination+1)
+- `MUL.SS source1, source2, destination`: Signed multiply (32-bit result in destination:destination+1)
+
+```asm
+; Addition
+ADD  W0, W1, W2      ; W2 = W0 + W1
+ADD  W0, #5, W0      ; W0 = W0 + 5
+
+; Subtraction
+SUB  W0, W1, W2      ; W2 = W1 - W0  (note order!)
+SUB  W0, #1, W0      ; W0 = W0 - 1  (decrement)
+
+; Multiplication (16-bit × 16-bit = 32-bit)
+MUL.UU  W0, W1, W2   ; Unsigned × Unsigned, W2:W3 = W0 × W1
+MUL.SS  W0, W1, W2   ; Signed × Signed
+```
+
+### Bitwise Operations
+
+##### Syntax
+- `AND source, destination`: Bitwise AND, store in destination
+- `OR source, destination`: Bitwise OR, store in destination
+- `XOR source, destination`: Bitwise XOR, store in destination
+- `CPL register`: Complement (bitwise NOT) all bits in register
+- `SL register, shift-count, destination`: Shift left
+- `SR register, shift-count, destination`: Shift right arithmetic (sign-extending)
+- `LSR register, shift-count, destination`: Shift right logical (zero-fill)
+
+```asm
+AND  W0, W1, W0      ; W0 = W0 & W1  (bitwise AND)
+OR   W0, W1, W0      ; W0 = W0 | W1  (bitwise OR)
+XOR  W0, W1, W0      ; W0 = W0 ^ W1  (bitwise XOR)
+CPL   W0             ; W0 = ~W0      (bitwise NOT/complement)
+
+; Bit shifts
+SL   W0, #4, W0      ; W0 = W0 << 4  (shift left)
+SR   W0, #4, W0      ; W0 = W0 >> 4  (shift right arithmetic)
+LSR  W0, #4, W0      ; W0 = W0 >>> 4 (shift right logical)
+```
+
+### Comparison
+`CP` compares two values by computing `source2 - source1` and setting the status flags based on the result, without storing the difference anywhere. It operates exclusively on **register values** — not on memory buffers directly.
+
+**Syntax:** `CP source1, source2`
+
+This is an important constraint to understand. `CP W0, W1` subtracts W1 from W0 and sets flags; it does not know anything about where those values came from. If you want to compare two bytes sitting in RAM, or check whether two audio buffers are identical, you must load the values into registers first, then compare:
+
+```asm
+MOV   [W4], W0       ; Load first value from memory into W0
+MOV   [W5], W1       ; Load second value from memory into W1
+CP    W0, W1         ; Now compare the two register values
+BRA   NZ, not_equal  ; Branch if they differ
+```
+
+For comparing entire memory buffers (the equivalent of `memcmp` in C), you would put this load-compare pattern inside a loop, stepping through the buffers element by element. The `CP` instruction itself sees only registers — the memory addressing is handled by the surrounding `MOV` and loop instructions.
+
+```asm
+; Compare W0 to W1 (subtracts W1 - W0, sets flags)
+CP    W0, W1
+
+; Compare to immediate
+CP    W0, #10
+
+; After CP, branch based on result
+BRA   Z,  equal_label     ; Branch if Zero flag set (W0 == W1)
+BRA   N,  neg_label      ; Branch if Negative flag set
+BRA   NZ, not_equal_label    ; Branch if Not Zero
+```
+
+## Control Flow Instructions
+
+### Unconditional Branch
+Branch to label (jump unconditionally)
+
+**Syntax:** `BRA label`
+
+```asm
+BRA   target_label       ; Jump to target_label (PC = target_label)
+```
+
+### Conditional Branches
+Branch to label if condition is true
+
+**Syntax:** `BRA condition, label`
+
+```asm
+BRA   Z,   label_zero    ; Branch if Zero (result = 0)
+BRA   NZ,  label_nz      ; Branch if Not Zero
+BRA   N,   label_neg     ; Branch if Negative
+BRA   NN,  label_nn      ; Branch if Not Negative
+BRA   C,   label_carry   ; Branch if Carry
+BRA   NC,  label_nc      ; Branch if No Carry
+BRA   GE,  label_ge      ; Branch if Greater or Equal (signed)
+BRA   GT,  label_gt      ; Branch if Greater Than
+BRA   LE,  label_le      ; Branch if Less or Equal
+BRA   LT,  label_lt      ; Branch if Less Than
+```
+
+:::{.callout-note title="Conditions Flags"}
+All conditions depend on flags set by the previous arithmetic/comparison operation. For example:
+
+```asm
+CP    W0, W1          ; Compare W0 to W1 (W1 - W0)
+BRA   Z, equal_label   ; Branch if W0 == W1
+BRA   N, less_label    ; Branch if W0 < W1 (Negative flag set)
+BRA   GT, greater_label ; Branch if W0 > W1 (Greater Than)
+```
+:::
+
+### Subroutine Calls
+When you call a subroutine, you need a way to get back. That "way back" is the return address — the address of the instruction immediately after the `CALL`. The CPU needs to save that address somewhere safe, execute the subroutine, and then use that saved address to resume execution. The mechanism for this is the **stack**.
+
+The stack is a region of RAM that grows and shrinks as functions are called and return. The dsPIC's stack pointer is **W15**, and it always points to the top of the stack — the most recently pushed value. The stack grows upward in memory on the dsPIC (toward higher addresses).
+
+When `CALL subroutine_name` executes, the hardware does two things automatically:
+
+1. Pushes the **return address** (the value of PC + 2, i.e., the address of the instruction after the CALL) onto the stack — W15 is incremented and the return address is written to `[W15]`.
+2. Jumps to `subroutine_name` by loading that address into the Program Counter.
+
+The subroutine then runs. When it reaches `RETURN`, the hardware does the reverse: it pops the return address off the stack and loads it back into the PC, resuming execution exactly where the caller left off.
+
+A **stack frame** is the collection of data a subroutine pushes onto the stack for its own use: saved registers, local variables, and sometimes a saved frame pointer (W14). The C compiler builds and tears down stack frames automatically for every C function. In hand-written assembly, you are responsible for this yourself — if you push registers at the start of your subroutine, you must pop them in the same order (reversed) before returning, or the stack will be unbalanced and `RETURN` will jump to garbage.
+
+:::{.callout-note title="The Golden Rule of Subroutines"}
+Every `PUSH` must have a matching `POP` before `RETURN`. If you push four registers entering a subroutine and only pop three before returning, `RETURN` will pop your fourth register's data as the return address and jump to a random location. This is one of the most common bugs in hand-written assembly.
+:::
+
+The stack also makes **nested calls** work naturally. If subroutine A calls subroutine B, B's return address sits on top of A's. When B returns, its address is popped and execution resumes in A. When A returns, its address is popped and execution resumes in the caller. Each level of call nesting adds another return address to the stack — which is why deeply recursive code can overflow the stack.
+
+##### Syntax
+- `CALL label`: Call subroutine at label (pushes return address)
+- `RETURN`: Return from subroutine (pops return address, also called `RET`)
+
+```asm
+CALL  subroutine_name    ; Push return address, jump to subroutine
+RETURN                    ; Pop return address, jump back (also called RET)
+```
+
+### Labels
+Labels mark locations in code for branches and data access:
+
+```asm
+; Code label
+loop_start:
+    ADD   W0, #1, W0
+    CP    W0, #10
+    BRA   NZ, loop_start    ; Loop until W0 = 10
+
+; Data label
+lookup_table:
+    .word  100, 200, 300, 400
+
+    MOV   #lookup_table, W0    ; W0 = address of table
+    MOV   [W0++], W1           ; W1 = 100, W0 now points to 200
+```
+
+## Loops in Assembly
+
+### Manual Counter Loop
+The explicit way, manually managing a counter:
+
+```asm
+; Sum array of 10 elements
+MOV   #0, W0            ; W0 = accumulator (sum)
+MOV   #10, W1           ; W1 = loop counter
+MOV   #array_ptr, W2    ; W2 = pointer to array
+
+sum_loop:
+    ADD   [W2++], W0, W0    ; Add element, increment pointer
+    DEC   W1, W1            ; W1--
+    CP    W1, #0            ; Check if W1 == 0
+    BRA   NZ, sum_loop      ; Loop while not zero
+```
+
+### Hardware Loop
+:::{.subheading}
+DO
+:::
+
+The dsPIC has **zero-overhead hardware looping**. No branch overhead!
+
+**Syntax:** `DO #count-1, end_label`: Execute following instruction(s) count times
+
+```asm
+; Sum array of N elements using hardware loop
+MOV   #0, W0            ; W0 = accumulator
+MOV   #array_ptr, W2    ; W2 = pointer to array
+MOV   #N, W3            ; W3 = loop count
+DO    #N-1, end_loop    ; Execute N times (0 to N-1)
+
+loop_body:
+    ADD   [W2++], W0, W0    ; This instruction repeated N times
+
+end_loop:
+    ; Continue here after loop completes
+```
+
+##### How it works
+- `DO` sets up a hardware loop counter
+- The instruction(s) after `DO` execute repeatedly
+- Zero cycles wasted on comparison and branching
+- Loop executes in `N × cycle_count` time
+
+### REPEAT
+:::{.subheading}
+Single-Instruction Loop
+:::
+
+When your loop body is just one instruction, `REPEAT` is even simpler:
+
+**Syntax:** `REPEAT #count-1`: Repeat next instruction count times
+
+```asm
+MOV   #0, W0
+MOV   #array_ptr, W2
+REPEAT #N-1              ; Repeat next instruction N times
+ADD   [W2++], W0, W0    ; Executed N times, zero overhead
+```
+
+:::{.callout-note title="Note: DEC and INC"}
+##### Syntax
+- `DEC register, destination`: Decrement register, store in destination
+- `INC register, destination`: Increment register, store in destination
+
+Used for manual counter management (see manual loop example above).
+:::
+
+## Addressing Modes
+Addressing modes specify *where* to find the operand data. The dsPIC supports several modes.
+
+### 1. Immediate Addressing
+Data is encoded in the instruction itself.
+
+```asm
+ADD   W0, #42, W0       ; Add literal value 42
+MOV   #0x1000, W1       ; Load hexadecimal value
+```
+
+### 2. Register Direct
+Operand is in a register.
+
+```asm
+ADD   W0, W1, W2        ; All operands are registers
+MOV   W0, W1
+```
+
+### 3. Register Indirect
+Register contains the **address** of the data (pointer).
+
+```asm
+MOV   #array_start, W0    ; W0 = address of array
+MOV   [W0], W1            ; W1 = Memory[W0] (read first element)
+```
+
+### 4. Register Indirect with Post-Increment
+Read data, **then** increment the pointer. Essential for array processing.
+
+```asm
+MOV   #array_start, W0
+MOV   [W0++], W1          ; W1 = Memory[W0], then W0 += 2 (16-bit)
+MOV   [W0++], W2          ; W2 = Memory[W0], then W0 += 2 (next element)
+```
+
+### 5. Register Indirect with Pre-Increment
+Increment the pointer **first**, then read data.
+
+```asm
+MOV   #array_start, W0
+INC   W0, W0              ; W0++ first
+MOV   [W0], W1            ; Then read
+```
+
+### 6. Register Indirect with Displacement
+Add an offset to the address before accessing.
+
+```asm
+MOV   #array_start, W0
+MOV   4[W0], W1           ; W1 = Memory[W0 + 4] (2nd element if 16-bit)
+```
+
+### 7. Bit-Reversed Addressing
+Special mode for FFT algorithms. Access patterns wrap around bit-reversed.
+
+```asm
+MOV   #__builtin_brev(0x1000), W0    ; Set up bit-reversed addressing
+```
+
+### 8. Modulo Addressing
+Automatic pointer wraparound for circular buffers (see [Circular Buffers](glossary.qmd#circular-buffer)).
+
+```asm
+; Configure modulo addressing (via special registers)
+MOV   #__builtin_modoffset(buffer, size), W0
+```
+
+## DSP-Specific Instructions
+The dsPIC includes instructions optimized for signal processing algorithms.
+
+### MAC
+:::{.subheading}
+Multiply-Accumulate
+:::
+
+The heart of DSP computing. Multiplies two values and adds the result to an accumulator, all in one cycle.
+
+The canonical use for `MAC` is **convolution** — and if you understand convolution, you understand why the dsPIC was designed around this instruction. A digital FIR filter computes:
+
+$$
+y[n] = \sum_{k=0}^{N-1} h[k] \cdot x[n-k]
+$$
+
+That summation is convolution. For every output sample, you multiply each filter coefficient $h[k]$ by the corresponding delayed input sample $x[n-k]$ and accumulate the products. That is exactly what `MAC` does: one coefficient times one input sample, added into the accumulator, then advance both pointers to the next pair. Repeat N times. One output sample computed.
+
+Without a dedicated `MAC` instruction, this inner loop requires a multiply, an add, two pointer increments, and a branch — at minimum five operations per tap. With `MAC`, it is one instruction per tap. For a 64-tap FIR running at 44.1 kHz audio, that difference is the gap between feasible and impossible on a modest microcontroller.
+
+**Syntax:** `MAC [reg1]*[reg2], accumulator, [pointer1]+=increment, [pointer2]+=increment`
+
+This syntax is entirely legitimate dsPIC assembly — it is not a pseudo-instruction or assembler macro. The dual post-increment on both pointer registers (`[W4++]` and `[W5++]`) is a real hardware capability baked into the `MAC` instruction encoding. Microchip designed the dsPIC instruction word to include fields for two independent memory reads and two independent pointer updates, all happening in the same clock cycle using separate internal data buses. This is what makes the `MAC` a **DSP instruction** rather than just a fast multiply-add: the hardware parallelism built around it.
+
+```asm
+; Signed multiply-accumulate
+MAC   W0*W1, A, [W2]+=2, [W3]+=2
+```
+
+##### What this single instruction does
+1. Multiply W0 × W1
+2. Add result to accumulator A
+3. Increment W2 by 2 (post-increment)
+4. Increment W3 by 2 (post-increment)
+5. All in **one clock cycle**!
+
+:::{.callout-note title="MAC in a FIR Convolution Loop"}
+Here is the essence of what the complete FIR example below computes, distilled to its inner loop:
+
+```asm
+; W4 = pointer to input samples x[n], x[n-1], x[n-2], ...
+; W5 = pointer to filter coefficients h[0], h[1], h[2], ...
+; Accumulator A starts cleared to zero
+
+CLR     A                        ; A = 0
+REPEAT  #N-1                     ; Repeat N times
+MAC     [W4++]*[W5++], A         ; A += *W4 * *W5, advance both pointers
+
+SAC.R   A, W0                    ; W0 = rounded, saturated 16-bit output
+```
+
+Each `MAC` handles one term of the convolution sum. After N iterations, accumulator A holds the full dot product $\sum h[k] \cdot x[n-k]$, and `SAC.R` converts it to a 16-bit output sample with rounding. The guard bits in A prevent any intermediate overflow during the summation.
+:::
+
+### Extended Precision
+:::{.subheading}
+ED
+:::
+
+For operations requiring more than 16 bits:
+
+**Syntax:** `ED.AC accumulator, [pointer]+=increment`
+
+```asm
+ED.AC    A, [W2++]      ; Extended access to accumulator A
+```
+
+### DSP Accumulator Instructions
+
+##### Syntax
+- `SAC accumulator, destination`: Store accumulator ([saturate](glossary.qmd#saturate) to 16-bit)
+- `SAC.R accumulator, destination`: Store accumulator with rounding
+- `LAC source, accumulator`: Load source into accumulator
+- `CLR accumulator`: Clear accumulator to zero
+- `ZAP accumulator, [pointer]+=increment`: Clear accumulator and increment pointer
+
+```asm
+SAC    A, W0           ; Store accumulator (saturate to 16-bit)
+SAC.R  A, W0           ; Store accumulator with rounding
+LAC    W0, A           ; Load W0 into accumulator A
+```
+
+### Clear and Zero Accumulator
+```asm
+CLR    A               ; A = 0
+ZAP    A, [W2++]       ; Clear accumulator and increment
+```
+
+## Complete Example
+:::{.subheading}
+FIR Filter Inner Loop
+:::
+
+Here is a complete, practical example showing the FIR filter computation that we discussed in our  [Applied DSP](https://celsasser.github.io/ucsd-appdsp-notes/) notebook. This computes one output sample:
+
+$$
+y[n] = \sum_{k=0}^{N-1} a_k \cdot x[n-k]
+$$
+
+### C Version
+:::{.subheading}
+For Reference
+:::
+
+```c
+// 8-tap FIR filter in C
+int16_t fir_filter(int16_t *x, int16_t *a, int n) {
+    int32_t acc = 0;
+    for(int i = 0; i < n; i++) {
+        acc += (int32_t)a[i] * x[i];
+    }
+    return (int16_t)(acc >> 15);  // Q15 scaling
+}
+```
+
+### Assembly Version
+:::{.subheading}
+Optimized
+:::
+
+```asm
+; ============================================================
+; FIR Filter - Single Output Sample Computation
+; ============================================================
+; Inputs:
+;   W8  = pointer to input samples (x[n], x[n-1], ...)
+;   W9  = pointer to coefficients (a[0], a[1], ...)
+;   W10 = tap count (N)
+; Output:
+;   W0  = filter output y[n]
+; ============================================================
+    .global  fir_filter
+    .section .text
+
+fir_filter:
+    ; Prologue - save registers we'll use
+    PUSH    W0
+    PUSH.D  W4                  ; Save W4 and W5 (push double)
+    PUSH    SR                  ; Save status register
+
+    ; Clear accumulator A
+    CLR     A
+
+    ; Set up input and coefficient pointers
+    MOV     W8, W4              ; W4 = input pointer
+    MOV     W9, W5              ; W5 = coefficient pointer
+
+    ; Get loop count (W10 - 1)
+    DEC     W10, W10
+
+    ; ========================================================
+    ; Inner Loop: MAC with hardware repeat
+    ; ========================================================
+    REPEAT  W10                 ; Repeat next MAC instruction (W10+1) times
+    MAC     [W4++]*[W5++], A    ; A += *W4 * *W5, then increment both pointers
+
+    ; ========================================================
+    ; Epilogue - scale and return result
+    ; ========================================================
+    ; Shift right by 15 (Q15 format), saturate, and store
+    SAC.R   A, W0               ; W0 = (A >> 15) with rounding and saturation
+
+    ; Restore saved registers
+    POP     SR
+    POP.D   W4
+    POP     W1                  ; Restore old W0 to W1 (don't need old W0)
+    RETURN                      ; Return to caller (output in W0)
+```
+
+### Performance Comparison
+| Implementation                 | Cycles per Output Sample         |
+|:-------------------------------|---------------------------------:|
+| C code (unoptimized)           | ~60-100 cycles                   |
+| C code (`-O3` with intrinsics) | ~20-30 cycles                    |
+| Hand-tuned assembly (above)    | **N + 10 ≈ 18 cycles** (for N=8) |
+
+The assembly version achieves near-ideal performance: one MAC per tap plus small overhead.
+
+### Assembly Breakdown
+Let's trace through the assembly:
+
+```asm
+; Save registers we'll modify (calling convention)
+PUSH    W0                  ; Save W0 (we'll use it for return value)
+PUSH.D  W4                  ; Save W4 and W5 together
+PUSH    SR                  ; Save status register (MAC affects flags)
+
+; Clear the DSP accumulator (40 bits, all zero)
+CLR     A
+
+; Copy pointer arguments to working registers
+MOV     W8, W4              ; W4 points to input buffer
+MOV     W9, W5              ; W5 points to coefficients
+
+; REPEAT executes the next instruction (N) times
+; REPEAT #N-1 means: execute MAC N times (iterations 0 to N-1)
+DEC     W10, W10            ; W10 = N - 1
+REPEAT  W10
+
+; The MAC instruction does FOUR things in ONE cycle:
+MAC     [W4++]*[W5++], A    ;   A += *W4 * *W5; W4++; W5++;
+;                            ;   Multiply, Accumulate, increment both pointers
+
+; After loop, scale and saturate result
+; Q15 format: accumulator has 32-bit result, need 16-bit
+SAC.R   A, W0               ; W0 = saturate(round(A >> 15))
+
+; Restore and return
+POP     SR                  ; Restore status flags
+POP.D   W4                  ; Restore W4, W5
+POP     W1                  ; Pop saved W0 into W1 (W0 holds our return value)
+RETURN                      ; Return to caller
+```
+
+## C vs. Assembly
+:::{.subheading}
+Side-by-Side Comparison
+:::
+
+Here's a simple operation shown both ways:
+
+### Task
+:::{.subheading}
+Sum an Array of 10 Elements
+:::
+
+##### C Code
+```c
+int16_t sum_array(int16_t *arr) {
+    int16_t sum = 0;
+    for(int i = 0; i < 10; i++) {
+        sum += arr[i];
+    }
+    return sum;
+}
+```
+
+##### Assembly Equivalent
+```asm
+sum_array:
+    MOV     W0, W2            ; W2 = arr (argument passed in W0)
+    MOV     #0, W0            ; sum = 0
+    MOV     #10, W1           ; counter = 10
+
+sum_loop:
+    ADD     [W2++], W0, W0    ; sum += *arr; arr++
+    DEC     W1, W1            ; counter--
+    CP      W1, #0            ; if (counter != 0)
+    BRA     NZ, sum_loop      ;     goto loop
+
+    RETURN                      ; return sum (in W0)
+```
+
+##### Key observations
+- The C compiler generates assembly similar to this
+- Assembly gives explicit control over register usage
+- Hardware loop (`DO`/`REPEAT`) would make assembly even faster
+- Understanding assembly helps you read compiler output
+
+## Calling Convention
+:::{.subheading}
+How Functions Communicate
+:::
+
+When C calls assembly (or vice versa), both sides must agree on where to find arguments and return values.
+
+### dsPIC C Calling Convention
+:::{.subheading}
+ABI
+:::
+
+| Item                    | Location            |
+|:------------------------|:--------------------|
+| **First argument**      | W0                  |
+| **Second argument**     | W1                  |
+| **Third argument**      | W2                  |
+| **Fourth argument**     | W3                  |
+| **Return value**        | W0                  |
+| **Preserved registers** | W4-W7 (callee-save) |
+| **Scratch registers**   | W0-W3 (caller-save) |
+
+### Example
+:::{.subheading}
+C Calling Assembly
+:::
+
+##### C code
+```c
+extern int16_t add_values(int16_t a, int16_t b);
+
+int main(void) {
+    int16_t result = add_values(10, 20);  // result = 30
+    return result;
+}
+```
+
+##### Assembly implementation
+```asm
+    .global  add_values
+    .section .text
+
+add_values:
+    ; W0 already contains first argument (10)
+    ; W1 already contains second argument (20)
+
+    ADD   W0, W1, W0       ; W0 = W0 + W1 = 30
+
+    RETURN                 ; Return to caller (W0 = 30)
+```
+
+### Example
+:::{.subheading}
+Assembly Calling C
+:::
+
+##### Assembly code
+```asm
+    .extern  c_function     ; External C function
+    .global  asm_caller
+
+asm_caller:
+    MOV   #10, W0          ; First argument in W0
+    MOV   #20, W1          ; Second argument in W1
+    CALL  c_function       ; Call C function
+    ; W0 now contains return value
+    RETURN
+```
+
+## Common Assembly Patterns
+
+### Delay Loop
+```asm
+delay:
+    MOV     #1000, W0
+delay_loop:
+    DEC     W0, W0
+    BRA     NZ, delay_loop
+    RETURN
+```
+
+### Table Lookup
+```asm
+; Data: sine wave table
+sine_table:
+    .word   0, 1000, 2000, 3000, 4000, 4000, 3000, 2000, 1000, 0
+
+; Code: lookup value by index
+get_sine:
+    SL      W0, #1, W0       ; Multiply index by 2 (16-bit words)
+    MOV     #sine_table, W1  ; Base address
+    ADD     W0, W1, W0       ; W0 = &sine_table[index]
+    MOV     [W0], W0         ; W0 = sine_table[index]
+    RETURN
+```
+
+### Clear Memory Block
+```asm
+clear_block:
+    ; W0 = destination address
+    ; W1 = byte count
+
+    MOV     #0, W2           ; Value to write (zero)
+
+clear_loop:
+    DEC     W1, W1
+    BRA     LT, clear_done   ; Exit if count < 0
+    MOV     W2, [W0++]       ; Store zero, increment pointer
+    BRA     clear_loop
+
+clear_done:
+    RETURN
+```
+
+## Reading Disassembly
+When debugging, your compiler will often show you disassembly (human-readable machine code).
+
+**Example: Disassembly of a simple C function**
+
+```c
+int add_five(int x) {
+    return x + 5;
+}
+```
+
+##### Compiler output
+:::{.subheading}
+simplified
+:::
+
+```asm
+add_five:
+    ADD   W0, #5, W0    ; W0 = W0 + 5
+    RETURN              ; return W0
+```
+
+##### Why this matters
+- When stepping through code in a debugger, you see actual instructions
+- Compiler optimizations can be verified by reading output
+- Sometimes bugs are visible only at assembly level
+
+## Debugging Tips
+1. **Comment heavily**: Assembly is opaque without comments
+2. **Use meaningful labels**: `loop_start:` not `L1:`
+3. **Check register usage**: Track which registers hold what
+4. **Watch the flags**: After every math operation, flags are set
+5. **Single-step**: Use your debugger to execute one instruction at a time
+6. **Watch memory**: Verify pointers point where you expect
+
+## The Assembly Toolchain
+How does text become behavior?
+
+```{python}
+# | label: fig-assembler-flow
+# | fig-cap: "The Assembly Build Process. The Assembler translates human-readable mnemonics 1-to-1 into machine opcodes. The Linker combines these separate object files into a final executable, resolving exact memory addresses."
+# | code-fold: true
+
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+
+fig, ax = plt.subplots(figsize=(10, 3))
+ax.set_xlim(0, 10)
+ax.set_ylim(0, 4)
+ax.axis("off")
+
+
+def draw_box(x, y, text, color="#e0e0e0", width=1.5, height=1.0):
+    rect = mpatches.FancyBboxPatch(
+        (x, y),
+        width,
+        height,
+        boxstyle="round,pad=0.1",
+        facecolor=color,
+        edgecolor="black",
+    )
+    ax.add_patch(rect)
+    ax.text(
+        x + width / 2,
+        y + height / 2,
+        text,
+        ha="center",
+        va="center",
+        weight="bold",
+        fontsize=10,
+    )
+
+
+def draw_arrow(x1, x2, y):
+    ax.annotate(
+        "",
+        xy=(x2, y),
+        xytext=(x1, y),
+        arrowprops=dict(width=1, headwidth=10, headlength=10),
+    )
+
+
+# Components
+draw_box(0.5, 1.5, "Source Code\n(.s)", "#ffcccc")  # Red
+draw_box(3.0, 1.5, "Assembler", "#ccffcc")  # Green
+draw_box(5.5, 1.5, "Object File\n(.o)", "#ccccff")  # Blue
+draw_box(8.0, 1.5, "Linker", "#ffffcc")  # Yellow
+
+# Arrows
+draw_arrow(2.1, 2.9, 2.0)
+draw_arrow(4.6, 5.4, 2.0)
+draw_arrow(7.1, 7.9, 2.0)
+draw_arrow(9.6, 9.95, 2.0)
+
+# Final output
+ax.text(10.0, 2.0, "Executable\n(.hex/.elf)", ha="left", va="center", weight="bold")
+
+# Descriptions
+ax.text(
+    3.75,
+    1.0,
+    "Translates Mnemonics\nto Machine Code",
+    ha="center",
+    va="top",
+    fontsize=9,
+    style="italic",
+)
+ax.text(
+    8.75,
+    1.0,
+    "Assigns Physical\nMemory Addresses",
+    ha="center",
+    va="top",
+    fontsize=9,
+    style="italic",
+)
+
+plt.tight_layout()
+plt.show()
+```
+
+1. **Source (.s)**: Your text file with mnemonics, labels, and directives
+2. **Assembler**: Translates `MOV W0, W1` to binary opcode `0x778210` (example). Produces an **Object File** with machine code but unresolved addresses.
+3. **Linker**: Takes all object files, assigns final memory addresses, resolves labels, and produces the final executable.
+
+## Summary
+
+##### Assembly fundamentals
+- **Explicit control**: You manage every register, memory access, and branch
+- **Registers first**: Arithmetic happens in registers; memory requires load/store
+- **Flags enable branches**: Conditional jumps depend on status flags from previous operations
+- **Labels provide targets**: Branch and jump destinations are marked with labels
+
+##### dsPIC DSP advantages
+- **Hardware looping**: `DO` and `REPEAT` enable zero-overhead loops
+- **MAC instruction**: Multiply-accumulate in one cycle
+- **Modulo addressing**: Automatic circular buffer pointer wraparound
+- **40-bit accumulators**: Guard bits prevent overflow in long summations
+
+##### Practical guidance
+- Write C first, optimize critical sections in assembly
+- Use compiler intrinsics before hand-writing assembly
+- Comment assembly code heavily
+- Understand your debugger's disassembly view
+
+## Further Reading
+- [GCC Inline Assembly](https://gcc.gnu.org/onlinedocs/gcc/Using-Assembly-Language-with-C.html){target="_blank" rel="noopener"} - How to integrate assembly code within C programs
+- [PC Assembly Language](./reference/pcasm-book.pdf){target="_blank" rel="noopener"} by Paul A. Carter - Comprehensive assembly language textbook (x86 focused, but concepts apply)

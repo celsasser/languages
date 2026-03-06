@@ -1,0 +1,566 @@
+---
+title: "Rust for C/C++ Programmers"
+subtitle: "A practical bridge to Rust's fundamentals"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: false
+---
+
+# Why Rust Exists
+
+Rust was created at Mozilla Research around 2010 and reached 1.0 in 2015.
+The motivation was straightforward and familiar to anyone who has debugged a
+segfault at 2am: **systems programming is unsafe by default**, and the
+traditional tools (C, C++) leave memory safety entirely to the programmer.
+
+The designers asked a pointed question: *can we have the performance of C with
+memory safety guaranteed at compile time, without a garbage collector?*
+
+The answer is Rust.
+
+## The Core Design Decisions
+
+**1. Ownership replaces manual memory management.**
+Rather than `malloc`/`free` or smart pointers bolted on after the fact, Rust
+builds ownership into the type system. The compiler tracks who owns what, and
+memory is freed automatically when the owner goes out of scope. No GC, no
+runtime overhead.
+
+**2. Borrowing replaces raw pointers.**
+Instead of passing pointers around freely, Rust has a formal concept of
+*borrowing* — you can lend a reference to data without transferring ownership.
+The compiler (the *borrow checker*) enforces that references are always valid.
+No dangling pointers, no use-after-free.
+
+**3. Fearless concurrency.**
+Data races are a compile error. The same ownership rules that prevent
+memory bugs also make entire classes of concurrency bugs impossible.
+
+**4. Zero-cost abstractions.**
+Rust's high-level features (iterators, generics, traits) compile down to the
+same machine code you'd write by hand. You don't pay for what you don't use —
+the same guarantee C++ makes, but delivered more consistently.
+
+**5. Explicit over implicit.**
+Rust rarely does things behind your back. Integer overflow is checked in debug
+builds and wraps in release (with explicit opt-in). Type coercions are almost
+never automatic. Mutability must be declared. This is intentionally more
+verbose than C++ in places, in exchange for fewer surprises.
+
+---
+
+# The Basics
+
+## Variables and Mutability
+
+In C you declare a variable and it's mutable by default. In Rust, variables
+are **immutable by default**. You opt into mutability with `mut`.
+
+```rust
+let x = 5;          // immutable
+let mut y = 5;      // mutable
+y += 1;             // fine
+// x += 1;          // compile error
+```
+
+This isn't just style — the compiler uses immutability information to reason
+about your program. It's a habit worth building early.
+
+## Types
+
+Rust is statically typed. Types are usually inferred, but you can annotate
+explicitly. The primitive types will be familiar:
+
+```rust
+let a: i32  = -42;       // signed 32-bit integer
+let b: u64  = 1_000_000; // unsigned 64-bit (underscores ok in literals)
+let c: f64  = 3.14;      // 64-bit float
+let d: bool = true;
+let e: char = 'z';       // Unicode scalar, 4 bytes (not u8!)
+```
+
+Integer types: `i8`, `i16`, `i32`, `i64`, `i128`, `isize` and their `u`
+counterparts. `isize`/`usize` are pointer-sized, like `ptrdiff_t`/`size_t`
+in C.
+
+No implicit numeric conversions. You cast explicitly with `as`:
+
+```rust
+let x: i32 = 42;
+let y: f64 = x as f64;
+```
+
+## Functions
+
+```rust
+fn add(a: i32, b: i32) -> i32 {
+    a + b       // no semicolon = expression = return value
+}
+
+fn greet(name: &str) {
+    println!("Hello, {}!", name);  // no return value = returns ()
+}
+```
+
+The last expression in a block is its value. `return` exists but is idiomatic
+only for early returns.
+
+## Control Flow
+
+```rust
+// if is an expression
+let max = if a > b { a } else { b };
+
+// loop
+loop {
+    break;   // only way to exit a bare loop
+}
+
+// while
+while x > 0 {
+    x -= 1;
+}
+
+// for over a range
+for i in 0..10 {        // 0 to 9
+    println!("{}", i);
+}
+
+// for over a collection
+let nums = vec![1, 2, 3];
+for n in &nums {
+    println!("{}", n);
+}
+```
+
+---
+
+# Memory Management
+
+This is the heart of Rust. If you understand this section, you understand Rust.
+
+## The Stack and the Heap
+
+Same as C/C++:
+
+- **Stack** — fixed-size values, automatically allocated and freed. Fast.
+- **Heap** — dynamic allocation, lives until explicitly freed. Flexible.
+
+In C you manage the heap manually. In Rust the compiler does it for you via
+ownership rules, at zero runtime cost.
+
+## Ownership
+
+Every value in Rust has exactly one **owner**. When the owner goes out of
+scope, the value is freed. This is RAII, but enforced by the type system rather
+than by convention.
+
+```rust
+{
+    let s = String::from("hello");  // s owns the heap-allocated string
+    // use s...
+}   // s goes out of scope: memory freed automatically. No free(), no delete.
+```
+
+**Move semantics** — when you assign an owned value to another variable, the
+original owner is invalidated. This prevents double-free:
+
+```rust
+let s1 = String::from("hello");
+let s2 = s1;         // ownership moves to s2
+// println!("{}", s1); // compile error: s1 no longer valid
+println!("{}", s2);  // fine
+```
+
+This is like C++ move semantics, but the compiler *forces* you to use them
+correctly. You can't accidentally use a moved-from value.
+
+**Copy types** — primitives like integers implement the `Copy` trait, so
+assignment copies the value rather than moving it (same as C):
+
+```rust
+let x = 5;
+let y = x;  // x is copied, not moved
+println!("{}", x);  // fine: x still valid
+```
+
+## Borrowing
+
+Moving ownership around constantly would be tedious. *Borrowing* lets you
+pass references to data without transferring ownership. Like pointers, but
+guaranteed safe.
+
+```rust
+fn print_len(s: &String) {    // borrows s, doesn't take ownership
+    println!("{}", s.len());
+}
+
+let s = String::from("hello");
+print_len(&s);               // lend s to the function
+println!("{}", s);           // s still valid after the call
+```
+
+**The borrow rules** (enforced at compile time):
+
+1. You can have *either* one mutable reference *or* any number of immutable
+   references — never both at the same time.
+2. References must always be valid (no dangling references).
+
+```rust
+let mut s = String::from("hello");
+
+let r1 = &s;      // immutable borrow
+let r2 = &s;      // another immutable borrow — fine
+// let r3 = &mut s; // compile error: can't borrow as mutable while immutable borrows exist
+
+println!("{} {}", r1, r2);
+// r1 and r2 go out of use here
+
+let r3 = &mut s;  // now a mutable borrow is fine
+r3.push_str(", world");
+```
+
+This feels restrictive at first. In practice it eliminates a huge class of
+bugs: data races, iterator invalidation, use-after-free. The compiler is
+your enforcer.
+
+## Slices
+
+A slice is a reference to a contiguous sequence — a view into an array or
+string without copying:
+
+```rust
+let a = [1, 2, 3, 4, 5];
+let slice = &a[1..3];    // [2, 3] — no copy
+
+let s = String::from("hello world");
+let word = &s[0..5];     // "hello" — &str, no copy
+```
+
+`&str` (string slice) and `&[T]` (array slice) are the idiomatic ways to
+pass read-only sequence data to functions.
+
+## The String Types
+
+Rust has two main string types, which confuses newcomers:
+
+| Type | Owned? | Mutable? | Analogy |
+|---|---|---|---|
+| `String` | Yes | Yes | `std::string` in C++ |
+| `&str` | No (a view) | No | `const char*` or `std::string_view` |
+
+```rust
+let owned: String = String::from("hello");
+let view: &str = "world";          // string literals are &str
+let slice: &str = &owned[0..3];    // borrow part of owned
+```
+
+Functions that just need to read a string should accept `&str` — it works
+with both `String` and string literals.
+
+## Lifetimes (Brief Introduction)
+
+Lifetimes are Rust's way of ensuring references don't outlive the data they
+point to. In most code the compiler infers them. You only write lifetime
+annotations when the compiler can't figure it out — usually in function
+signatures that return references:
+
+```rust
+fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+    if x.len() > y.len() { x } else { y }
+}
+```
+
+The `'a` says "the returned reference lives at least as long as both inputs."
+Don't worry about this too deeply at first — the compiler will tell you when
+you need an annotation and the error messages are good.
+
+---
+
+# Structs, Enums, and Traits
+
+## Structs
+
+```rust
+struct Point {
+    x: f64,
+    y: f64,
+}
+
+impl Point {
+    // Associated function (like a static method) — constructor by convention
+    fn new(x: f64, y: f64) -> Self {
+        Point { x, y }   // field shorthand when names match
+    }
+
+    // Method — first arg is &self (immutable) or &mut self (mutable)
+    fn distance_from_origin(&self) -> f64 {
+        (self.x * self.x + self.y * self.y).sqrt()
+    }
+}
+
+let p = Point::new(3.0, 4.0);
+println!("{}", p.distance_from_origin()); // 5.0
+```
+
+No inheritance. Composition over inheritance is idiomatic Rust.
+
+## Enums
+
+Rust enums are algebraic data types — each variant can carry different data.
+This is far more powerful than C enums.
+
+```rust
+enum Shape {
+    Circle(f64),               // radius
+    Rectangle(f64, f64),       // width, height
+    Triangle { base: f64, height: f64 },  // named fields
+}
+
+impl Shape {
+    fn area(&self) -> f64 {
+        match self {
+            Shape::Circle(r)             => std::f64::consts::PI * r * r,
+            Shape::Rectangle(w, h)       => w * h,
+            Shape::Triangle { base, height } => 0.5 * base * height,
+        }
+    }
+}
+```
+
+Two enums you'll use constantly:
+
+```rust
+// Option<T> replaces null
+enum Option<T> {
+    Some(T),
+    None,
+}
+
+// Result<T, E> replaces error codes and exceptions
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+```
+
+## Traits
+
+Traits are Rust's answer to interfaces. A trait defines behaviour; structs
+implement it.
+
+```rust
+trait Describe {
+    fn describe(&self) -> String;
+}
+
+impl Describe for Point {
+    fn describe(&self) -> String {
+        format!("({}, {})", self.x, self.y)
+    }
+}
+
+impl Describe for Shape {
+    fn describe(&self) -> String {
+        format!("area = {:.2}", self.area())
+    }
+}
+
+// Accept any type that implements Describe
+fn print_description(item: &impl Describe) {
+    println!("{}", item.describe());
+}
+```
+
+Common standard library traits you'll encounter:
+- `Debug` — enables `{:?}` formatting (usually derived)
+- `Clone` — explicit deep copy
+- `Copy` — implicit copy on assignment (primitives)
+- `Iterator` — gives you `map`, `filter`, `collect`, etc.
+- `Display` — enables `{}` formatting
+
+Derive macros implement common traits automatically:
+
+```rust
+#[derive(Debug, Clone)]
+struct Point { x: f64, y: f64 }
+// Now you can: println!("{:?}", p);
+```
+
+---
+
+# Pattern Matching
+
+`match` is a supercharged switch statement. It must be exhaustive — the
+compiler ensures you've handled every case.
+
+```rust
+let result: Result<i32, &str> = Ok(42);
+
+match result {
+    Ok(n) if n > 0  => println!("positive: {}", n),
+    Ok(n)           => println!("non-positive: {}", n),
+    Err(e)          => println!("error: {}", e),
+}
+```
+
+`if let` for when you care about one variant:
+
+```rust
+if let Some(value) = some_option {
+    println!("got {}", value);
+}
+```
+
+`?` operator for propagating errors — the idiomatic replacement for
+`if (err) return err`:
+
+```rust
+fn read_number(s: &str) -> Result<i32, std::num::ParseIntError> {
+    let n = s.trim().parse::<i32>()?;  // ? returns Err early if parse fails
+    Ok(n * 2)
+}
+```
+
+---
+
+# Error Handling
+
+Rust has no exceptions. Errors are values, returned via `Result<T, E>`.
+
+```rust
+use std::fs;
+use std::io;
+
+fn read_file(path: &str) -> Result<String, io::Error> {
+    let content = fs::read_to_string(path)?;  // ? propagates error
+    Ok(content)
+}
+
+// Caller handles the result
+match read_file("data.txt") {
+    Ok(content) => println!("{}", content),
+    Err(e)      => eprintln!("Failed: {}", e),
+}
+```
+
+For quick scripts or prototypes, `.unwrap()` panics on error (like an
+unchecked assertion). Use it in tests and exploratory code; prefer explicit
+handling in production code.
+
+---
+
+# Modules and Visibility
+
+```rust
+// In src/geometry/mod.rs
+pub mod shapes;       // declares a submodule in shapes.rs
+pub mod transforms;
+
+// In src/geometry/shapes.rs
+pub struct Circle {
+    pub radius: f64,  // pub fields are accessible outside the module
+    center: Point,    // private field
+}
+
+pub fn area(c: &Circle) -> f64 { ... }
+```
+
+```rust
+// In main.rs or lib.rs
+mod geometry;                    // declare the module
+
+use geometry::shapes::Circle;   // bring into scope
+use geometry::shapes::area;
+```
+
+Items are private by default. `pub` makes them visible outside their module.
+`pub(crate)` makes them visible within the crate but not to external users.
+
+---
+
+# Common Collections
+
+```rust
+// Vec<T> — growable array (like std::vector)
+let mut v: Vec<i32> = Vec::new();
+v.push(1);
+v.push(2);
+let third = v[2];           // panics if out of bounds
+let safe = v.get(2);        // returns Option<&i32>
+
+// HashMap<K, V>
+use std::collections::HashMap;
+let mut map = HashMap::new();
+map.insert("key", 42);
+let val = map.get("key");   // Option<&i32>
+
+// Iterate
+for (k, v) in &map {
+    println!("{}: {}", k, v);
+}
+```
+
+---
+
+# Cargo: The Build System
+
+Cargo is Rust's build tool, package manager, and test runner. You'll use it
+for everything.
+
+```bash
+cargo new my_project    # create new project
+cargo build             # debug build
+cargo build --release   # optimized build
+cargo run               # build and run
+cargo test              # run all tests
+cargo check             # fast type-check without building
+cargo clippy            # linter
+cargo fmt               # formatter
+```
+
+Dependencies go in `Cargo.toml`:
+
+```toml
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+regex = "1.10"
+```
+
+`cargo add serde` adds a dependency from the command line. The ecosystem
+(crates.io) is large and high quality.
+
+---
+
+# Key Differences from C/C++ — Quick Reference
+
+| C/C++ | Rust |
+|---|---|
+| `int x = 5;` | `let x: i32 = 5;` |
+| Mutable by default | Immutable by default (`mut` to opt in) |
+| `void` return | `()` return (unit type) |
+| `NULL` / `nullptr` | `None` (in `Option<T>`) |
+| Exceptions | `Result<T, E>` |
+| `struct` + methods (C++ class) | `struct` + `impl` block |
+| Virtual methods / vtable | Trait objects (`dyn Trait`) |
+| Templates | Generics + trait bounds |
+| `#include` | `use` |
+| Header files | No headers — modules handle visibility |
+| Manual `free` / `delete` | Automatic via ownership |
+| Undefined behaviour on misuse | Compile error on misuse |
+| `printf` | `println!("{}",  val)` |
+
+---
+
+# Where to Go Next
+
+The [Rust Book](https://doc.rust-lang.org/book/) is free online and excellent.
+[Rustlings](https://github.com/rust-lang/rustlings) is a set of small exercises
+that build muscle memory quickly. [docs.rs](https://docs.rs) is the standard
+library and crate documentation hub — well worth bookmarking.
+
+The compiler error messages are unusually good. Read them carefully —
+they usually tell you exactly what's wrong and often suggest the fix.

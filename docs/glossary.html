@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2026-03-06">
+
+<title>Glossary – Computer Language Notebook</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="././favicon.png" rel="icon" type="image/png">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-238593fbc75c52b1713b5944fbe78712.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": true,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Computer Language Notebook</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./glossary.html">Appendix</a></li><li class="breadcrumb-item"><a href="./glossary.html">Glossary</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+      <a href="./index.html" class="sidebar-logo-link">
+      <img src="././images/logo.png" alt="" class="sidebar-logo light-content py-0 d-lg-inline d-none">
+      <img src="././images/logo.png" alt="" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
+      </a>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Languages</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./assembly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assembly Language</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./c.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The C Language</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./rust.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Rust Language</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendix</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./glossary.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Glossary</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="1">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#terms" id="toc-terms" class="nav-link" data-scroll-target="#terms">Terms</a>
+  <ul>
+  <li><a href="#block-started-by-symbol" id="toc-block-started-by-symbol" class="nav-link" data-scroll-target="#block-started-by-symbol">Block Started by Symbol</a></li>
+  <li><a href="#circular-buffer" id="toc-circular-buffer" class="nav-link" data-scroll-target="#circular-buffer">Circular Buffer</a></li>
+  <li><a href="#comparator" id="toc-comparator" class="nav-link" data-scroll-target="#comparator">Comparator</a></li>
+  <li><a href="#fixed-point-numbers" id="toc-fixed-point-numbers" class="nav-link" data-scroll-target="#fixed-point-numbers">Fixed Point Numbers</a></li>
+  <li><a href="#floating-point-numbers" id="toc-floating-point-numbers" class="nav-link" data-scroll-target="#floating-point-numbers">Floating Point Numbers</a></li>
+  <li><a href="#mac" id="toc-mac" class="nav-link" data-scroll-target="#mac">MAC</a></li>
+  <li><a href="#multiplexer" id="toc-multiplexer" class="nav-link" data-scroll-target="#multiplexer">Multiplexer</a></li>
+  <li><a href="#parallel-interface" id="toc-parallel-interface" class="nav-link" data-scroll-target="#parallel-interface">Parallel Interface</a></li>
+  <li><a href="#register" id="toc-register" class="nav-link" data-scroll-target="#register">Register</a>
+  <ul class="collapse">
+  <li><a href="#cpu-registers" id="toc-cpu-registers" class="nav-link" data-scroll-target="#cpu-registers">CPU Registers</a></li>
+  <li><a href="#hardware-registers" id="toc-hardware-registers" class="nav-link" data-scroll-target="#hardware-registers">Hardware Registers</a></li>
+  </ul></li>
+  <li><a href="#saturate" id="toc-saturate" class="nav-link" data-scroll-target="#saturate">Saturate</a></li>
+  <li><a href="#serial-interface" id="toc-serial-interface" class="nav-link" data-scroll-target="#serial-interface">Serial Interface</a></li>
+  <li><a href="#uart" id="toc-uart" class="nav-link" data-scroll-target="#uart">UART</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content column-body" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./glossary.html">Appendix</a></li><li class="breadcrumb-item"><a href="./glossary.html">Glossary</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Glossary</h1>
+</div>
+
+
+
+<div class="quarto-title-meta column-body">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">March 6, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>Our stockpile of terms. We are structured in that the terms are alphabetical. For each term, attempt to include:</p>
+<ol type="1">
+<li>A rigorous definition.</li>
+<li>An example, if applicable.</li>
+<li>If applicable, a graphic. Preferably generated by python, but static is good too.</li>
+<li>See also if applicable.</li>
+</ol>
+</section>
+<section id="terms" class="level2">
+<h2 class="anchored" data-anchor-id="terms">Terms</h2>
+<section id="block-started-by-symbol" class="level3">
+<h3 class="anchored" data-anchor-id="block-started-by-symbol">Block Started by Symbol</h3>
+<div class="subheading">
+<p>BSS</p>
+</div>
+<p>The <strong>block starting symbol</strong> (abbreviated to <code>.bss</code> or BSS) is the portion of an object file, executable, or assembly language code that contains statically allocated variables that are declared but have not been assigned a value yet. It is often referred to as the “bss section” or “bss segment”.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/gloss-01.png" class="img-fluid figure-img" style="width:2.25in"></p>
+<figcaption>The typical layout of a simple computer’s program memory with the text, various data, and stack and heap sections</figcaption>
+</figure>
+</div>
+<p>On some platforms, some or all of the bss section is initialized to zeroes. Unix-like systems and Windows initialize the bss section to zero. In C, statically allocated objects without an explicit initializer are initialized to zero (for arithmetic types) or a null pointer (for pointer types). Implementations of C typically represent zero values and null pointer values using a bit pattern consisting solely of zero-valued bits.</p>
+</section>
+<section id="circular-buffer" class="level3">
+<h3 class="anchored" data-anchor-id="circular-buffer">Circular Buffer</h3>
+</section>
+<section id="comparator" class="level3">
+<h3 class="anchored" data-anchor-id="comparator">Comparator</h3>
+<p>An electronic component that compares two input voltages and outputs a digital signal indicating which is larger. It is essentially a specialized operational amplifier designed to operate in open-loop mode (without negative feedback).</p>
+<section id="the-logic" class="level5">
+<h5 class="anchored" data-anchor-id="the-logic">The Logic</h5>
+<p>The comparator has two analog inputs (<span class="math inline">\(V_+\)</span> and <span class="math inline">\(V_-\)</span>) and one binary digital output (<span class="math inline">\(V_{out}\)</span>).</p>
+<p><span class="math display">\[
+V_{out} = \begin{cases}
+V_{High} &amp; \text{if } V_+ &gt; V_- \\
+V_{Low} &amp; \text{if } V_+ &lt; V_-
+\end{cases}
+\]</span></p>
+<p>Where <span class="math inline">\(V_{High}\)</span> and <span class="math inline">\(V_{Low}\)</span> are typically the positive and negative (or ground) supply rails.</p>
+</section>
+<section id="visualization" class="level5">
+<h5 class="anchored" data-anchor-id="visualization">Visualization</h5>
+<div class="subheading">
+<p>Zero-Crossing Detector</p>
+</div>
+<p>The following plot demonstrates a comparator configured to switch when the input signal crosses 0V. This effectively converts a sine wave into a square wave.</p>
+<div id="cell-fig-comparator" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1000</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>freq <span class="op">=</span> <span class="fl">2.5</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>amplitude <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Analog Input: Sine Wave</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>v_in <span class="op">=</span> amplitude <span class="op">*</span> np.sin(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> freq <span class="op">*</span> t)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Reference Voltage (Threshold)</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>v_ref <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Comparator Output (Digital)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Ideally switches between +5V and 0V</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>v_out <span class="op">=</span> np.where(v_in <span class="op">&gt;</span> v_ref, <span class="dv">5</span>, <span class="dv">0</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>fig, (ax1, ax2) <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>), sharex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Analog Input</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>ax1.plot(t, v_in, label<span class="op">=</span><span class="st">'$V_</span><span class="sc">{in}</span><span class="st">$ (Analog)'</span>, color<span class="op">=</span><span class="st">'tab:blue'</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>ax1.axhline(v_ref, color<span class="op">=</span><span class="st">'black'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, label<span class="op">=</span><span class="st">'$V_</span><span class="sc">{ref}</span><span class="st">$ (0V)'</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>ax1.set_title(<span class="st">"Input: Analog Signal"</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>ax1.set_ylabel(<span class="st">"Voltage (V)"</span>)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>ax1.legend(loc<span class="op">=</span><span class="st">'upper right'</span>)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>ax1.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Digital Output</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>ax2.plot(t, v_out, label<span class="op">=</span><span class="st">'$V_</span><span class="sc">{out}</span><span class="st">$ (Digital)'</span>, color<span class="op">=</span><span class="st">'tab:red'</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>ax2.set_title(<span class="st">"Output: Digital Logic Level"</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>ax2.set_ylabel(<span class="st">"Voltage (V)"</span>)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>ax2.set_xlabel(<span class="st">"Time (s)"</span>)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>ax2.set_ylim(<span class="op">-</span><span class="dv">1</span>, <span class="dv">6</span>)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>ax2.legend(loc<span class="op">=</span><span class="st">'upper right'</span>)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>ax2.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-comparator" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-comparator-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="glossary_files/figure-html/fig-comparator-output-1.png" width="757" height="564" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-comparator-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Comparator Operation: Converting a Sine Wave (Analog) to a Square Wave (Digital).
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="key-properties" class="level5">
+<h5 class="anchored" data-anchor-id="key-properties">Key Properties</h5>
+<ul>
+<li><strong>1-Bit ADC</strong>: A comparator acts as the simplest possible Analog-to-Digital Converter. It produces a single bit of information: “Is <span class="math inline">\(A\)</span> larger than <span class="math inline">\(B\)</span>?”</li>
+<li><strong>Speed</strong>: Comparators are designed to recover quickly from saturation, making them much faster at switching than standard Op-Amps.</li>
+<li><strong>Hysteresis</strong>: To prevent rapid, erratic switching due to noise when inputs are nearly equal, positive feedback is often added to create a “dead zone” or hysteresis. This configuration is known as a <strong>Schmitt Trigger</strong>.</li>
+</ul>
+</section>
+</section>
+<section id="fixed-point-numbers" class="level3">
+<h3 class="anchored" data-anchor-id="fixed-point-numbers">Fixed Point Numbers</h3>
+<p>A method of representing real (fractional) numbers using standard integer hardware by implicitly fixing the position of the binary point.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./images/ns-06.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:6in"></p>
+</figure>
+</div>
+<p>In a fixed-point system, there is no physical difference between an integer and a fixed-point number in memory; the difference lies entirely in how the programmer <em>interprets</em> the bits.</p>
+<section id="the-integers-as-reals-concept" class="level5">
+<h5 class="anchored" data-anchor-id="the-integers-as-reals-concept">The “Integers as Reals” Concept</h5>
+<p>To represent a fractional value <span class="math inline">\(x\)</span> using an integer <span class="math inline">\(I\)</span>, we use a scaling factor <span class="math inline">\(S\)</span> (typically a power of two, <span class="math inline">\(2^n\)</span>):</p>
+<p><span class="math display">\[
+x = \frac{I}{S}
+\]</span></p>
+<ul>
+<li><strong>The Computer Sees</strong>: <span class="math inline">\(I\)</span> (e.g., The integer 16,384)</li>
+<li><strong>The Programmer Sees</strong>: <span class="math inline">\(x\)</span> (e.g., The fraction 0.5)</li>
+<li><strong>The Link</strong>: The scaling factor (e.g., <span class="math inline">\(2^{15} = 32,768\)</span>)</li>
+</ul>
+</section>
+<section id="visualization-1" class="level5">
+<h5 class="anchored" data-anchor-id="visualization-1">Visualization</h5>
+<p>The bit pattern <code>01000000</code> (64 decimal) can mean different things depending on where we “fix” the point:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Format</th>
+<th style="text-align: left;">Point Position</th>
+<th style="text-align: left;">Calculation</th>
+<th style="text-align: left;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Integer</strong></td>
+<td style="text-align: left;"><code>01000000.</code></td>
+<td style="text-align: left;"><span class="math inline">\(64 \times 2^0\)</span></td>
+<td style="text-align: left;"><strong>64</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Fixed Q4.4</strong></td>
+<td style="text-align: left;"><code>0100.0000</code></td>
+<td style="text-align: left;"><span class="math inline">\(64 \times 2^{-4}\)</span></td>
+<td style="text-align: left;"><strong>4.0</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Fixed Q0.8</strong></td>
+<td style="text-align: left;"><code>.01000000</code></td>
+<td style="text-align: left;"><span class="math inline">\(64 \times 2^{-8}\)</span></td>
+<td style="text-align: left;"><strong>0.25</strong></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="key-properties-1" class="level5">
+<h5 class="anchored" data-anchor-id="key-properties-1">Key Properties</h5>
+<ul>
+<li><strong>Determinism</strong>: Precision is uniform across the entire range (unlike floating-point, where precision varies).</li>
+<li><strong>Speed</strong>: Arithmetic operations (add, subtract) are identical to integer operations, making them extremely fast on standard hardware.</li>
+<li><strong>Limited Range</strong>: You cannot represent very large and very small numbers simultaneously.</li>
+<li><strong>Overflow Risk</strong>: Because the range is fixed, operations must be carefully scaled to avoid wrapping around.</li>
+</ul>
+</section>
+</section>
+<section id="floating-point-numbers" class="level3">
+<h3 class="anchored" data-anchor-id="floating-point-numbers">Floating Point Numbers</h3>
+<p>A method of representing real numbers where the position of the radix point (decimal or binary point) is not fixed, allowing it to “float” based on the magnitude of the number. This format is the computer equivalent of scientific notation.</p>
+<section id="the-logic-1" class="level5">
+<h5 class="anchored" data-anchor-id="the-logic-1">The Logic</h5>
+<p>A floating-point number is composed of three parts: a <strong>Sign</strong> (<span class="math inline">\(S\)</span>), an <strong>Exponent</strong> (<span class="math inline">\(E\)</span>), and a <strong>Mantissa</strong> or Significand (<span class="math inline">\(M\)</span>). The value <span class="math inline">\(V\)</span> is calculated as:</p>
+<p><span class="math display">\[
+V = (-1)^S \times (1.M) \times 2^{(E - Bias)}
+\]</span></p>
+<ul>
+<li><strong>Sign</strong>: Determines if the number is positive or negative.</li>
+<li><strong>Exponent</strong>: Scales the number (moves the binary point).</li>
+<li><strong>Mantissa</strong>: The fractional part of the number (precision).</li>
+</ul>
+</section>
+<section id="visualization-2" class="level5">
+<h5 class="anchored" data-anchor-id="visualization-2">Visualization</h5>
+<div class="subheading">
+<p>IEEE 754 Single Precision (32-bit)</p>
+</div>
+<p>The following diagram illustrates how the 32 bits are allocated in the standard IEEE 754 format.</p>
+<div id="cell-fig-float-ieee" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.patches <span class="im">as</span> patches</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">3</span>))</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Draw Main Box</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>rect_total <span class="op">=</span> patches.Rectangle((<span class="dv">0</span>, <span class="dv">0</span>), <span class="dv">32</span>, <span class="dv">1</span>, facecolor<span class="op">=</span><span class="st">'none'</span>, edgecolor<span class="op">=</span><span class="st">'black'</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>ax.add_patch(rect_total)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Sign Bit (1 bit)</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>rect_sign <span class="op">=</span> patches.Rectangle((<span class="dv">31</span>, <span class="dv">0</span>), <span class="dv">1</span>, <span class="dv">1</span>, facecolor<span class="op">=</span><span class="st">'tab:red'</span>, alpha<span class="op">=</span><span class="fl">0.5</span>, edgecolor<span class="op">=</span><span class="st">'black'</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>ax.add_patch(rect_sign)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>ax.text(<span class="fl">31.5</span>, <span class="fl">0.5</span>, <span class="st">"S"</span>, ha<span class="op">=</span><span class="st">'center'</span>, va<span class="op">=</span><span class="st">'center'</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>ax.text(<span class="fl">31.5</span>, <span class="fl">1.2</span>, <span class="st">"Sign</span><span class="ch">\n</span><span class="st">(1 bit)"</span>, ha<span class="op">=</span><span class="st">'center'</span>, va<span class="op">=</span><span class="st">'bottom'</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Exponent (8 bits)</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>rect_exp <span class="op">=</span> patches.Rectangle((<span class="dv">23</span>, <span class="dv">0</span>), <span class="dv">8</span>, <span class="dv">1</span>, facecolor<span class="op">=</span><span class="st">'tab:green'</span>, alpha<span class="op">=</span><span class="fl">0.5</span>, edgecolor<span class="op">=</span><span class="st">'black'</span>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>ax.add_patch(rect_exp)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>ax.text(<span class="dv">27</span>, <span class="fl">0.5</span>, <span class="st">"Exponent"</span>, ha<span class="op">=</span><span class="st">'center'</span>, va<span class="op">=</span><span class="st">'center'</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>ax.text(<span class="dv">27</span>, <span class="fl">1.2</span>, <span class="st">"Exponent</span><span class="ch">\n</span><span class="st">(8 bits)"</span>, ha<span class="op">=</span><span class="st">'center'</span>, va<span class="op">=</span><span class="st">'bottom'</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Mantissa (23 bits)</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>rect_mant <span class="op">=</span> patches.Rectangle((<span class="dv">0</span>, <span class="dv">0</span>), <span class="dv">23</span>, <span class="dv">1</span>, facecolor<span class="op">=</span><span class="st">'tab:blue'</span>, alpha<span class="op">=</span><span class="fl">0.5</span>, edgecolor<span class="op">=</span><span class="st">'black'</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>ax.add_patch(rect_mant)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>ax.text(<span class="fl">11.5</span>, <span class="fl">0.5</span>, <span class="st">"Mantissa / Fraction"</span>, ha<span class="op">=</span><span class="st">'center'</span>, va<span class="op">=</span><span class="st">'center'</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>ax.text(<span class="fl">11.5</span>, <span class="fl">1.2</span>, <span class="st">"Mantissa</span><span class="ch">\n</span><span class="st">(23 bits)"</span>, ha<span class="op">=</span><span class="st">'center'</span>, va<span class="op">=</span><span class="st">'bottom'</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Axis formatting</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="op">-</span><span class="dv">1</span>, <span class="dv">33</span>)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="op">-</span><span class="fl">0.5</span>, <span class="dv">2</span>)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>ax.axis(<span class="st">'off'</span>)</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"IEEE 754 Single Precision Structure"</span>, y<span class="op">=</span><span class="fl">0.9</span>)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-float-ieee" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-float-ieee-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="glossary_files/figure-html/fig-float-ieee-output-1.png" width="763" height="241" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-float-ieee-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Structure of a 32-bit Floating Point Number (IEEE 754). The binary point is implicitly just to the right of the leading ‘1’ (which is not stored), and moved by the exponent.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="key-properties-2" class="level5">
+<h5 class="anchored" data-anchor-id="key-properties-2">Key Properties</h5>
+<ul>
+<li><strong>Dynamic Range</strong>: Can represent extremely large (<span class="math inline">\(~10^{38}\)</span>) and extremely small (<span class="math inline">\(~10^{-38}\)</span>) numbers, which is impossible for a 32-bit fixed-point number.</li>
+<li><strong>Variable Precision</strong>: The absolute precision depends on the magnitude.
+<ul>
+<li>Small numbers have very fine precision (bits are close together).</li>
+<li>Large numbers have coarse precision (gaps between representable numbers are large).</li>
+</ul></li>
+<li><strong>Complexity</strong>: Arithmetic operations are significantly more complex than integer/fixed-point math. They typically require a dedicated Floating Point Unit (FPU) or slow software emulation.</li>
+<li><strong>Not Associative</strong>: Due to rounding errors, <span class="math inline">\((a + b) + c\)</span> does not always equal <span class="math inline">\(a + (b + c)\)</span>.</li>
+</ul>
+</section>
+</section>
+<section id="mac" class="level3">
+<h3 class="anchored" data-anchor-id="mac">MAC</h3>
+<div class="subheading">
+<p>Multiply and Accumulate</p>
+</div>
+<p>A fundamental hardware operation in Digital Signal Processors that computes the product of two numbers and adds that product to an accumulator in a single clock cycle.</p>
+<section id="the-governing-equation" class="level5">
+<h5 class="anchored" data-anchor-id="the-governing-equation">The Governing Equation</h5>
+<p>The operation updates an accumulator (<span class="math inline">\(A\)</span>) using two input operands (<span class="math inline">\(B\)</span> and <span class="math inline">\(C\)</span>):</p>
+<p><span class="math display">\[
+A \leftarrow A + (B \times C)
+\]</span></p>
+<p>This is the most common operation in DSP algorithms, especially those involving linear combinations.</p>
+</section>
+<section id="visualization-3" class="level5">
+<h5 class="anchored" data-anchor-id="visualization-3">Visualization</h5>
+<div class="subheading">
+<p>Hardware Architecture</p>
+</div>
+<p>The following diagram illustrates the data flow within a dedicated MAC unit. Note the feedback loop from the Accumulator back to the Adder, which allows for efficient summation over many iterations.</p>
+<div id="cell-fig-mac-unit" class="cell" data-execution_count="3">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.patches <span class="im">as</span> patches</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">3</span>))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiplier Box</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>mult <span class="op">=</span> patches.Rectangle(</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">1</span>, <span class="dv">2</span>), <span class="fl">1.5</span>, <span class="dv">1</span>, facecolor<span class="op">=</span><span class="st">"tab:blue"</span>, alpha<span class="op">=</span><span class="fl">0.3</span>, edgecolor<span class="op">=</span><span class="st">"black"</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>ax.add_patch(mult)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>ax.text(<span class="fl">1.75</span>, <span class="fl">2.5</span>, <span class="st">"Multiplier</span><span class="ch">\n</span><span class="st">($B </span><span class="ch">\\</span><span class="st">times C$)"</span>, ha<span class="op">=</span><span class="st">"center"</span>, va<span class="op">=</span><span class="st">"center"</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Adder Box</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>adder <span class="op">=</span> patches.Rectangle(</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">4</span>, <span class="dv">2</span>), <span class="fl">1.5</span>, <span class="dv">1</span>, facecolor<span class="op">=</span><span class="st">"tab:red"</span>, alpha<span class="op">=</span><span class="fl">0.3</span>, edgecolor<span class="op">=</span><span class="st">"black"</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>ax.add_patch(adder)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>ax.text(<span class="fl">4.75</span>, <span class="fl">2.5</span>, <span class="st">"Adder</span><span class="ch">\n</span><span class="st">(+)"</span>, ha<span class="op">=</span><span class="st">"center"</span>, va<span class="op">=</span><span class="st">"center"</span>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Accumulator Box (Register)</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>acc <span class="op">=</span> patches.Rectangle(</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">7</span>, <span class="dv">2</span>), <span class="fl">1.6</span>, <span class="dv">1</span>, facecolor<span class="op">=</span><span class="st">"tab:green"</span>, alpha<span class="op">=</span><span class="fl">0.3</span>, edgecolor<span class="op">=</span><span class="st">"black"</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>ax.add_patch(acc)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>ax.text(<span class="fl">7.75</span>, <span class="fl">2.5</span>, <span class="st">"Accumulator</span><span class="ch">\n</span><span class="st">Register (A)"</span>, ha<span class="op">=</span><span class="st">"center"</span>, va<span class="op">=</span><span class="st">"center"</span>)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Arrows</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Inputs to Multiplier</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>ax.annotate(<span class="st">"B"</span>, xy<span class="op">=</span>(<span class="dv">1</span>, <span class="fl">2.7</span>), xytext<span class="op">=</span>(<span class="dv">0</span>, <span class="fl">2.7</span>), arrowprops<span class="op">=</span><span class="bu">dict</span>(arrowstyle<span class="op">=</span><span class="st">"-&gt;"</span>))</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>ax.annotate(<span class="st">"C"</span>, xy<span class="op">=</span>(<span class="dv">1</span>, <span class="fl">2.3</span>), xytext<span class="op">=</span>(<span class="dv">0</span>, <span class="fl">2.3</span>), arrowprops<span class="op">=</span><span class="bu">dict</span>(arrowstyle<span class="op">=</span><span class="st">"-&gt;"</span>))</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiplier to Adder</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>ax.annotate(<span class="st">""</span>, xy<span class="op">=</span>(<span class="dv">4</span>, <span class="fl">2.5</span>), xytext<span class="op">=</span>(<span class="fl">2.5</span>, <span class="fl">2.5</span>), arrowprops<span class="op">=</span><span class="bu">dict</span>(arrowstyle<span class="op">=</span><span class="st">"-&gt;"</span>))</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Adder to Accumulator</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>ax.annotate(<span class="st">""</span>, xy<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">2.5</span>), xytext<span class="op">=</span>(<span class="fl">5.5</span>, <span class="fl">2.5</span>), arrowprops<span class="op">=</span><span class="bu">dict</span>(arrowstyle<span class="op">=</span><span class="st">"-&gt;"</span>))</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Feedback loop (Accumulator to Adder)</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>ax.annotate(</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="st">""</span>,</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    xy<span class="op">=</span>(<span class="fl">4.75</span>, <span class="dv">3</span>),</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    xytext<span class="op">=</span>(<span class="fl">7.75</span>, <span class="dv">3</span>),</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    arrowprops<span class="op">=</span><span class="bu">dict</span>(arrowstyle<span class="op">=</span><span class="st">"-&gt;"</span>, connectionstyle<span class="op">=</span><span class="st">"bar,fraction=0.2"</span>, color<span class="op">=</span><span class="st">"gray"</span>),</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>ax.text(<span class="fl">6.25</span>, <span class="fl">3.725</span>, <span class="st">"Feedback (Previous Sum)"</span>, ha<span class="op">=</span><span class="st">"center"</span>, color<span class="op">=</span><span class="st">"gray"</span>)</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="co"># Output</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>ax.annotate(</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Result"</span>, xy<span class="op">=</span>(<span class="fl">8.6</span>, <span class="fl">2.5</span>), xytext<span class="op">=</span>(<span class="fl">9.2</span>, <span class="fl">2.465</span>), arrowprops<span class="op">=</span><span class="bu">dict</span>(arrowstyle<span class="op">=</span><span class="st">"&lt;-"</span>)</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="op">-</span><span class="fl">0.5</span>, <span class="dv">10</span>)</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">1</span>, <span class="dv">5</span>)</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>ax.axis(<span class="st">"off"</span>)</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"MAC Unit Architecture"</span>, fontsize<span class="op">=</span><span class="dv">14</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-mac-unit" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mac-unit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="glossary_files/figure-html/fig-mac-unit-output-1.png" width="689" height="263" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mac-unit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Functional block diagram of a MAC unit. The multiplier computes the product, which is then added to the previous value stored in the accumulator.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="key-properties-3" class="level5">
+<h5 class="anchored" data-anchor-id="key-properties-3">Key Properties</h5>
+<ul>
+<li><strong>Efficiency</strong>: In a general-purpose CPU, a MAC operation might take several cycles (Fetch, Mult, Add, Store). A DSP (like the dsPIC33) can perform a 16x16-bit MAC in a <strong>single cycle</strong>.</li>
+<li><strong>Algorithm Foundation</strong>: MAC is the “workhorse” of DSP. It is the core operation for:
+<ul>
+<li><strong>Digital Filters (FIR/IIR)</strong>: Computing the weighted sum of samples.</li>
+<li><strong>Correlation/Convolution</strong>: Sliding dot products.</li>
+<li><strong>FFT</strong>: Butterfly computations.</li>
+</ul></li>
+<li><strong>Precision (Guard Bits)</strong>: To prevent overflow during repeated additions, MAC accumulators are usually wider than the input data. For example, a 16-bit DSP might have 40-bit accumulators (16*16=32 bits, plus 8 “guard bits” to allow 256 additions without overflow).</li>
+</ul>
+</section>
+</section>
+<section id="multiplexer" class="level3">
+<h3 class="anchored" data-anchor-id="multiplexer">Multiplexer</h3>
+<div class="subheading">
+<p>MUX</p>
+</div>
+<p>A device that selects between several input signals and forwards the selected input to a single output line. In electronic systems, a multiplexer (or MUX) acts as a digitally controlled multi-position switch.</p>
+<section id="the-selection-logic" class="level5">
+<h5 class="anchored" data-anchor-id="the-selection-logic">The Selection Logic</h5>
+<p>A multiplexer with <span class="math inline">\(2^n\)</span> inputs requires <span class="math inline">\(n\)</span> selection lines to determine which input is routed to the output. For a basic 2-to-1 MUX with inputs <span class="math inline">\(I_0, I_1\)</span> and select line <span class="math inline">\(S\)</span>:</p>
+<p><span class="math display">\[
+Y = \bar{S}I_0 + SI_1
+\]</span></p>
+<p>Where:</p>
+<ul>
+<li><span class="math inline">\(Y\)</span> is the output.</li>
+<li><span class="math inline">\(S=0\)</span> selects input <span class="math inline">\(I_0\)</span>.</li>
+<li><span class="math inline">\(S=1\)</span> selects input <span class="math inline">\(I_1\)</span>.</li>
+</ul>
+</section>
+<section id="visualization-4" class="level5">
+<h5 class="anchored" data-anchor-id="visualization-4">Visualization</h5>
+<div class="subheading">
+<p>Time-Division Multiplexing (TDM)</p>
+</div>
+<p>In DSP and communications, multiplexing often refers to sharing a single channel by rapidly switching between signals. This is called Time-Division Multiplexing.</p>
+<div id="cell-fig-mux-tdm" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Parameters</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>fs <span class="op">=</span> <span class="dv">2000</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="fl">0.1</span>, fs)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Two different signals to multiplex</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>sig_a <span class="op">=</span> np.sin(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> <span class="dv">50</span> <span class="op">*</span> t)          <span class="co"># 50 Hz Sine</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>sig_b <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> np.sign(np.sin(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> <span class="dv">30</span> <span class="op">*</span> t)) <span class="co"># 30 Hz Square</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Selector signal (Switching at 200 Hz)</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># When &gt; 0, select sig_b; when &lt;= 0, select sig_a</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>f_select <span class="op">=</span> <span class="dv">200</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>selector <span class="op">=</span> (np.sin(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> f_select <span class="op">*</span> t) <span class="op">&gt;</span> <span class="dv">0</span>).astype(<span class="bu">float</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiplexed Output</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>mux_out <span class="op">=</span> np.where(selector <span class="op">==</span> <span class="dv">0</span>, sig_a, sig_b)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotting</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">3</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">10</span>), sharex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].plot(t, sig_a, color<span class="op">=</span><span class="st">'tab:blue'</span>, label<span class="op">=</span><span class="st">'Signal A (Sine)'</span>)</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">'Input Signal A'</span>)</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].legend(loc<span class="op">=</span><span class="st">'upper right'</span>)</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].plot(t, sig_b, color<span class="op">=</span><span class="st">'tab:green'</span>, label<span class="op">=</span><span class="st">'Signal B (Square)'</span>)</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">'Input Signal B'</span>)</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend(loc<span class="op">=</span><span class="st">'upper right'</span>)</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].step(t, mux_out, color<span class="op">=</span><span class="st">'tab:red'</span>, where<span class="op">=</span><span class="st">'post'</span>, label<span class="op">=</span><span class="st">'MUX Output'</span>)</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].set_title(<span class="st">'Multiplexed Output (TDM)'</span>)</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].set_xlabel(<span class="st">'Time (s)'</span>)</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].legend(loc<span class="op">=</span><span class="st">'upper right'</span>)</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Add background shading for selector state</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="bu">len</span>(t)<span class="op">-</span><span class="dv">1</span>, <span class="dv">10</span>): <span class="co"># Sparse shading for performance</span></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> selector[i] <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>        axes[<span class="dv">2</span>].axvspan(t[i], t[<span class="bu">min</span>(i<span class="op">+</span><span class="dv">10</span>, <span class="bu">len</span>(t)<span class="op">-</span><span class="dv">1</span>)], color<span class="op">=</span><span class="st">'tab:green'</span>, alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>        axes[<span class="dv">2</span>].axvspan(t[i], t[<span class="bu">min</span>(i<span class="op">+</span><span class="dv">10</span>, <span class="bu">len</span>(t)<span class="op">-</span><span class="dv">1</span>)], color<span class="op">=</span><span class="st">'tab:blue'</span>, alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-mux-tdm" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mux-tdm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="glossary_files/figure-html/fig-mux-tdm-output-1.png" width="767" height="948" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mux-tdm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Time-Division Multiplexing of two signals. The ‘MUX Output’ switches between Signal A and Signal B based on a high-frequency clock signal.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="key-properties-4" class="level5">
+<h5 class="anchored" data-anchor-id="key-properties-4">Key Properties</h5>
+<ul>
+<li><strong>Many-to-One</strong>: The fundamental role of a MUX is to concentrate multiple data streams into a single physical medium.</li>
+<li><strong>Transparency</strong>: In an ideal multiplexer, the selected signal is passed to the output without distortion or modification.</li>
+<li><strong>Complementary Operation</strong>: The inverse process is performed by a <strong>Demultiplexer (DEMUX)</strong>, which takes a single input and routes it to one of many possible outputs.</li>
+</ul>
+</section>
+</section>
+<section id="parallel-interface" class="level3">
+<h3 class="anchored" data-anchor-id="parallel-interface">Parallel Interface</h3>
+<p>A <strong>parallel interface</strong> is a data communication method where multiple bits of data are transmitted simultaneously over separate wires or channels. In contrast to serial communication where bits are sent one at a time over a single channel, parallel interfaces use multiple data lines to transfer an entire data word (typically 8, 16, or 32 bits) in a single clock cycle.</p>
+<section id="key-characteristics" class="level5">
+<h5 class="anchored" data-anchor-id="key-characteristics">Key Characteristics</h5>
+<ul>
+<li><strong>Multiple Data Lines</strong>: Uses separate physical conductors for each bit (e.g., an 8-bit parallel interface requires 8 data lines plus control signals)</li>
+<li><strong>Higher Speed Potential</strong>: Can achieve higher data transfer rates for short distances since multiple bits are transmitted simultaneously</li>
+<li><strong>Distance Limitations</strong>: Susceptible to signal skew and crosstalk at longer distances, limiting practical cable lengths</li>
+<li><strong>Cost</strong>: Requires more physical connections, making cables and connectors more expensive and bulky</li>
+</ul>
+</section>
+<section id="common-examples" class="level5">
+<h5 class="anchored" data-anchor-id="common-examples">Common Examples</h5>
+<ul>
+<li><strong>Parallel Printer Port</strong> (IEEE 1284): Traditional PC printer connection using 8 data lines</li>
+<li><strong>PCI Bus</strong>: Computer expansion bus using parallel data transfer</li>
+<li><strong>Memory Interfaces</strong>: RAM connections typically use wide parallel buses (64+ bits)</li>
+<li><strong>Parallel I/O Ports</strong>: GPIO ports on microcontrollers that can read/write multiple pins simultaneously</li>
+</ul>
+</section>
+<section id="trade-offs" class="level5">
+<h5 class="anchored" data-anchor-id="trade-offs">Trade-offs</h5>
+<p>While parallel interfaces offer theoretical speed advantages through simultaneous bit transmission, modern high-speed serial interfaces (USB, PCIe, SATA) have largely replaced parallel interfaces in many applications. This is because serial interfaces can achieve higher aggregate data rates through faster clock speeds without the signal integrity issues that plague parallel transmission at high frequencies.</p>
+</section>
+</section>
+<section id="register" class="level3">
+<h3 class="anchored" data-anchor-id="register">Register</h3>
+<p>The term <strong>register</strong> in embedded systems refers to two distinct but related concepts:</p>
+<section id="cpu-registers" class="level4">
+<h4 class="anchored" data-anchor-id="cpu-registers">CPU Registers</h4>
+<div class="subheading">
+<p>Working Registers</p>
+</div>
+<p>Fast storage locations <em>inside the CPU core</em> used for computation and data manipulation. These are the processor’s “scratch pad” for arithmetic operations, loop counters, function arguments, and intermediate values.</p>
+<section id="characteristics" class="level5">
+<h5 class="anchored" data-anchor-id="characteristics">Characteristics</h5>
+<ul>
+<li><strong>Location</strong>: Internal to the CPU</li>
+<li><strong>Speed</strong>: Extremely fast (1-cycle access)</li>
+<li><strong>Quantity</strong>: Limited (dsPIC33F has 16 working registers: W0-W15)</li>
+<li><strong>Purpose</strong>: Pure data storage for computation</li>
+<li><strong>Side effects</strong>: None: writing/reading only affects the stored value</li>
+</ul>
+</section>
+<section id="example" class="level5">
+<h5 class="anchored" data-anchor-id="example">Example</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> x <span class="op">=</span> a <span class="op">+</span> b<span class="op">;</span>  <span class="co">// Compiler uses CPU registers (e.g., W0, W1)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                <span class="co">// to hold a, b, and result</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="hardware-registers" class="level4">
+<h4 class="anchored" data-anchor-id="hardware-registers">Hardware Registers</h4>
+<div class="subheading">
+<p>Special Function Registers / SFRs</p>
+</div>
+<p>Memory-mapped control locations that configure and interact with hardware peripherals. Despite the name “register,” these are actually <em>memory addresses</em> in a special region of the address space (typically 0x0000-0x0FFF). Writing to these locations has <em>side effects</em>: the hardware logic “listens” to these addresses and changes physical behavior accordingly.</p>
+<section id="characteristics-1" class="level5">
+<h5 class="anchored" data-anchor-id="characteristics-1">Characteristics</h5>
+<ul>
+<li><strong>Location</strong>: Memory-mapped addresses in peripheral space</li>
+<li><strong>Speed</strong>: Normal memory access speed</li>
+<li><strong>Quantity</strong>: Hundreds (one or more per hardware feature)</li>
+<li><strong>Purpose</strong>: Control GPIO pins, timers, ADC, UART, etc.</li>
+<li><strong>Side effects</strong>: Writing changes physical hardware state!</li>
+</ul>
+</section>
+<section id="examples" class="level5">
+<h5 class="anchored" data-anchor-id="examples">Examples</h5>
+<ul>
+<li><code>TRISC</code>: Controls pin direction (input/output) on Port C</li>
+<li><code>LATB</code>: Controls output state (high/low) on Port B</li>
+<li><code>ADC1BUF0</code>: Holds the most recent ADC conversion result</li>
+<li><code>T1CON</code>: Configures Timer 1 operation</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>TRISCbits<span class="op">.</span>TRISC1 <span class="op">=</span> <span class="dv">0</span><span class="op">;</span>  <span class="co">// Writing to memory address 0x0042</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                       <span class="co">// → Hardware sees write</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                       <span class="co">// → Configures pin C1 as output</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                       <span class="co">// → Physical pin direction changes!</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="memory-mapped-io" class="level5">
+<h5 class="anchored" data-anchor-id="memory-mapped-io">Memory-Mapped I/O</h5>
+<p>Hardware registers use <strong>memory-mapped I/O</strong>, where peripheral controls are accessed like normal memory locations but have special behavior. The dsPIC memory map typically looks like:</p>
+<ul>
+<li><code>0x0000 - 0x0FFF</code>: Special Function Registers (SFRs) - hardware control</li>
+<li><code>0x1000 - 0x7FFF</code>: RAM - regular data storage</li>
+<li><code>0x8000 - 0xFFFF</code>: Flash - program code</li>
+</ul>
+</section>
+<section id="key-distinction" class="level5">
+<h5 class="anchored" data-anchor-id="key-distinction">Key Distinction</h5>
+<p>When you hear “register” in embedded contexts, pay attention to context:</p>
+<ul>
+<li>“Store the result in register W0” → CPU register (computation)</li>
+<li>“Configure the TRISC register” → Hardware register (peripheral control)</li>
+</ul>
+<p>Both are called “registers,” but they serve completely different purposes and live in different parts of the system.</p>
+</section>
+</section>
+</section>
+<section id="saturate" class="level3">
+<h3 class="anchored" data-anchor-id="saturate">Saturate</h3>
+<p>In the context of <em>CPUs</em> and <em>DSP processors</em>, <strong>saturation</strong> (or saturate arithmetic) is a method of handling arithmetic overflow where results that exceed the representable range are “clamped” to the maximum or minimum value instead of wrapping around.</p>
+<section id="the-problem-overflow-wrapping" class="level5">
+<h5 class="anchored" data-anchor-id="the-problem-overflow-wrapping">The Problem: Overflow Wrapping</h5>
+<p>In standard two’s complement arithmetic, when a computation exceeds the maximum representable value, the result wraps around to the opposite end of the range. For example, with 8-bit signed integers:</p>
+<p><span class="math display">\[
+\underbrace{01111111}_{127} + \underbrace{00000001}_{1} = \underbrace{10000000}_{-128}
+\]</span></p>
+<p>This is catastrophic in audio and control systems—a loud signal suddenly becomes maximally negative, causing audible clicks or system instability.</p>
+</section>
+<section id="saturation-arithmetic" class="level5">
+<h5 class="anchored" data-anchor-id="saturation-arithmetic">Saturation Arithmetic</h5>
+<div class="callout callout-style-default callout-note callout-titled" title="Who's the Boss of Saturation?">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Who’s the Boss of Saturation?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>DSP saturation is primarily done by the hardware processor itself, but it is enabled and configured by the programmer. DSP chips contain hardware units (such as accumulation registers) designed to catch arithmetic overflows and cap them at the maximum or minimum value rather than wrapping around.</p>
+<ul>
+<li><strong>Processor Hardware:</strong> When the processor is in “saturation mode,” it automatically restricts results to valid ranges (e.g., <span class="math inline">\(0x7FFFFFFF\)</span> in a 32-bit system).</li>
+<li><strong>Programmer/Software:</strong> The programmer must explicitly configure this behavior, usually by setting a control register, enabling a flag, or using specific instructions (e.g., in assembly or intrinsics) to turn on saturation arithmetic.</li>
+<li><strong>Alternatives:</strong> If the processor does not support hardware saturation or the programmer does not enable it, the programmer must implement saturation using software logic (e.g., manual clamping with if/else), which is slower.</li>
+</ul>
+</div>
+</div>
+<p>With saturation enabled, overflow is handled by clamping to the boundary:</p>
+<p><span class="math display">\[
+\text{saturate}(x) = \begin{cases}
+\text{MAX} &amp; \text{if } x &gt; \text{MAX} \\
+\text{MIN} &amp; \text{if } x &lt; \text{MIN} \\
+x &amp; \text{otherwise}
+\end{cases}
+\]</span></p>
+<ul>
+<li><strong>For 8-bit signed:</strong> <span class="math inline">\(127 + 1 = 127\)</span> (saturates at maximum).</li>
+<li><strong>For 8-bit signed:</strong> <span class="math inline">\(-128 - 1 = -128\)</span> (saturates at minimum).</li>
+</ul>
+</section>
+<section id="dsp-hardware-support" class="level5">
+<h5 class="anchored" data-anchor-id="dsp-hardware-support">DSP Hardware Support</h5>
+<p>Many DSP processors (including the <em>dsPIC</em>) provide saturate instructions and modes:</p>
+<ul>
+<li><strong>SFTAC instruction</strong>: Shift with automatic saturation</li>
+<li><strong>CORCON register</strong>: Control bits to enable global saturation for accumulator operations</li>
+<li><strong>Accumulator saturation</strong>: 40-bit accumulators can be configured to saturate when stored to 16-bit registers</li>
+</ul>
+<p>This prevents distortion in digital audio, maintains stability in control loops, and ensures graceful degradation under clipping conditions.</p>
+</section>
+<section id="example-1" class="level5">
+<h5 class="anchored" data-anchor-id="example-1">Example</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">// On dsPIC with saturation enabled</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="dt">int16_t</span> a <span class="op">=</span> <span class="dv">30000</span><span class="op">;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="dt">int16_t</span> b <span class="op">=</span> <span class="dv">10000</span><span class="op">;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="dt">int16_t</span> result <span class="op">=</span> a <span class="op">+</span> b<span class="op">;</span>  <span class="co">// Result saturates to 32767 instead of wrapping to -25536</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Saturation is essential for <a href="#fixed-point-numbers">fixed-point</a> DSP where dynamic range management is critical.</p>
+</section>
+</section>
+<section id="serial-interface" class="level3">
+<h3 class="anchored" data-anchor-id="serial-interface">Serial Interface</h3>
+<p>A <strong>serial interface</strong> is a data communication method where information is transmitted sequentially, one bit at a time, over a single channel or wire. This stands in contrast to parallel interfaces which transmit multiple bits simultaneously over multiple channels.</p>
+<section id="key-characteristics-1" class="level5">
+<h5 class="anchored" data-anchor-id="key-characteristics-1">Key Characteristics</h5>
+<ul>
+<li><strong>Sequential Transmission</strong>: Bits are sent one after another in a time-multiplexed manner</li>
+<li><strong>Fewer Physical Connections</strong>: Requires minimal wiring (often just two wires: transmit and receive, plus ground)</li>
+<li><strong>Clock Recovery</strong>: May use embedded clocking or separate clock lines depending on synchronous vs.&nbsp;asynchronous operation</li>
+<li><strong>Scalability</strong>: Better suited for long-distance communication due to reduced signal integrity issues</li>
+<li><strong>Lower Pin Count</strong>: Particularly advantageous for integrated circuits where pin count directly affects cost</li>
+</ul>
+</section>
+<section id="types-of-serial-interfaces" class="level5">
+<h5 class="anchored" data-anchor-id="types-of-serial-interfaces">Types of Serial Interfaces</h5>
+<div class="subheading">
+<p>Synchronous Serial</p>
+</div>
+<p>In synchronous serial communication, a separate clock signal coordinates the timing of data transmission between sender and receiver. Both devices share the same clock reference.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./images/lec-03_18.png" class="img-fluid figure-img" style="width:9in"></p>
+<figcaption>Lecture 3, slide 18</figcaption>
+</figure>
+</div>
+<p><strong>Examples:</strong></p>
+<ul>
+<li><strong>SPI (Serial Peripheral Interface)</strong>: Master-slave protocol with separate clock line (SCK), commonly used for sensors and memory devices</li>
+<li><strong>I²C (Inter-Integrated Circuit)</strong>: Two-wire interface (SDA for data, SCL for clock) supporting multiple devices on a single bus</li>
+<li><strong>I²S (Inter-IC Sound)</strong>: Protocol for transmitting digital audio data between devices</li>
+</ul>
+<div class="subheading">
+<p>Asynchronous Serial</p>
+</div>
+<p>In asynchronous serial communication, no separate clock signal is transmitted. Instead, timing is established through agreed-upon baud rates and special start/stop bits frame each data word.</p>
+<p><strong>Examples:</strong></p>
+<ul>
+<li><strong>UART (Universal Asynchronous Receiver-Transmitter)</strong>: Standard for asynchronous serial communication, often using RS-232 voltage levels</li>
+<li><strong>RS-232/RS-485</strong>: Physical layer standards for serial communication</li>
+<li><strong>USB (Universal Serial Bus)</strong>: High-speed serial interface with differential signaling</li>
+<li><strong>SATA (Serial ATA)</strong>: High-speed storage interface</li>
+</ul>
+</section>
+<section id="advantages-over-parallel" class="level5">
+<h5 class="anchored" data-anchor-id="advantages-over-parallel">Advantages Over Parallel</h5>
+<p>Modern high-speed serial interfaces often outperform parallel interfaces because:</p>
+<ol type="1">
+<li><strong>Higher Clock Rates</strong>: Serial links can operate at much higher frequencies without signal skew issues</li>
+<li><strong>Differential Signaling</strong>: Many serial protocols use differential pairs for superior noise immunity</li>
+<li><strong>Simpler Routing</strong>: Fewer traces on PCBs reduce complexity and cost</li>
+<li><strong>Reduced EMI</strong>: Fewer simultaneous transitions reduce electromagnetic interference</li>
+</ol>
+</section>
+</section>
+<section id="uart" class="level3">
+<h3 class="anchored" data-anchor-id="uart">UART</h3>
+<div class="subheading">
+<p>Universal Asynchronous Receiver/Transmitter</p>
+</div>
+<p>A hardware communication protocol used for serial communication between devices. Unlike synchronous protocols (such as SPI or I2C), <strong>UART</strong> does not use a shared clock signal. Instead, the transmitter and receiver must agree on a timing parameter called the <strong>Baud Rate</strong> beforehand.</p>
+<section id="the-uart-frame" class="level5">
+<h5 class="anchored" data-anchor-id="the-uart-frame">The UART Frame</h5>
+<p>Communication is performed in discrete “packets” or “frames.” A standard frame consists of:</p>
+<ol type="1">
+<li><strong>Start Bit</strong>: A logic ‘0’ (low) signal that alerts the receiver to an incoming byte.</li>
+<li><strong>Data Bits</strong>: Typically 8 bits of information, usually transmitted Least Significant Bit (LSB) first.</li>
+<li><strong>Parity Bit</strong>: An optional bit used for simple error detection.</li>
+<li><strong>Stop Bit(s)</strong>: One or more logic ‘1’ (high) signals to signify the end of the frame and return the line to its idle high state.</li>
+</ol>
+</section>
+<section id="visualization-5" class="level5">
+<h5 class="anchored" data-anchor-id="visualization-5">Visualization</h5>
+<div class="subheading">
+<p>UART Serial Frame (8N1)</p>
+</div>
+<p>The following plot illustrates a single UART frame transmitting the character ‘A’ (ASCII 0x41, Binary <code>01000001</code>). Note the LSB-first transmission order.</p>
+<div id="cell-fig-uart-frame" class="cell" data-execution_count="5">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Data for ASCII 'A' (0x41) -&gt; 01000001</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Transmitted LSB first: 1, 0, 0, 0, 0, 0, 1, 0</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>]</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>frame <span class="op">=</span> [<span class="dv">0</span>] <span class="op">+</span> data <span class="op">+</span> [<span class="dv">1</span>]  <span class="co"># Start(0), Data, Stop(1)</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>bit_labels <span class="op">=</span> [<span class="st">'Start'</span>, <span class="st">'D0</span><span class="ch">\n</span><span class="st">(LSB)'</span>, <span class="st">'D1'</span>, <span class="st">'D2'</span>, <span class="st">'D3'</span>, <span class="st">'D4'</span>, <span class="st">'D5'</span>, <span class="st">'D6'</span>, <span class="st">'D7</span><span class="ch">\n</span><span class="st">(MSB)'</span>, <span class="st">'Stop'</span>]</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare signal for plotting (Idle High -&gt; Frame -&gt; Idle High)</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>bits <span class="op">=</span> [<span class="dv">1</span>] <span class="op">+</span> frame <span class="op">+</span> [<span class="dv">1</span>]</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> np.arange(<span class="bu">len</span>(bits))</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>))</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>plt.step(t, bits, where<span class="op">=</span><span class="st">'post'</span>, color<span class="op">=</span><span class="st">'tab:blue'</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Annotate Bits</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="bu">len</span>(bits)<span class="op">-</span><span class="dv">1</span>):</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    plt.text(i <span class="op">+</span> <span class="fl">0.5</span>, <span class="fl">0.5</span>, bit_labels[i<span class="op">-</span><span class="dv">1</span>], ha<span class="op">=</span><span class="st">'center'</span>, va<span class="op">=</span><span class="st">'center'</span>, fontsize<span class="op">=</span><span class="dv">9</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>)</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    plt.axvline(i, color<span class="op">=</span><span class="st">'gray'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>plt.axvline(<span class="bu">len</span>(bits)<span class="op">-</span><span class="dv">1</span>, color<span class="op">=</span><span class="st">'gray'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Labeling</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"UART Timing Diagram: Transmitting 'A' (0x41)"</span>)</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Bit Period"</span>)</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Logic Level"</span>)</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>plt.ylim(<span class="op">-</span><span class="fl">0.2</span>, <span class="fl">1.2</span>)</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>plt.yticks([<span class="dv">0</span>, <span class="dv">1</span>], [<span class="st">'0 (Low)'</span>, <span class="st">'1 (High)'</span>])</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">False</span>)</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-uart-frame" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-uart-frame-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="glossary_files/figure-html/fig-uart-frame-output-1.png" width="949" height="372" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-uart-frame-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Timing diagram of a standard UART frame (8 bits, No parity, 1 stop bit). The signal is ‘Idle High’. The transition to ‘0’ signals the Start Bit.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="key-properties-5" class="level5">
+<h5 class="anchored" data-anchor-id="key-properties-5">Key Properties</h5>
+<ul>
+<li><strong>Asynchronous</strong>: No clock line is required, saving pins and simplifying wiring. However, both devices must have independent, stable oscillators.</li>
+<li><strong>Baud Rate</strong>: The speed of transmission (bits per second). Common rates include 9600, 115200, and 921600. Timing mismatch between RX and TX (usually &gt; 3%) will cause data corruption.</li>
+<li><strong>Full-Duplex</strong>: Most UART hardware (like that found on the dsPIC33) supports simultaneous transmission and reception using two dedicated wires (TX and RX).</li>
+<li><strong>8N1 Convention</strong>: The most common configuration, standing for <strong>8</strong> data bits, <strong>N</strong>o parity bit, and <strong>1</strong> stop bit.</li>
+</ul>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

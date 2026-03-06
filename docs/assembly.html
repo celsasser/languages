@@ -1,0 +1,1975 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2026-03-06">
+
+<title>The Assembly Language – Computer Language Notebook</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="././favicon.png" rel="icon" type="image/png">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-238593fbc75c52b1713b5944fbe78712.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": true,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Computer Language Notebook</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Languages</a></li><li class="breadcrumb-item"><a href="./assembly.html">Assembly Language</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+      <a href="./index.html" class="sidebar-logo-link">
+      <img src="././images/logo.png" alt="" class="sidebar-logo light-content py-0 d-lg-inline d-none">
+      <img src="././images/logo.png" alt="" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
+      </a>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Languages</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./assembly.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Assembly Language</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./c.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The C Language</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./rust.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Rust Language</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Appendix</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Glossary</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="1">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#why-learn-assembly" id="toc-why-learn-assembly" class="nav-link" data-scroll-target="#why-learn-assembly">Why Learn Assembly?</a></li>
+  <li><a href="#the-dspic33f-architecture" id="toc-the-dspic33f-architecture" class="nav-link" data-scroll-target="#the-dspic33f-architecture">The dsPIC33F Architecture</a>
+  <ul>
+  <li><a href="#register-file" id="toc-register-file" class="nav-link" data-scroll-target="#register-file">Register File</a></li>
+  <li><a href="#dsp-accumulators" id="toc-dsp-accumulators" class="nav-link" data-scroll-target="#dsp-accumulators">DSP Accumulators</a></li>
+  <li><a href="#program-counter" id="toc-program-counter" class="nav-link" data-scroll-target="#program-counter">Program Counter</a></li>
+  <li><a href="#status-register" id="toc-status-register" class="nav-link" data-scroll-target="#status-register">Status Register</a></li>
+  </ul></li>
+  <li><a href="#instruction-format" id="toc-instruction-format" class="nav-link" data-scroll-target="#instruction-format">Instruction Format</a>
+  <ul>
+  <li><a href="#operands" id="toc-operands" class="nav-link" data-scroll-target="#operands">Operands</a></li>
+  </ul></li>
+  <li><a href="#assembly-directives" id="toc-assembly-directives" class="nav-link" data-scroll-target="#assembly-directives">Assembly Directives</a>
+  <ul>
+  <li><a href="#example" id="toc-example" class="nav-link" data-scroll-target="#example">Example</a></li>
+  <li><a href="#example-1" id="toc-example-1" class="nav-link" data-scroll-target="#example-1">Example</a></li>
+  </ul></li>
+  <li><a href="#data-movement-instructions" id="toc-data-movement-instructions" class="nav-link" data-scroll-target="#data-movement-instructions">Data Movement Instructions</a>
+  <ul>
+  <li><a href="#mov" id="toc-mov" class="nav-link" data-scroll-target="#mov">MOV</a></li>
+  <li><a href="#pushpop" id="toc-pushpop" class="nav-link" data-scroll-target="#pushpop">PUSH/POP</a></li>
+  </ul></li>
+  <li><a href="#arithmetic-and-logical-instructions" id="toc-arithmetic-and-logical-instructions" class="nav-link" data-scroll-target="#arithmetic-and-logical-instructions">Arithmetic and Logical Instructions</a>
+  <ul>
+  <li><a href="#basic-arithmetic" id="toc-basic-arithmetic" class="nav-link" data-scroll-target="#basic-arithmetic">Basic Arithmetic</a></li>
+  <li><a href="#bitwise-operations" id="toc-bitwise-operations" class="nav-link" data-scroll-target="#bitwise-operations">Bitwise Operations</a></li>
+  <li><a href="#comparison" id="toc-comparison" class="nav-link" data-scroll-target="#comparison">Comparison</a></li>
+  </ul></li>
+  <li><a href="#control-flow-instructions" id="toc-control-flow-instructions" class="nav-link" data-scroll-target="#control-flow-instructions">Control Flow Instructions</a>
+  <ul>
+  <li><a href="#unconditional-branch" id="toc-unconditional-branch" class="nav-link" data-scroll-target="#unconditional-branch">Unconditional Branch</a></li>
+  <li><a href="#conditional-branches" id="toc-conditional-branches" class="nav-link" data-scroll-target="#conditional-branches">Conditional Branches</a></li>
+  <li><a href="#subroutine-calls" id="toc-subroutine-calls" class="nav-link" data-scroll-target="#subroutine-calls">Subroutine Calls</a></li>
+  <li><a href="#labels" id="toc-labels" class="nav-link" data-scroll-target="#labels">Labels</a></li>
+  </ul></li>
+  <li><a href="#loops-in-assembly" id="toc-loops-in-assembly" class="nav-link" data-scroll-target="#loops-in-assembly">Loops in Assembly</a>
+  <ul>
+  <li><a href="#manual-counter-loop" id="toc-manual-counter-loop" class="nav-link" data-scroll-target="#manual-counter-loop">Manual Counter Loop</a></li>
+  <li><a href="#hardware-loop" id="toc-hardware-loop" class="nav-link" data-scroll-target="#hardware-loop">Hardware Loop</a></li>
+  <li><a href="#repeat" id="toc-repeat" class="nav-link" data-scroll-target="#repeat">REPEAT</a></li>
+  </ul></li>
+  <li><a href="#addressing-modes" id="toc-addressing-modes" class="nav-link" data-scroll-target="#addressing-modes">Addressing Modes</a>
+  <ul>
+  <li><a href="#immediate-addressing" id="toc-immediate-addressing" class="nav-link" data-scroll-target="#immediate-addressing">1. Immediate Addressing</a></li>
+  <li><a href="#register-direct" id="toc-register-direct" class="nav-link" data-scroll-target="#register-direct">2. Register Direct</a></li>
+  <li><a href="#register-indirect" id="toc-register-indirect" class="nav-link" data-scroll-target="#register-indirect">3. Register Indirect</a></li>
+  <li><a href="#register-indirect-with-post-increment" id="toc-register-indirect-with-post-increment" class="nav-link" data-scroll-target="#register-indirect-with-post-increment">4. Register Indirect with Post-Increment</a></li>
+  <li><a href="#register-indirect-with-pre-increment" id="toc-register-indirect-with-pre-increment" class="nav-link" data-scroll-target="#register-indirect-with-pre-increment">5. Register Indirect with Pre-Increment</a></li>
+  <li><a href="#register-indirect-with-displacement" id="toc-register-indirect-with-displacement" class="nav-link" data-scroll-target="#register-indirect-with-displacement">6. Register Indirect with Displacement</a></li>
+  <li><a href="#bit-reversed-addressing" id="toc-bit-reversed-addressing" class="nav-link" data-scroll-target="#bit-reversed-addressing">7. Bit-Reversed Addressing</a></li>
+  <li><a href="#modulo-addressing" id="toc-modulo-addressing" class="nav-link" data-scroll-target="#modulo-addressing">8. Modulo Addressing</a></li>
+  </ul></li>
+  <li><a href="#dsp-specific-instructions" id="toc-dsp-specific-instructions" class="nav-link" data-scroll-target="#dsp-specific-instructions">DSP-Specific Instructions</a>
+  <ul>
+  <li><a href="#mac" id="toc-mac" class="nav-link" data-scroll-target="#mac">MAC</a></li>
+  <li><a href="#extended-precision" id="toc-extended-precision" class="nav-link" data-scroll-target="#extended-precision">Extended Precision</a></li>
+  <li><a href="#dsp-accumulator-instructions" id="toc-dsp-accumulator-instructions" class="nav-link" data-scroll-target="#dsp-accumulator-instructions">DSP Accumulator Instructions</a></li>
+  <li><a href="#clear-and-zero-accumulator" id="toc-clear-and-zero-accumulator" class="nav-link" data-scroll-target="#clear-and-zero-accumulator">Clear and Zero Accumulator</a></li>
+  </ul></li>
+  <li><a href="#complete-example" id="toc-complete-example" class="nav-link" data-scroll-target="#complete-example">Complete Example</a>
+  <ul>
+  <li><a href="#c-version" id="toc-c-version" class="nav-link" data-scroll-target="#c-version">C Version</a></li>
+  <li><a href="#assembly-version" id="toc-assembly-version" class="nav-link" data-scroll-target="#assembly-version">Assembly Version</a></li>
+  <li><a href="#performance-comparison" id="toc-performance-comparison" class="nav-link" data-scroll-target="#performance-comparison">Performance Comparison</a></li>
+  <li><a href="#assembly-breakdown" id="toc-assembly-breakdown" class="nav-link" data-scroll-target="#assembly-breakdown">Assembly Breakdown</a></li>
+  </ul></li>
+  <li><a href="#c-vs.-assembly" id="toc-c-vs.-assembly" class="nav-link" data-scroll-target="#c-vs.-assembly">C vs.&nbsp;Assembly</a>
+  <ul>
+  <li><a href="#task" id="toc-task" class="nav-link" data-scroll-target="#task">Task</a></li>
+  </ul></li>
+  <li><a href="#calling-convention" id="toc-calling-convention" class="nav-link" data-scroll-target="#calling-convention">Calling Convention</a>
+  <ul>
+  <li><a href="#dspic-c-calling-convention" id="toc-dspic-c-calling-convention" class="nav-link" data-scroll-target="#dspic-c-calling-convention">dsPIC C Calling Convention</a></li>
+  <li><a href="#example-2" id="toc-example-2" class="nav-link" data-scroll-target="#example-2">Example</a></li>
+  <li><a href="#example-3" id="toc-example-3" class="nav-link" data-scroll-target="#example-3">Example</a></li>
+  </ul></li>
+  <li><a href="#common-assembly-patterns" id="toc-common-assembly-patterns" class="nav-link" data-scroll-target="#common-assembly-patterns">Common Assembly Patterns</a>
+  <ul>
+  <li><a href="#delay-loop" id="toc-delay-loop" class="nav-link" data-scroll-target="#delay-loop">Delay Loop</a></li>
+  <li><a href="#table-lookup" id="toc-table-lookup" class="nav-link" data-scroll-target="#table-lookup">Table Lookup</a></li>
+  <li><a href="#clear-memory-block" id="toc-clear-memory-block" class="nav-link" data-scroll-target="#clear-memory-block">Clear Memory Block</a></li>
+  </ul></li>
+  <li><a href="#reading-disassembly" id="toc-reading-disassembly" class="nav-link" data-scroll-target="#reading-disassembly">Reading Disassembly</a></li>
+  <li><a href="#debugging-tips" id="toc-debugging-tips" class="nav-link" data-scroll-target="#debugging-tips">Debugging Tips</a></li>
+  <li><a href="#the-assembly-toolchain" id="toc-the-assembly-toolchain" class="nav-link" data-scroll-target="#the-assembly-toolchain">The Assembly Toolchain</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading">Further Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content column-body" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Languages</a></li><li class="breadcrumb-item"><a href="./assembly.html">Assembly Language</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">The Assembly Language</h1>
+<p class="subtitle lead">Direct Hardware Control for DSP Applications</p>
+</div>
+
+
+
+<div class="quarto-title-meta column-body">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">March 6, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>Assembly language is the closest humans have ever come to speaking directly to a machine. Before we get to the dsPIC specifics, it helps to understand where assembly sits in the history of programming languages — because that context explains <em>why</em> assembly works the way it does and why it still matters.</p>
+<p>In the earliest days of computing (1940s–1950s), programmers wrote in <strong>machine code</strong> — raw binary or hexadecimal opcodes entered by hand, switch by switch. <code>0x778210</code> is a MOV instruction. Good luck remembering that. This was first-generation programming. Assembly language arrived as the <strong>second-generation language</strong>: instead of writing <code>0x778210</code>, you write <code>MOV W0, W1</code>. The assembler — a program — translates those human-readable mnemonics one-for-one into the binary opcodes the processor actually executes. One mnemonic, one machine instruction. That 1:1 relationship is the defining characteristic of assembly. There is no abstraction, no compilation strategy, no runtime. What you write is what the CPU runs.</p>
+<p><strong>Third-generation languages</strong> — C, Fortran, Pascal — introduced real abstraction. One line of C might become dozens of assembly instructions. This is both the power and the cost of high-level languages. The C compiler does the translation for you, and it does it well, but you lose direct visibility into what the processor is actually doing. Here is the insight that makes assembly worth studying even today: <em>C is compiled to assembly</em>. Every <code>for</code> loop, every <code>if</code> statement, every function call — the compiler turns all of it into the same register loads, branches, and arithmetic that you will write by hand in this chapter. Learning assembly means learning what C actually <em>does</em>, not just what it says.</p>
+<p>The relationship between assembly and processor architecture is tight and interesting. When processor designers shifted from <strong>CISC</strong> (Complex Instruction Set Computing) to <strong>RISC</strong> (Reduced Instruction Set Computing) architectures in the 1980s and 1990s, assembly language changed with them. CISC processors like x86 accumulated hundreds of instructions over decades — there are x86 instructions for computing BCD arithmetic and string comparisons that no C compiler has touched in thirty years. RISC architectures took the opposite philosophy: a small, uniform set of simple instructions, each completing in one clock cycle. The dsPIC33F is a RISC-influenced architecture. Its instruction set is clean and regular: 16-bit registers, load-store memory model, predictable timing. That predictability is not an accident — it is what makes the dsPIC suitable for real-time DSP, where you need to know <em>exactly</em> how many cycles your filter will take.</p>
+<p>In C, you write <code>for(int i = 0; i &lt; N; i++)</code> and the compiler generates the assembly to load, compare, decrement, and branch. In assembly, you manage every step explicitly.</p>
+<p>This guide covers assembly language fundamentals with specific focus on the dsPIC33F architecture used in this course. You will learn the instruction set, addressing modes, and DSP-specific features that enable real-time signal processing.</p>
+</section>
+<section id="why-learn-assembly" class="level2">
+<h2 class="anchored" data-anchor-id="why-learn-assembly">Why Learn Assembly?</h2>
+<p>Even when programming in C, understanding assembly is valuable:</p>
+<ul>
+<li><strong>Debugging</strong>: Read disassembly when your debugger shows <code>0x1234</code> instead of your function name</li>
+<li><strong>Performance</strong>: Identify bottlenecks and understand compiler output</li>
+<li><strong>Hardware access</strong>: Some features (configuration bits, special registers) require direct assembly</li>
+<li><strong>DSP optimization</strong>: Critical inner loops (filters, FFT) often benefit from hand-tuned assembly</li>
+</ul>
+</section>
+<section id="the-dspic33f-architecture" class="level2">
+<h2 class="anchored" data-anchor-id="the-dspic33f-architecture">The dsPIC33F Architecture</h2>
+<p>Before writing instructions, understand the hardware you’re controlling.</p>
+<section id="register-file" class="level3">
+<h3 class="anchored" data-anchor-id="register-file">Register File</h3>
+<p>The dsPIC33F has 16 working registers, each 16 bits wide:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 36%">
+<col style="width: 49%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Register</th>
+<th style="text-align: left;">Purpose</th>
+<th style="text-align: left;">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>W0</strong></td>
+<td style="text-align: left;">General purpose / Return value</td>
+<td style="text-align: left;">Default accumulator for many instructions</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>W1-W13</strong></td>
+<td style="text-align: left;">General purpose</td>
+<td style="text-align: left;">Available for computation</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>W14</strong></td>
+<td style="text-align: left;">Frame pointer</td>
+<td style="text-align: left;">Used by C compiler for stack frames</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>W15</strong></td>
+<td style="text-align: left;">Stack pointer</td>
+<td style="text-align: left;"><strong>Do not use</strong> for general computation</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="dsp-accumulators" class="level3">
+<h3 class="anchored" data-anchor-id="dsp-accumulators">DSP Accumulators</h3>
+<p>Beyond the working registers, the dsPIC has two <strong>40-bit accumulators</strong> for multiply-accumulate operations:</p>
+<ul>
+<li><strong>AccA</strong>: Primary accumulator (32 bits + 8 guard bits)</li>
+<li><strong>AccB</strong>: Secondary accumulator (32 bits + 8 guard bits)</li>
+</ul>
+<p>The guard bits prevent overflow during long summations (critical for FIR filters). Here is how they work mechanically, and why they matter enormously for DSP.</p>
+<p>A 16-bit × 16-bit multiply produces a 32-bit result. The accumulator holds 32 bits of “real” data, which is enough for a single multiply. But a FIR filter does not compute one multiply — it computes <em>N</em> multiplies and adds them all together. If each product can be up to 32 bits wide, and you are summing up to 128 of them, the sum could grow beyond 32 bits before you are done. Without protection, the accumulator would simply wrap around or <a href="./glossary.html#saturate">saturate</a>, silently corrupting your output sample.</p>
+<p>The <strong>8 guard bits</strong> are 8 additional high-order bits sitting above the 32-bit accumulator, extending it to 40 bits total. They absorb the overflow that would otherwise destroy your result. Mathematically, 8 guard bits give you <span class="math inline">\(2^8 = 256\)</span> headroom: the running sum can grow up to 256× larger than the maximum single-product value before the accumulator overflows. For a 128-tap FIR filter with full-scale inputs, the worst-case sum is 128× the maximum product — comfortably within the 256× headroom the guard bits provide.</p>
+<p>Without guard bits, you would have to scale your coefficients down to prevent overflow, sacrificing precision. With them, you accumulate at full precision throughout the entire summation and only convert (<a href="./glossary.html#saturate">saturate</a> and round) to 16 bits at the very end with <code>SAC.R</code>. This is not a minor optimization — it is the difference between a filter that sounds correct and one that clips on loud audio transients.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Why exactly 8 guard bits?">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Why exactly 8 guard bits?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Eight guard bits give <span class="math inline">\(2^8 = 256\times\)</span> overflow headroom. A practical FIR filter rarely exceeds 256 taps at full scale, so 8 bits covers virtually all real-world cases. Fewer bits would require coefficient scaling on large filters; more bits would waste silicon area on a constraint that never binds.</p>
+</div>
+</div>
+</section>
+<section id="program-counter" class="level3">
+<h3 class="anchored" data-anchor-id="program-counter">Program Counter</h3>
+<div class="subheading">
+<p>PC</p>
+</div>
+<p>A 24-bit register holding the address of the next instruction. Branch and jump instructions modify this register to change execution flow.</p>
+</section>
+<section id="status-register" class="level3">
+<h3 class="anchored" data-anchor-id="status-register">Status Register</h3>
+<div class="subheading">
+<p>SR</p>
+</div>
+<p>Contains <em>flags</em> affected by arithmetic operations:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Bit</th>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Set When…</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">Z</td>
+<td style="text-align: left;">Zero</td>
+<td style="text-align: left;">Result equals zero</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">N</td>
+<td style="text-align: left;">Negative</td>
+<td style="text-align: left;">Result is negative (MSB = 1)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">C</td>
+<td style="text-align: left;">Carry</td>
+<td style="text-align: left;">Unsigned overflow occurred</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">OV</td>
+<td style="text-align: left;">Overflow</td>
+<td style="text-align: left;">Signed overflow occurred</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="instruction-format" class="level2">
+<h2 class="anchored" data-anchor-id="instruction-format">Instruction Format</h2>
+<p>An assembly instruction has four components:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Part</th>
+<th style="text-align: left;">Purpose</th>
+<th style="text-align: left;">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>label</strong></td>
+<td style="text-align: left;">Marker for branch targets</td>
+<td style="text-align: left;"><code>loop_start:</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>mnemonic</strong></td>
+<td style="text-align: left;">Operation to perform</td>
+<td style="text-align: left;"><code>MOV</code>, <code>ADD</code>, <code>MAC</code>, etc.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>operands</strong></td>
+<td style="text-align: left;">Source/destination data</td>
+<td style="text-align: left;"><code>W0, W1</code>, <code>#0xFF</code>, etc.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>comment</strong></td>
+<td style="text-align: left;">Documentation (after <code>;</code>)</td>
+<td style="text-align: left;"><code>; Read ADC value</code></td>
+</tr>
+</tbody>
+</table>
+<p>The syntax can be formally defined as:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode md code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>STATEMENT := <span class="co">[</span><span class="ot">label</span><span class="co">]</span> mnemonic <span class="co">[</span><span class="ot">operands</span><span class="co">] [comment]</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>LABEL := identifier | identifier ":"</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>MNEMONIC := "MOV" | "ADD" | "MAC" | etc.</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>OPERANDS := OPERAND | OPERAND "," OPERANDs</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>OPERAND := "W0" | "W1" | "#0xFF" | etc.</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>COMMENT := ";" TEXT</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This grammar is a simplified <strong>BNF</strong> (Backus-Naur Form) description — the same notation used to define programming language syntax. Square brackets mean optional; the vertical bar means “or.” What it is telling you is that a statement must have a mnemonic, may optionally be preceded by a label, may optionally have operands, and may optionally be followed by a comment.</p>
+<p>Notice something important about this grammar: it is much simpler than the grammar for any high-level language. There is no recursion, no nesting, no expression tree. Every line is flat — one operation, one destination. That simplicity is not a limitation; it is the point. Assemblers do not need a complex parser because the language is not complex. A real assembler reads each line left-to-right, identifies the mnemonic, looks it up in a table to get the binary opcode, encodes the operands into the instruction word, and moves on. The assembler for a RISC processor like the dsPIC can be written in a few thousand lines of C. By contrast, a C compiler’s front-end parser alone is orders of magnitude larger. Every level of abstraction you add above assembly requires more parsing, more analysis, more code generation — assembly exposes the bedrock that everything else is built on.</p>
+<p>One practical consequence: <strong>assembler error messages are usually about the tokens on a single line</strong>, not about multi-line logic. If you mistype an operand, the assembler tells you exactly which line is wrong. There is no “undefined behavior at runtime” in assembly — either the instruction is valid and the processor executes it, or it is not and the assembler rejects it.</p>
+<section id="operands" class="level3">
+<h3 class="anchored" data-anchor-id="operands">Operands</h3>
+<div class="subheading">
+<p>Destination Order</p>
+</div>
+<p>The dsPIC uses <strong>destination-last</strong> ordering for most instructions:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">ADD</span>  W0<span class="op">,</span> W1<span class="op">,</span> W2    <span class="co">; W2 = W0 + W1  (dest is W2, the last operand)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>  W0<span class="op">,</span> W1        <span class="co">; W1 = W0        (dest is W1, the last operand)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Compare to x86 (Intel): <code>MOV EAX, EBX</code> puts EBX into EAX (destination first).</p>
+</section>
+</section>
+<section id="assembly-directives" class="level2">
+<h2 class="anchored" data-anchor-id="assembly-directives">Assembly Directives</h2>
+<p>Directives are instructions to the <strong>assembler</strong>, not the CPU. They don’t become machine instructions.</p>
+<p>This distinction is worth sitting with, because it can be confusing at first. Think of it this way: when the program runs on hardware, the CPU executes a sequence of binary opcodes. Every <code>MOV</code>, <code>ADD</code>, <code>MAC</code>, and <code>BRA</code> you write becomes one of those opcodes — a real instruction the CPU fetches, decodes, and executes. These are <strong>CPU instructions</strong>.</p>
+<p>Directives, by contrast, are commands addressed to the assembler <em>program itself</em>, not to the CPU. They are processed before any code runs — during the assembly phase — and they control how the assembler does its job. A directive like <code>.section .text</code> tells the assembler “put the following machine code into the text segment of the object file.” A directive like <code>.equ BUFFER_SIZE, 128</code> tells the assembler “whenever you see the symbol <code>BUFFER_SIZE</code>, substitute the value 128.” Neither of these directives produces a machine opcode. When the CPU eventually runs your program, there is no trace of them — they were consumed entirely by the assembler.</p>
+<p>Are they like macros? Somewhat, but not exactly. Macros in C are preprocessed text substitutions: the preprocessor expands them before the compiler even sees the code. Directives are different — they are parsed by the assembler itself as part of its normal processing pass, not as a separate preprocessing step. A <code>.equ</code> directive is more like a compile-time constant than a macro: it defines a name that the assembler replaces with a value wherever it appears in operand fields. There is no text substitution happening; the assembler simply knows the numeric value of the symbol when it encodes the instruction.</p>
+<p>The bottom line: every line in your assembly source is either a <strong>CPU instruction</strong> (becomes an opcode the processor runs) or an <strong>assembler directive</strong> (consumed by the assembler to control layout, define symbols, or allocate space). Directives are the assembler’s configuration language; instructions are the CPU’s command language.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Directive</th>
+<th style="text-align: left;">Purpose</th>
+<th style="text-align: left;">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>.section</code></td>
+<td style="text-align: left;">Specify memory section</td>
+<td style="text-align: left;"><code>.section .text</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>.global</code></td>
+<td style="text-align: left;">Export symbol to linker</td>
+<td style="text-align: left;"><code>.global _T1Interrupt</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>.equ</code></td>
+<td style="text-align: left;">Define constant</td>
+<td style="text-align: left;"><code>.MAX_SAMPLES  128</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>.word</code></td>
+<td style="text-align: left;">Allocate 16-bit data</td>
+<td style="text-align: left;"><code>.word  0x1234</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>.space</code></td>
+<td style="text-align: left;">Allocate bytes</td>
+<td style="text-align: left;"><code>.space  256</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>.set</code></td>
+<td style="text-align: left;">Set symbol value</td>
+<td style="text-align: left;"><code>count  .set  0</code></td>
+</tr>
+</tbody>
+</table>
+<section id="example" class="level3">
+<h3 class="anchored" data-anchor-id="example">Example</h3>
+<div class="subheading">
+<p>Defining Constants</p>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">; Define constants at top of file</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>.<span class="pp">equ</span>    BUFFER_SIZE<span class="op">,</span>   <span class="dv">128</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>.<span class="pp">equ</span>    ADC_CHANNEL<span class="op">,</span>   <span class="dv">5</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">; Use in code</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>     <span class="op">#</span>BUFFER_SIZE<span class="op">,</span> W0     <span class="co">; Load 128 into W0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="example-1" class="level3">
+<h3 class="anchored" data-anchor-id="example-1">Example</h3>
+<div class="subheading">
+<p>Data Section</p>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>.<span class="bu">section</span> <span class="op">.</span>data                    <span class="co">; Data section (RAM)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">input_buffer:</span>  .space  <span class="dv">256</span>        <span class="co">; Reserve 256 bytes</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">output_buffer:</span> .space  <span class="dv">256</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">coefficients:</span>  .<span class="dt">word</span>   <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span><span class="op">,</span> <span class="dv">5</span>   <span class="co">; Initialized data</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>.<span class="bu">section</span> <span class="op">.</span>text                    <span class="co">; Code section (Flash)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="data-movement-instructions" class="level2">
+<h2 class="anchored" data-anchor-id="data-movement-instructions">Data Movement Instructions</h2>
+<p>Before diving into specific instructions, it is worth asking: what does “moving data” actually mean inside a processor, and where can data even live?</p>
+<p>At any moment in a running dsPIC program, your data might be in one of several places:</p>
+<ul>
+<li><strong>Registers (W0–W15, AccA, AccB)</strong>: The fastest storage on the chip. Arithmetic happens here exclusively. There are only 16 general-purpose registers, so this is precious, limited space — but accessing a register takes zero additional cycles.</li>
+<li><strong>RAM (Data Memory)</strong>: Hundreds or thousands of bytes of on-chip SRAM, accessible by address. Slower than registers, but much larger. Your audio buffers, filter delay lines, and stack all live here.</li>
+<li><strong>Flash (Program Memory)</strong>: Non-volatile storage where your code lives. On the dsPIC you can also store constant data here (coefficient tables, lookup tables) using special table-read instructions. It is slower to read than RAM and cannot be written at runtime in normal operation.</li>
+<li><strong>Peripheral Registers (SFRs — Special Function Registers)</strong>: Every peripheral on the chip — ADC, DAC, UART, Timer — has its own memory-mapped registers that appear at fixed addresses. Writing to <code>DAC1RDAT</code> sends a sample to the DAC output. Reading <code>ADC1BUF0</code> retrieves the latest ADC conversion. These look like memory accesses but they actually toggle hardware signals inside the chip.</li>
+</ul>
+<p>“Moving” data means transferring a value from one of these locations to another. The key constraint is that <strong>the CPU can only perform arithmetic on data that is in registers</strong>. You cannot add two values that are sitting in RAM — you must first load them into registers, add them, then optionally store the result back. This load-compute-store pattern is the fundamental rhythm of all assembly programming.</p>
+<p>The kinds of moves you will encounter are:</p>
+<ul>
+<li><strong>Immediate to register</strong>: Load a constant value directly into a register (<code>MOV #42, W0</code>)</li>
+<li><strong>Register to register</strong>: Copy between two working registers (<code>MOV W0, W1</code>)</li>
+<li><strong>Register to memory</strong>: Store a register value out to RAM or a peripheral (<code>MOV W0, [W4]</code>)</li>
+<li><strong>Memory to register</strong>: Load a value from RAM or a peripheral into a register (<code>MOV [W4], W0</code>)</li>
+</ul>
+<p>There is no direct memory-to-memory move in a single instruction on the dsPIC — to copy a block of data from one RAM location to another, you load into a register first, then store. This is the load-store architecture philosophy, and it is shared by most RISC processors.</p>
+<section id="mov" class="level3">
+<h3 class="anchored" data-anchor-id="mov">MOV</h3>
+<div class="subheading">
+<p>Copy Data</p>
+</div>
+<p><strong>Syntax:</strong> <code>MOV source, destination</code></p>
+<p>The most fundamental instruction. Copies data from source to destination.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">; Register to register</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>  W0<span class="op">,</span> W1          <span class="co">; W1 = W0</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">; Immediate to register</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>  <span class="op">#</span><span class="bn">0xFF</span><span class="op">,</span> W0       <span class="co">; W0 = 255 (decimal)</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">; Register to memory</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>  W0<span class="op">,</span> <span class="bn">0x1000</span>      <span class="co">; Memory[0x1000] = W0</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">; Memory to register</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>  <span class="bn">0x1000</span><span class="op">,</span> W0      <span class="co">; W0 = Memory[0x1000]</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">; Register indirect (pointer)</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>  W0<span class="op">,</span> W1          <span class="co">; W1 = address to read</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>  <span class="op">[</span>W1<span class="op">],</span> W0        <span class="co">; W0 = Memory[W1]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="pushpop" class="level3">
+<h3 class="anchored" data-anchor-id="pushpop">PUSH/POP</h3>
+<div class="subheading">
+<p>Stack Operations</p>
+</div>
+<p>Save/restore registers to the stack (pointed to by W15).</p>
+<section id="syntax" class="level5">
+<h5 class="anchored" data-anchor-id="syntax">Syntax</h5>
+<ul>
+<li><code>PUSH register</code>: Save to stack</li>
+<li><code>POP register</code>: Restore from stack</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">PUSH</span>  W0             <span class="co">; Decrement W15, store W0 to [W15]</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">POP</span>   W0             <span class="co">; Read from [W15], store to W0, increment W15</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+</section>
+<section id="arithmetic-and-logical-instructions" class="level2">
+<h2 class="anchored" data-anchor-id="arithmetic-and-logical-instructions">Arithmetic and Logical Instructions</h2>
+<section id="basic-arithmetic" class="level3">
+<h3 class="anchored" data-anchor-id="basic-arithmetic">Basic Arithmetic</h3>
+<section id="syntax-1" class="level5">
+<h5 class="anchored" data-anchor-id="syntax-1">Syntax</h5>
+<ul>
+<li><code>ADD source, destination</code>: Add source to destination</li>
+<li><code>ADD source1, source2, destination</code>: Add source1 + source2, store in destination</li>
+<li><code>SUB source, destination</code>: Subtract source from destination</li>
+<li><code>SUB source1, source2, destination</code>: Subtract source2 - source1, store in destination</li>
+<li><code>MUL.UU source1, source2, destination</code>: Unsigned multiply (32-bit result in destination:destination+1)</li>
+<li><code>MUL.SS source1, source2, destination</code>: Signed multiply (32-bit result in destination:destination+1)</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">; Addition</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">ADD</span>  W0<span class="op">,</span> W1<span class="op">,</span> W2      <span class="co">; W2 = W0 + W1</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">ADD</span>  W0<span class="op">,</span> <span class="op">#</span><span class="dv">5</span><span class="op">,</span> W0      <span class="co">; W0 = W0 + 5</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">; Subtraction</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="bu">SUB</span>  W0<span class="op">,</span> W1<span class="op">,</span> W2      <span class="co">; W2 = W1 - W0  (note order!)</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="bu">SUB</span>  W0<span class="op">,</span> <span class="op">#</span><span class="dv">1</span><span class="op">,</span> W0      <span class="co">; W0 = W0 - 1  (decrement)</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">; Multiplication (16-bit × 16-bit = 32-bit)</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="bu">MUL</span><span class="op">.</span>UU  W0<span class="op">,</span> W1<span class="op">,</span> W2   <span class="co">; Unsigned × Unsigned, W2:W3 = W0 × W1</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="bu">MUL</span><span class="op">.</span><span class="kw">SS</span>  W0<span class="op">,</span> W1<span class="op">,</span> W2   <span class="co">; Signed × Signed</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="bitwise-operations" class="level3">
+<h3 class="anchored" data-anchor-id="bitwise-operations">Bitwise Operations</h3>
+<section id="syntax-2" class="level5">
+<h5 class="anchored" data-anchor-id="syntax-2">Syntax</h5>
+<ul>
+<li><code>AND source, destination</code>: Bitwise AND, store in destination</li>
+<li><code>OR source, destination</code>: Bitwise OR, store in destination</li>
+<li><code>XOR source, destination</code>: Bitwise XOR, store in destination</li>
+<li><code>CPL register</code>: Complement (bitwise NOT) all bits in register</li>
+<li><code>SL register, shift-count, destination</code>: Shift left</li>
+<li><code>SR register, shift-count, destination</code>: Shift right arithmetic (sign-extending)</li>
+<li><code>LSR register, shift-count, destination</code>: Shift right logical (zero-fill)</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">AND</span>  W0<span class="op">,</span> W1<span class="op">,</span> W0      <span class="co">; W0 = W0 &amp; W1  (bitwise AND)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">OR</span>   W0<span class="op">,</span> W1<span class="op">,</span> W0      <span class="co">; W0 = W0 | W1  (bitwise OR)</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">XOR</span>  W0<span class="op">,</span> W1<span class="op">,</span> W0      <span class="co">; W0 = W0 ^ W1  (bitwise XOR)</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>CPL   W0             <span class="co">; W0 = ~W0      (bitwise NOT/complement)</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">; Bit shifts</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>SL   W0<span class="op">,</span> <span class="op">#</span><span class="dv">4</span><span class="op">,</span> W0      <span class="co">; W0 = W0 &lt;&lt; 4  (shift left)</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>SR   W0<span class="op">,</span> <span class="op">#</span><span class="dv">4</span><span class="op">,</span> W0      <span class="co">; W0 = W0 &gt;&gt; 4  (shift right arithmetic)</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>LSR  W0<span class="op">,</span> <span class="op">#</span><span class="dv">4</span><span class="op">,</span> W0      <span class="co">; W0 = W0 &gt;&gt;&gt; 4 (shift right logical)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="comparison" class="level3">
+<h3 class="anchored" data-anchor-id="comparison">Comparison</h3>
+<p><code>CP</code> compares two values by computing <code>source2 - source1</code> and setting the status flags based on the result, without storing the difference anywhere. It operates exclusively on <strong>register values</strong> — not on memory buffers directly.</p>
+<p><strong>Syntax:</strong> <code>CP source1, source2</code></p>
+<p>This is an important constraint to understand. <code>CP W0, W1</code> subtracts W1 from W0 and sets flags; it does not know anything about where those values came from. If you want to compare two bytes sitting in RAM, or check whether two audio buffers are identical, you must load the values into registers first, then compare:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="op">[</span>W4<span class="op">],</span> W0       <span class="co">; Load first value from memory into W0</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="op">[</span>W5<span class="op">],</span> W1       <span class="co">; Load second value from memory into W1</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>CP    W0<span class="op">,</span> W1         <span class="co">; Now compare the two register values</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>BRA   NZ<span class="op">,</span> not_equal  <span class="co">; Branch if they differ</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>For comparing entire memory buffers (the equivalent of <code>memcmp</code> in C), you would put this load-compare pattern inside a loop, stepping through the buffers element by element. The <code>CP</code> instruction itself sees only registers — the memory addressing is handled by the surrounding <code>MOV</code> and loop instructions.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">; Compare W0 to W1 (subtracts W1 - W0, sets flags)</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>CP    W0<span class="op">,</span> W1</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">; Compare to immediate</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>CP    W0<span class="op">,</span> <span class="op">#</span><span class="dv">10</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">; After CP, branch based on result</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>BRA   Z<span class="op">,</span>  equal_label     <span class="co">; Branch if Zero flag set (W0 == W1)</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>BRA   N<span class="op">,</span>  neg_label      <span class="co">; Branch if Negative flag set</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>BRA   NZ<span class="op">,</span> not_equal_label    <span class="co">; Branch if Not Zero</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="control-flow-instructions" class="level2">
+<h2 class="anchored" data-anchor-id="control-flow-instructions">Control Flow Instructions</h2>
+<section id="unconditional-branch" class="level3">
+<h3 class="anchored" data-anchor-id="unconditional-branch">Unconditional Branch</h3>
+<p>Branch to label (jump unconditionally)</p>
+<p><strong>Syntax:</strong> <code>BRA label</code></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>BRA   target_label       <span class="co">; Jump to target_label (PC = target_label)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="conditional-branches" class="level3">
+<h3 class="anchored" data-anchor-id="conditional-branches">Conditional Branches</h3>
+<p>Branch to label if condition is true</p>
+<p><strong>Syntax:</strong> <code>BRA condition, label</code></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>BRA   Z<span class="op">,</span>   label_zero    <span class="co">; Branch if Zero (result = 0)</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>BRA   NZ<span class="op">,</span>  label_nz      <span class="co">; Branch if Not Zero</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>BRA   N<span class="op">,</span>   label_neg     <span class="co">; Branch if Negative</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>BRA   NN<span class="op">,</span>  label_nn      <span class="co">; Branch if Not Negative</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>BRA   C<span class="op">,</span>   label_carry   <span class="co">; Branch if Carry</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>BRA   NC<span class="op">,</span>  label_nc      <span class="co">; Branch if No Carry</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>BRA   GE<span class="op">,</span>  label_ge      <span class="co">; Branch if Greater or Equal (signed)</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>BRA   GT<span class="op">,</span>  label_gt      <span class="co">; Branch if Greater Than</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>BRA   LE<span class="op">,</span>  label_le      <span class="co">; Branch if Less or Equal</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>BRA   LT<span class="op">,</span>  label_lt      <span class="co">; Branch if Less Than</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-note callout-titled" title="Conditions Flags">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Conditions Flags
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>All conditions depend on flags set by the previous arithmetic/comparison operation. For example:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>CP    W0<span class="op">,</span> W1          <span class="co">; Compare W0 to W1 (W1 - W0)</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>BRA   Z<span class="op">,</span> equal_label   <span class="co">; Branch if W0 == W1</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>BRA   N<span class="op">,</span> less_label    <span class="co">; Branch if W0 &lt; W1 (Negative flag set)</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>BRA   GT<span class="op">,</span> greater_label <span class="co">; Branch if W0 &gt; W1 (Greater Than)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</section>
+<section id="subroutine-calls" class="level3">
+<h3 class="anchored" data-anchor-id="subroutine-calls">Subroutine Calls</h3>
+<p>When you call a subroutine, you need a way to get back. That “way back” is the return address — the address of the instruction immediately after the <code>CALL</code>. The CPU needs to save that address somewhere safe, execute the subroutine, and then use that saved address to resume execution. The mechanism for this is the <strong>stack</strong>.</p>
+<p>The stack is a region of RAM that grows and shrinks as functions are called and return. The dsPIC’s stack pointer is <strong>W15</strong>, and it always points to the top of the stack — the most recently pushed value. The stack grows upward in memory on the dsPIC (toward higher addresses).</p>
+<p>When <code>CALL subroutine_name</code> executes, the hardware does two things automatically:</p>
+<ol type="1">
+<li>Pushes the <strong>return address</strong> (the value of PC + 2, i.e., the address of the instruction after the CALL) onto the stack — W15 is incremented and the return address is written to <code>[W15]</code>.</li>
+<li>Jumps to <code>subroutine_name</code> by loading that address into the Program Counter.</li>
+</ol>
+<p>The subroutine then runs. When it reaches <code>RETURN</code>, the hardware does the reverse: it pops the return address off the stack and loads it back into the PC, resuming execution exactly where the caller left off.</p>
+<p>A <strong>stack frame</strong> is the collection of data a subroutine pushes onto the stack for its own use: saved registers, local variables, and sometimes a saved frame pointer (W14). The C compiler builds and tears down stack frames automatically for every C function. In hand-written assembly, you are responsible for this yourself — if you push registers at the start of your subroutine, you must pop them in the same order (reversed) before returning, or the stack will be unbalanced and <code>RETURN</code> will jump to garbage.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="The Golden Rule of Subroutines">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>The Golden Rule of Subroutines
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Every <code>PUSH</code> must have a matching <code>POP</code> before <code>RETURN</code>. If you push four registers entering a subroutine and only pop three before returning, <code>RETURN</code> will pop your fourth register’s data as the return address and jump to a random location. This is one of the most common bugs in hand-written assembly.</p>
+</div>
+</div>
+<p>The stack also makes <strong>nested calls</strong> work naturally. If subroutine A calls subroutine B, B’s return address sits on top of A’s. When B returns, its address is popped and execution resumes in A. When A returns, its address is popped and execution resumes in the caller. Each level of call nesting adds another return address to the stack — which is why deeply recursive code can overflow the stack.</p>
+<section id="syntax-3" class="level5">
+<h5 class="anchored" data-anchor-id="syntax-3">Syntax</h5>
+<ul>
+<li><code>CALL label</code>: Call subroutine at label (pushes return address)</li>
+<li><code>RETURN</code>: Return from subroutine (pops return address, also called <code>RET</code>)</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">CALL</span>  subroutine_name    <span class="co">; Push return address, jump to subroutine</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>RETURN                    <span class="co">; Pop return address, jump back (also called RET)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="labels" class="level3">
+<h3 class="anchored" data-anchor-id="labels">Labels</h3>
+<p>Labels mark locations in code for branches and data access:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">; Code label</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">loop_start:</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">ADD</span>   W0<span class="op">,</span> <span class="op">#</span><span class="dv">1</span><span class="op">,</span> W0</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    CP    W0<span class="op">,</span> <span class="op">#</span><span class="dv">10</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    BRA   NZ<span class="op">,</span> loop_start    <span class="co">; Loop until W0 = 10</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co">; Data label</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="fu">lookup_table:</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    .<span class="dt">word</span>  <span class="dv">100</span><span class="op">,</span> <span class="dv">200</span><span class="op">,</span> <span class="dv">300</span><span class="op">,</span> <span class="dv">400</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">MOV</span>   <span class="op">#</span>lookup_table<span class="op">,</span> W0    <span class="co">; W0 = address of table</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">MOV</span>   <span class="op">[</span>W0<span class="op">++],</span> W1           <span class="co">; W1 = 100, W0 now points to 200</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="loops-in-assembly" class="level2">
+<h2 class="anchored" data-anchor-id="loops-in-assembly">Loops in Assembly</h2>
+<section id="manual-counter-loop" class="level3">
+<h3 class="anchored" data-anchor-id="manual-counter-loop">Manual Counter Loop</h3>
+<p>The explicit way, manually managing a counter:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">; Sum array of 10 elements</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="op">#</span><span class="dv">0</span><span class="op">,</span> W0            <span class="co">; W0 = accumulator (sum)</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="op">#</span><span class="dv">10</span><span class="op">,</span> W1           <span class="co">; W1 = loop counter</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="op">#</span>array_ptr<span class="op">,</span> W2    <span class="co">; W2 = pointer to array</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sum_loop:</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">ADD</span>   <span class="op">[</span>W2<span class="op">++],</span> W0<span class="op">,</span> W0    <span class="co">; Add element, increment pointer</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">DEC</span>   W1<span class="op">,</span> W1            <span class="co">; W1--</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    CP    W1<span class="op">,</span> <span class="op">#</span><span class="dv">0</span>            <span class="co">; Check if W1 == 0</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    BRA   NZ<span class="op">,</span> sum_loop      <span class="co">; Loop while not zero</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="hardware-loop" class="level3">
+<h3 class="anchored" data-anchor-id="hardware-loop">Hardware Loop</h3>
+<div class="subheading">
+<p>DO</p>
+</div>
+<p>The dsPIC has <strong>zero-overhead hardware looping</strong>. No branch overhead!</p>
+<p><strong>Syntax:</strong> <code>DO #count-1, end_label</code>: Execute following instruction(s) count times</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">; Sum array of N elements using hardware loop</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="op">#</span><span class="dv">0</span><span class="op">,</span> W0            <span class="co">; W0 = accumulator</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="op">#</span>array_ptr<span class="op">,</span> W2    <span class="co">; W2 = pointer to array</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="op">#</span>N<span class="op">,</span> W3            <span class="co">; W3 = loop count</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>DO    <span class="op">#</span>N<span class="op">-</span><span class="dv">1</span><span class="op">,</span> end_loop    <span class="co">; Execute N times (0 to N-1)</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="fu">loop_body:</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">ADD</span>   <span class="op">[</span>W2<span class="op">++],</span> W0<span class="op">,</span> W0    <span class="co">; This instruction repeated N times</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="fu">end_loop:</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">; Continue here after loop completes</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="how-it-works" class="level5">
+<h5 class="anchored" data-anchor-id="how-it-works">How it works</h5>
+<ul>
+<li><code>DO</code> sets up a hardware loop counter</li>
+<li>The instruction(s) after <code>DO</code> execute repeatedly</li>
+<li>Zero cycles wasted on comparison and branching</li>
+<li>Loop executes in <code>N × cycle_count</code> time</li>
+</ul>
+</section>
+</section>
+<section id="repeat" class="level3">
+<h3 class="anchored" data-anchor-id="repeat">REPEAT</h3>
+<div class="subheading">
+<p>Single-Instruction Loop</p>
+</div>
+<p>When your loop body is just one instruction, <code>REPEAT</code> is even simpler:</p>
+<p><strong>Syntax:</strong> <code>REPEAT #count-1</code>: Repeat next instruction count times</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="op">#</span><span class="dv">0</span><span class="op">,</span> W0</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="op">#</span>array_ptr<span class="op">,</span> W2</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="pp">REPEAT</span> <span class="op">#</span>N<span class="op">-</span><span class="dv">1</span>              <span class="co">; Repeat next instruction N times</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="bu">ADD</span>   <span class="op">[</span>W2<span class="op">++],</span> W0<span class="op">,</span> W0    <span class="co">; Executed N times, zero overhead</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-note callout-titled" title="Note: DEC and INC">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Note: DEC and INC
+</div>
+</div>
+<section id="syntax-4" class="level5 callout-body-container callout-body">
+<h5 class="anchored" data-anchor-id="syntax-4">Syntax</h5>
+<ul>
+<li><code>DEC register, destination</code>: Decrement register, store in destination</li>
+<li><code>INC register, destination</code>: Increment register, store in destination</li>
+</ul>
+<p>Used for manual counter management (see manual loop example above).</p>
+</section>
+</div>
+</section>
+</section>
+<section id="addressing-modes" class="level2">
+<h2 class="anchored" data-anchor-id="addressing-modes">Addressing Modes</h2>
+<p>Addressing modes specify <em>where</em> to find the operand data. The dsPIC supports several modes.</p>
+<section id="immediate-addressing" class="level3">
+<h3 class="anchored" data-anchor-id="immediate-addressing">1. Immediate Addressing</h3>
+<p>Data is encoded in the instruction itself.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="bu">ADD</span>   W0<span class="op">,</span> <span class="op">#</span><span class="dv">42</span><span class="op">,</span> W0       <span class="co">; Add literal value 42</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="op">#</span><span class="bn">0x1000</span><span class="op">,</span> W1       <span class="co">; Load hexadecimal value</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="register-direct" class="level3">
+<h3 class="anchored" data-anchor-id="register-direct">2. Register Direct</h3>
+<p>Operand is in a register.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="bu">ADD</span>   W0<span class="op">,</span> W1<span class="op">,</span> W2        <span class="co">; All operands are registers</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   W0<span class="op">,</span> W1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="register-indirect" class="level3">
+<h3 class="anchored" data-anchor-id="register-indirect">3. Register Indirect</h3>
+<p>Register contains the <strong>address</strong> of the data (pointer).</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="op">#</span>array_start<span class="op">,</span> W0    <span class="co">; W0 = address of array</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="op">[</span>W0<span class="op">],</span> W1            <span class="co">; W1 = Memory[W0] (read first element)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="register-indirect-with-post-increment" class="level3">
+<h3 class="anchored" data-anchor-id="register-indirect-with-post-increment">4. Register Indirect with Post-Increment</h3>
+<p>Read data, <strong>then</strong> increment the pointer. Essential for array processing.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="op">#</span>array_start<span class="op">,</span> W0</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="op">[</span>W0<span class="op">++],</span> W1          <span class="co">; W1 = Memory[W0], then W0 += 2 (16-bit)</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="op">[</span>W0<span class="op">++],</span> W2          <span class="co">; W2 = Memory[W0], then W0 += 2 (next element)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="register-indirect-with-pre-increment" class="level3">
+<h3 class="anchored" data-anchor-id="register-indirect-with-pre-increment">5. Register Indirect with Pre-Increment</h3>
+<p>Increment the pointer <strong>first</strong>, then read data.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="op">#</span>array_start<span class="op">,</span> W0</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="bu">INC</span>   W0<span class="op">,</span> W0              <span class="co">; W0++ first</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="op">[</span>W0<span class="op">],</span> W1            <span class="co">; Then read</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="register-indirect-with-displacement" class="level3">
+<h3 class="anchored" data-anchor-id="register-indirect-with-displacement">6. Register Indirect with Displacement</h3>
+<p>Add an offset to the address before accessing.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="op">#</span>array_start<span class="op">,</span> W0</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="dv">4</span><span class="op">[</span>W0<span class="op">],</span> W1           <span class="co">; W1 = Memory[W0 + 4] (2nd element if 16-bit)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="bit-reversed-addressing" class="level3">
+<h3 class="anchored" data-anchor-id="bit-reversed-addressing">7. Bit-Reversed Addressing</h3>
+<p>Special mode for FFT algorithms. Access patterns wrap around bit-reversed.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="op">#</span>__builtin_brev<span class="op">(</span><span class="bn">0x1000</span><span class="op">),</span> W0    <span class="co">; Set up bit-reversed addressing</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="modulo-addressing" class="level3">
+<h3 class="anchored" data-anchor-id="modulo-addressing">8. Modulo Addressing</h3>
+<p>Automatic pointer wraparound for circular buffers (see <a href="./glossary.html#circular-buffer">Circular Buffers</a>).</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">; Configure modulo addressing (via special registers)</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>   <span class="op">#</span>__builtin_modoffset<span class="op">(</span>buffer<span class="op">,</span> size<span class="op">),</span> W0</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="dsp-specific-instructions" class="level2">
+<h2 class="anchored" data-anchor-id="dsp-specific-instructions">DSP-Specific Instructions</h2>
+<p>The dsPIC includes instructions optimized for signal processing algorithms.</p>
+<section id="mac" class="level3">
+<h3 class="anchored" data-anchor-id="mac">MAC</h3>
+<div class="subheading">
+<p>Multiply-Accumulate</p>
+</div>
+<p>The heart of DSP computing. Multiplies two values and adds the result to an accumulator, all in one cycle.</p>
+<p>The canonical use for <code>MAC</code> is <strong>convolution</strong> — and if you understand convolution, you understand why the dsPIC was designed around this instruction. A digital FIR filter computes:</p>
+<p><span class="math display">\[
+y[n] = \sum_{k=0}^{N-1} h[k] \cdot x[n-k]
+\]</span></p>
+<p>That summation is convolution. For every output sample, you multiply each filter coefficient <span class="math inline">\(h[k]\)</span> by the corresponding delayed input sample <span class="math inline">\(x[n-k]\)</span> and accumulate the products. That is exactly what <code>MAC</code> does: one coefficient times one input sample, added into the accumulator, then advance both pointers to the next pair. Repeat N times. One output sample computed.</p>
+<p>Without a dedicated <code>MAC</code> instruction, this inner loop requires a multiply, an add, two pointer increments, and a branch — at minimum five operations per tap. With <code>MAC</code>, it is one instruction per tap. For a 64-tap FIR running at 44.1 kHz audio, that difference is the gap between feasible and impossible on a modest microcontroller.</p>
+<p><strong>Syntax:</strong> <code>MAC [reg1]*[reg2], accumulator, [pointer1]+=increment, [pointer2]+=increment</code></p>
+<p>This syntax is entirely legitimate dsPIC assembly — it is not a pseudo-instruction or assembler macro. The dual post-increment on both pointer registers (<code>[W4++]</code> and <code>[W5++]</code>) is a real hardware capability baked into the <code>MAC</code> instruction encoding. Microchip designed the dsPIC instruction word to include fields for two independent memory reads and two independent pointer updates, all happening in the same clock cycle using separate internal data buses. This is what makes the <code>MAC</code> a <strong>DSP instruction</strong> rather than just a fast multiply-add: the hardware parallelism built around it.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">; Signed multiply-accumulate</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>MAC   W0<span class="op">*</span>W1<span class="op">,</span> A<span class="op">,</span> <span class="op">[</span>W2<span class="op">]+=</span><span class="dv">2</span><span class="op">,</span> <span class="op">[</span>W3<span class="op">]+=</span><span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="what-this-single-instruction-does" class="level5">
+<h5 class="anchored" data-anchor-id="what-this-single-instruction-does">What this single instruction does</h5>
+<ol type="1">
+<li>Multiply W0 × W1</li>
+<li>Add result to accumulator A</li>
+<li>Increment W2 by 2 (post-increment)</li>
+<li>Increment W3 by 2 (post-increment)</li>
+<li>All in <strong>one clock cycle</strong>!</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled" title="MAC in a FIR Convolution Loop">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>MAC in a FIR Convolution Loop
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Here is the essence of what the complete FIR example below computes, distilled to its inner loop:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">; W4 = pointer to input samples x[n], x[n-1], x[n-2], ...</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co">; W5 = pointer to filter coefficients h[0], h[1], h[2], ...</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co">; Accumulator A starts cleared to zero</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>CLR     A                        <span class="co">; A = 0</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="pp">REPEAT</span>  <span class="op">#</span>N<span class="op">-</span><span class="dv">1</span>                     <span class="co">; Repeat N times</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>MAC     <span class="op">[</span>W4<span class="op">++]*[</span>W5<span class="op">++],</span> A         <span class="co">; A += *W4 * *W5, advance both pointers</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>SAC<span class="op">.</span>R   A<span class="op">,</span> W0                    <span class="co">; W0 = rounded, saturated 16-bit output</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Each <code>MAC</code> handles one term of the convolution sum. After N iterations, accumulator A holds the full dot product <span class="math inline">\(\sum h[k] \cdot x[n-k]\)</span>, and <code>SAC.R</code> converts it to a 16-bit output sample with rounding. The guard bits in A prevent any intermediate overflow during the summation.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="extended-precision" class="level3">
+<h3 class="anchored" data-anchor-id="extended-precision">Extended Precision</h3>
+<div class="subheading">
+<p>ED</p>
+</div>
+<p>For operations requiring more than 16 bits:</p>
+<p><strong>Syntax:</strong> <code>ED.AC accumulator, [pointer]+=increment</code></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>ED<span class="op">.</span>AC    A<span class="op">,</span> <span class="op">[</span>W2<span class="op">++]</span>      <span class="co">; Extended access to accumulator A</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="dsp-accumulator-instructions" class="level3">
+<h3 class="anchored" data-anchor-id="dsp-accumulator-instructions">DSP Accumulator Instructions</h3>
+<section id="syntax-5" class="level5">
+<h5 class="anchored" data-anchor-id="syntax-5">Syntax</h5>
+<ul>
+<li><code>SAC accumulator, destination</code>: Store accumulator (<a href="./glossary.html#saturate">saturate</a> to 16-bit)</li>
+<li><code>SAC.R accumulator, destination</code>: Store accumulator with rounding</li>
+<li><code>LAC source, accumulator</code>: Load source into accumulator</li>
+<li><code>CLR accumulator</code>: Clear accumulator to zero</li>
+<li><code>ZAP accumulator, [pointer]+=increment</code>: Clear accumulator and increment pointer</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>SAC    A<span class="op">,</span> W0           <span class="co">; Store accumulator (saturate to 16-bit)</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>SAC<span class="op">.</span>R  A<span class="op">,</span> W0           <span class="co">; Store accumulator with rounding</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>LAC    W0<span class="op">,</span> A           <span class="co">; Load W0 into accumulator A</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="clear-and-zero-accumulator" class="level3">
+<h3 class="anchored" data-anchor-id="clear-and-zero-accumulator">Clear and Zero Accumulator</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>CLR    A               <span class="co">; A = 0</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>ZAP    A<span class="op">,</span> <span class="op">[</span>W2<span class="op">++]</span>       <span class="co">; Clear accumulator and increment</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="complete-example" class="level2">
+<h2 class="anchored" data-anchor-id="complete-example">Complete Example</h2>
+<div class="subheading">
+<p>FIR Filter Inner Loop</p>
+</div>
+<p>Here is a complete, practical example showing the FIR filter computation that we discussed in our <a href="https://celsasser.github.io/ucsd-appdsp-notes/">Applied DSP</a> notebook. This computes one output sample:</p>
+<p><span class="math display">\[
+y[n] = \sum_{k=0}^{N-1} a_k \cdot x[n-k]
+\]</span></p>
+<section id="c-version" class="level3">
+<h3 class="anchored" data-anchor-id="c-version">C Version</h3>
+<div class="subheading">
+<p>For Reference</p>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 8-tap FIR filter in C</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="dt">int16_t</span> fir_filter<span class="op">(</span><span class="dt">int16_t</span> <span class="op">*</span>x<span class="op">,</span> <span class="dt">int16_t</span> <span class="op">*</span>a<span class="op">,</span> <span class="dt">int</span> n<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int32_t</span> acc <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span><span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>        acc <span class="op">+=</span> <span class="op">(</span><span class="dt">int32_t</span><span class="op">)</span>a<span class="op">[</span>i<span class="op">]</span> <span class="op">*</span> x<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">(</span><span class="dt">int16_t</span><span class="op">)(</span>acc <span class="op">&gt;&gt;</span> <span class="dv">15</span><span class="op">);</span>  <span class="co">// Q15 scaling</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="assembly-version" class="level3">
+<h3 class="anchored" data-anchor-id="assembly-version">Assembly Version</h3>
+<div class="subheading">
+<p>Optimized</p>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co">; ============================================================</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="co">; FIR Filter - Single Output Sample Computation</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co">; ============================================================</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="co">; Inputs:</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="co">;   W8  = pointer to input samples (x[n], x[n-1], ...)</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="co">;   W9  = pointer to coefficients (a[0], a[1], ...)</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co">;   W10 = tap count (N)</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="co">; Output:</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a><span class="co">;   W0  = filter output y[n]</span></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a><span class="co">; ============================================================</span></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>    .global  fir_filter</span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>    .<span class="bu">section</span> <span class="op">.</span>text</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a><span class="fu">fir_filter:</span></span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">; Prologue - save registers we'll use</span></span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>    <span class="bu">PUSH</span>    W0</span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">PUSH</span><span class="op">.</span>D  W4                  <span class="co">; Save W4 and W5 (push double)</span></span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">PUSH</span>    SR                  <span class="co">; Save status register</span></span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a>    <span class="co">; Clear accumulator A</span></span>
+<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a>    CLR     A</span>
+<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a>    <span class="co">; Set up input and coefficient pointers</span></span>
+<span id="cb33-24"><a href="#cb33-24" aria-hidden="true" tabindex="-1"></a>    <span class="bu">MOV</span>     W8<span class="op">,</span> W4              <span class="co">; W4 = input pointer</span></span>
+<span id="cb33-25"><a href="#cb33-25" aria-hidden="true" tabindex="-1"></a>    <span class="bu">MOV</span>     W9<span class="op">,</span> W5              <span class="co">; W5 = coefficient pointer</span></span>
+<span id="cb33-26"><a href="#cb33-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-27"><a href="#cb33-27" aria-hidden="true" tabindex="-1"></a>    <span class="co">; Get loop count (W10 - 1)</span></span>
+<span id="cb33-28"><a href="#cb33-28" aria-hidden="true" tabindex="-1"></a>    <span class="bu">DEC</span>     W10<span class="op">,</span> W10</span>
+<span id="cb33-29"><a href="#cb33-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-30"><a href="#cb33-30" aria-hidden="true" tabindex="-1"></a>    <span class="co">; ========================================================</span></span>
+<span id="cb33-31"><a href="#cb33-31" aria-hidden="true" tabindex="-1"></a>    <span class="co">; Inner Loop: MAC with hardware repeat</span></span>
+<span id="cb33-32"><a href="#cb33-32" aria-hidden="true" tabindex="-1"></a>    <span class="co">; ========================================================</span></span>
+<span id="cb33-33"><a href="#cb33-33" aria-hidden="true" tabindex="-1"></a>    <span class="pp">REPEAT</span>  W10                 <span class="co">; Repeat next MAC instruction (W10+1) times</span></span>
+<span id="cb33-34"><a href="#cb33-34" aria-hidden="true" tabindex="-1"></a>    MAC     <span class="op">[</span>W4<span class="op">++]*[</span>W5<span class="op">++],</span> A    <span class="co">; A += *W4 * *W5, then increment both pointers</span></span>
+<span id="cb33-35"><a href="#cb33-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-36"><a href="#cb33-36" aria-hidden="true" tabindex="-1"></a>    <span class="co">; ========================================================</span></span>
+<span id="cb33-37"><a href="#cb33-37" aria-hidden="true" tabindex="-1"></a>    <span class="co">; Epilogue - scale and return result</span></span>
+<span id="cb33-38"><a href="#cb33-38" aria-hidden="true" tabindex="-1"></a>    <span class="co">; ========================================================</span></span>
+<span id="cb33-39"><a href="#cb33-39" aria-hidden="true" tabindex="-1"></a>    <span class="co">; Shift right by 15 (Q15 format), saturate, and store</span></span>
+<span id="cb33-40"><a href="#cb33-40" aria-hidden="true" tabindex="-1"></a>    SAC<span class="op">.</span>R   A<span class="op">,</span> W0               <span class="co">; W0 = (A &gt;&gt; 15) with rounding and saturation</span></span>
+<span id="cb33-41"><a href="#cb33-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-42"><a href="#cb33-42" aria-hidden="true" tabindex="-1"></a>    <span class="co">; Restore saved registers</span></span>
+<span id="cb33-43"><a href="#cb33-43" aria-hidden="true" tabindex="-1"></a>    <span class="bu">POP</span>     SR</span>
+<span id="cb33-44"><a href="#cb33-44" aria-hidden="true" tabindex="-1"></a>    <span class="bu">POP</span><span class="op">.</span>D   W4</span>
+<span id="cb33-45"><a href="#cb33-45" aria-hidden="true" tabindex="-1"></a>    <span class="bu">POP</span>     W1                  <span class="co">; Restore old W0 to W1 (don't need old W0)</span></span>
+<span id="cb33-46"><a href="#cb33-46" aria-hidden="true" tabindex="-1"></a>    RETURN                      <span class="co">; Return to caller (output in W0)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="performance-comparison" class="level3">
+<h3 class="anchored" data-anchor-id="performance-comparison">Performance Comparison</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Implementation</th>
+<th style="text-align: right;">Cycles per Output Sample</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">C code (unoptimized)</td>
+<td style="text-align: right;">~60-100 cycles</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C code (<code>-O3</code> with intrinsics)</td>
+<td style="text-align: right;">~20-30 cycles</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Hand-tuned assembly (above)</td>
+<td style="text-align: right;"><strong>N + 10 ≈ 18 cycles</strong> (for N=8)</td>
+</tr>
+</tbody>
+</table>
+<p>The assembly version achieves near-ideal performance: one MAC per tap plus small overhead.</p>
+</section>
+<section id="assembly-breakdown" class="level3">
+<h3 class="anchored" data-anchor-id="assembly-breakdown">Assembly Breakdown</h3>
+<p>Let’s trace through the assembly:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co">; Save registers we'll modify (calling convention)</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="bu">PUSH</span>    W0                  <span class="co">; Save W0 (we'll use it for return value)</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="bu">PUSH</span><span class="op">.</span>D  W4                  <span class="co">; Save W4 and W5 together</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="bu">PUSH</span>    SR                  <span class="co">; Save status register (MAC affects flags)</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="co">; Clear the DSP accumulator (40 bits, all zero)</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>CLR     A</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="co">; Copy pointer arguments to working registers</span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>     W8<span class="op">,</span> W4              <span class="co">; W4 points to input buffer</span></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="bu">MOV</span>     W9<span class="op">,</span> W5              <span class="co">; W5 points to coefficients</span></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a><span class="co">; REPEAT executes the next instruction (N) times</span></span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a><span class="co">; REPEAT #N-1 means: execute MAC N times (iterations 0 to N-1)</span></span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a><span class="bu">DEC</span>     W10<span class="op">,</span> W10            <span class="co">; W10 = N - 1</span></span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a><span class="pp">REPEAT</span>  W10</span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a><span class="co">; The MAC instruction does FOUR things in ONE cycle:</span></span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>MAC     <span class="op">[</span>W4<span class="op">++]*[</span>W5<span class="op">++],</span> A    <span class="co">;   A += *W4 * *W5; W4++; W5++;</span></span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a><span class="co">;                            ;   Multiply, Accumulate, increment both pointers</span></span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a><span class="co">; After loop, scale and saturate result</span></span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a><span class="co">; Q15 format: accumulator has 32-bit result, need 16-bit</span></span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>SAC<span class="op">.</span>R   A<span class="op">,</span> W0               <span class="co">; W0 = saturate(round(A &gt;&gt; 15))</span></span>
+<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a><span class="co">; Restore and return</span></span>
+<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a><span class="bu">POP</span>     SR                  <span class="co">; Restore status flags</span></span>
+<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a><span class="bu">POP</span><span class="op">.</span>D   W4                  <span class="co">; Restore W4, W5</span></span>
+<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a><span class="bu">POP</span>     W1                  <span class="co">; Pop saved W0 into W1 (W0 holds our return value)</span></span>
+<span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a>RETURN                      <span class="co">; Return to caller</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="c-vs.-assembly" class="level2">
+<h2 class="anchored" data-anchor-id="c-vs.-assembly">C vs.&nbsp;Assembly</h2>
+<div class="subheading">
+<p>Side-by-Side Comparison</p>
+</div>
+<p>Here’s a simple operation shown both ways:</p>
+<section id="task" class="level3">
+<h3 class="anchored" data-anchor-id="task">Task</h3>
+<div class="subheading">
+<p>Sum an Array of 10 Elements</p>
+</div>
+<section id="c-code" class="level5">
+<h5 class="anchored" data-anchor-id="c-code">C Code</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int16_t</span> sum_array<span class="op">(</span><span class="dt">int16_t</span> <span class="op">*</span>arr<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int16_t</span> sum <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span><span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dv">10</span><span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>        sum <span class="op">+=</span> arr<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> sum<span class="op">;</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="assembly-equivalent" class="level5">
+<h5 class="anchored" data-anchor-id="assembly-equivalent">Assembly Equivalent</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum_array:</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">MOV</span>     W0<span class="op">,</span> W2            <span class="co">; W2 = arr (argument passed in W0)</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">MOV</span>     <span class="op">#</span><span class="dv">0</span><span class="op">,</span> W0            <span class="co">; sum = 0</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">MOV</span>     <span class="op">#</span><span class="dv">10</span><span class="op">,</span> W1           <span class="co">; counter = 10</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sum_loop:</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">ADD</span>     <span class="op">[</span>W2<span class="op">++],</span> W0<span class="op">,</span> W0    <span class="co">; sum += *arr; arr++</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">DEC</span>     W1<span class="op">,</span> W1            <span class="co">; counter--</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>    CP      W1<span class="op">,</span> <span class="op">#</span><span class="dv">0</span>            <span class="co">; if (counter != 0)</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>    BRA     NZ<span class="op">,</span> sum_loop      <span class="co">;     goto loop</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>    RETURN                      <span class="co">; return sum (in W0)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="key-observations" class="level5">
+<h5 class="anchored" data-anchor-id="key-observations">Key observations</h5>
+<ul>
+<li>The C compiler generates assembly similar to this</li>
+<li>Assembly gives explicit control over register usage</li>
+<li>Hardware loop (<code>DO</code>/<code>REPEAT</code>) would make assembly even faster</li>
+<li>Understanding assembly helps you read compiler output</li>
+</ul>
+</section>
+</section>
+</section>
+<section id="calling-convention" class="level2">
+<h2 class="anchored" data-anchor-id="calling-convention">Calling Convention</h2>
+<div class="subheading">
+<p>How Functions Communicate</p>
+</div>
+<p>When C calls assembly (or vice versa), both sides must agree on where to find arguments and return values.</p>
+<section id="dspic-c-calling-convention" class="level3">
+<h3 class="anchored" data-anchor-id="dspic-c-calling-convention">dsPIC C Calling Convention</h3>
+<div class="subheading">
+<p>ABI</p>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Item</th>
+<th style="text-align: left;">Location</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>First argument</strong></td>
+<td style="text-align: left;">W0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Second argument</strong></td>
+<td style="text-align: left;">W1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Third argument</strong></td>
+<td style="text-align: left;">W2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Fourth argument</strong></td>
+<td style="text-align: left;">W3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Return value</strong></td>
+<td style="text-align: left;">W0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Preserved registers</strong></td>
+<td style="text-align: left;">W4-W7 (callee-save)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Scratch registers</strong></td>
+<td style="text-align: left;">W0-W3 (caller-save)</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="example-2" class="level3">
+<h3 class="anchored" data-anchor-id="example-2">Example</h3>
+<div class="subheading">
+<p>C Calling Assembly</p>
+</div>
+<section id="c-code-1" class="level5">
+<h5 class="anchored" data-anchor-id="c-code-1">C code</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb37"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">extern</span> <span class="dt">int16_t</span> add_values<span class="op">(</span><span class="dt">int16_t</span> a<span class="op">,</span> <span class="dt">int16_t</span> b<span class="op">);</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">(</span><span class="dt">void</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int16_t</span> result <span class="op">=</span> add_values<span class="op">(</span><span class="dv">10</span><span class="op">,</span> <span class="dv">20</span><span class="op">);</span>  <span class="co">// result = 30</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result<span class="op">;</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="assembly-implementation" class="level5">
+<h5 class="anchored" data-anchor-id="assembly-implementation">Assembly implementation</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb38"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>    .global  add_values</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    .<span class="bu">section</span> <span class="op">.</span>text</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="fu">add_values:</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">; W0 already contains first argument (10)</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">; W1 already contains second argument (20)</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">ADD</span>   W0<span class="op">,</span> W1<span class="op">,</span> W0       <span class="co">; W0 = W0 + W1 = 30</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>    RETURN                 <span class="co">; Return to caller (W0 = 30)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="example-3" class="level3">
+<h3 class="anchored" data-anchor-id="example-3">Example</h3>
+<div class="subheading">
+<p>Assembly Calling C</p>
+</div>
+<section id="assembly-code" class="level5">
+<h5 class="anchored" data-anchor-id="assembly-code">Assembly code</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb39"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>    .extern  c_function     <span class="co">; External C function</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    .global  asm_caller</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="fu">asm_caller:</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">MOV</span>   <span class="op">#</span><span class="dv">10</span><span class="op">,</span> W0          <span class="co">; First argument in W0</span></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">MOV</span>   <span class="op">#</span><span class="dv">20</span><span class="op">,</span> W1          <span class="co">; Second argument in W1</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">CALL</span>  c_function       <span class="co">; Call C function</span></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">; W0 now contains return value</span></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>    RETURN</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+</section>
+<section id="common-assembly-patterns" class="level2">
+<h2 class="anchored" data-anchor-id="common-assembly-patterns">Common Assembly Patterns</h2>
+<section id="delay-loop" class="level3">
+<h3 class="anchored" data-anchor-id="delay-loop">Delay Loop</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb40"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">delay:</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">MOV</span>     <span class="op">#</span><span class="dv">1000</span><span class="op">,</span> W0</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="fu">delay_loop:</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">DEC</span>     W0<span class="op">,</span> W0</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    BRA     NZ<span class="op">,</span> delay_loop</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>    RETURN</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="table-lookup" class="level3">
+<h3 class="anchored" data-anchor-id="table-lookup">Table Lookup</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb41"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co">; Data: sine wave table</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sine_table:</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    .<span class="dt">word</span>   <span class="dv">0</span><span class="op">,</span> <span class="dv">1000</span><span class="op">,</span> <span class="dv">2000</span><span class="op">,</span> <span class="dv">3000</span><span class="op">,</span> <span class="dv">4000</span><span class="op">,</span> <span class="dv">4000</span><span class="op">,</span> <span class="dv">3000</span><span class="op">,</span> <span class="dv">2000</span><span class="op">,</span> <span class="dv">1000</span><span class="op">,</span> <span class="dv">0</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="co">; Code: lookup value by index</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="fu">get_sine:</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>    SL      W0<span class="op">,</span> <span class="op">#</span><span class="dv">1</span><span class="op">,</span> W0       <span class="co">; Multiply index by 2 (16-bit words)</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">MOV</span>     <span class="op">#</span>sine_table<span class="op">,</span> W1  <span class="co">; Base address</span></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">ADD</span>     W0<span class="op">,</span> W1<span class="op">,</span> W0       <span class="co">; W0 = &amp;sine_table[index]</span></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">MOV</span>     <span class="op">[</span>W0<span class="op">],</span> W0         <span class="co">; W0 = sine_table[index]</span></span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>    RETURN</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="clear-memory-block" class="level3">
+<h3 class="anchored" data-anchor-id="clear-memory-block">Clear Memory Block</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb42"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">clear_block:</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">; W0 = destination address</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">; W1 = byte count</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">MOV</span>     <span class="op">#</span><span class="dv">0</span><span class="op">,</span> W2           <span class="co">; Value to write (zero)</span></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a><span class="fu">clear_loop:</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">DEC</span>     W1<span class="op">,</span> W1</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>    BRA     LT<span class="op">,</span> clear_done   <span class="co">; Exit if count &lt; 0</span></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">MOV</span>     W2<span class="op">,</span> <span class="op">[</span>W0<span class="op">++]</span>       <span class="co">; Store zero, increment pointer</span></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>    BRA     clear_loop</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a><span class="fu">clear_done:</span></span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>    RETURN</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="reading-disassembly" class="level2">
+<h2 class="anchored" data-anchor-id="reading-disassembly">Reading Disassembly</h2>
+<p>When debugging, your compiler will often show you disassembly (human-readable machine code).</p>
+<p><strong>Example: Disassembly of a simple C function</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb43"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> add_five<span class="op">(</span><span class="dt">int</span> x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x <span class="op">+</span> <span class="dv">5</span><span class="op">;</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="compiler-output" class="level5">
+<h5 class="anchored" data-anchor-id="compiler-output">Compiler output</h5>
+<div class="subheading">
+<p>simplified</p>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb44"><pre class="sourceCode asm code-with-copy"><code class="sourceCode fasm"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">add_five:</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">ADD</span>   W0<span class="op">,</span> <span class="op">#</span><span class="dv">5</span><span class="op">,</span> W0    <span class="co">; W0 = W0 + 5</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    RETURN              <span class="co">; return W0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="why-this-matters" class="level5">
+<h5 class="anchored" data-anchor-id="why-this-matters">Why this matters</h5>
+<ul>
+<li>When stepping through code in a debugger, you see actual instructions</li>
+<li>Compiler optimizations can be verified by reading output</li>
+<li>Sometimes bugs are visible only at assembly level</li>
+</ul>
+</section>
+</section>
+<section id="debugging-tips" class="level2">
+<h2 class="anchored" data-anchor-id="debugging-tips">Debugging Tips</h2>
+<ol type="1">
+<li><strong>Comment heavily</strong>: Assembly is opaque without comments</li>
+<li><strong>Use meaningful labels</strong>: <code>loop_start:</code> not <code>L1:</code></li>
+<li><strong>Check register usage</strong>: Track which registers hold what</li>
+<li><strong>Watch the flags</strong>: After every math operation, flags are set</li>
+<li><strong>Single-step</strong>: Use your debugger to execute one instruction at a time</li>
+<li><strong>Watch memory</strong>: Verify pointers point where you expect</li>
+</ol>
+</section>
+<section id="the-assembly-toolchain" class="level2">
+<h2 class="anchored" data-anchor-id="the-assembly-toolchain">The Assembly Toolchain</h2>
+<p>How does text become behavior?</p>
+<div id="cell-fig-assembler-flow" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.patches <span class="im">as</span> mpatches</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">3</span>))</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="dv">0</span>, <span class="dv">10</span>)</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, <span class="dv">4</span>)</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>ax.axis(<span class="st">"off"</span>)</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> draw_box(x, y, text, color<span class="op">=</span><span class="st">"#e0e0e0"</span>, width<span class="op">=</span><span class="fl">1.5</span>, height<span class="op">=</span><span class="fl">1.0</span>):</span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>    rect <span class="op">=</span> mpatches.FancyBboxPatch(</span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>        (x, y),</span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>        width,</span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a>        height,</span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>        boxstyle<span class="op">=</span><span class="st">"round,pad=0.1"</span>,</span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>        facecolor<span class="op">=</span>color,</span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a>        edgecolor<span class="op">=</span><span class="st">"black"</span>,</span>
+<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a>    ax.add_patch(rect)</span>
+<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a>    ax.text(</span>
+<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a>        x <span class="op">+</span> width <span class="op">/</span> <span class="dv">2</span>,</span>
+<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a>        y <span class="op">+</span> height <span class="op">/</span> <span class="dv">2</span>,</span>
+<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a>        text,</span>
+<span id="cb45-24"><a href="#cb45-24" aria-hidden="true" tabindex="-1"></a>        ha<span class="op">=</span><span class="st">"center"</span>,</span>
+<span id="cb45-25"><a href="#cb45-25" aria-hidden="true" tabindex="-1"></a>        va<span class="op">=</span><span class="st">"center"</span>,</span>
+<span id="cb45-26"><a href="#cb45-26" aria-hidden="true" tabindex="-1"></a>        weight<span class="op">=</span><span class="st">"bold"</span>,</span>
+<span id="cb45-27"><a href="#cb45-27" aria-hidden="true" tabindex="-1"></a>        fontsize<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb45-28"><a href="#cb45-28" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb45-29"><a href="#cb45-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-30"><a href="#cb45-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-31"><a href="#cb45-31" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> draw_arrow(x1, x2, y):</span>
+<span id="cb45-32"><a href="#cb45-32" aria-hidden="true" tabindex="-1"></a>    ax.annotate(</span>
+<span id="cb45-33"><a href="#cb45-33" aria-hidden="true" tabindex="-1"></a>        <span class="st">""</span>,</span>
+<span id="cb45-34"><a href="#cb45-34" aria-hidden="true" tabindex="-1"></a>        xy<span class="op">=</span>(x2, y),</span>
+<span id="cb45-35"><a href="#cb45-35" aria-hidden="true" tabindex="-1"></a>        xytext<span class="op">=</span>(x1, y),</span>
+<span id="cb45-36"><a href="#cb45-36" aria-hidden="true" tabindex="-1"></a>        arrowprops<span class="op">=</span><span class="bu">dict</span>(width<span class="op">=</span><span class="dv">1</span>, headwidth<span class="op">=</span><span class="dv">10</span>, headlength<span class="op">=</span><span class="dv">10</span>),</span>
+<span id="cb45-37"><a href="#cb45-37" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb45-38"><a href="#cb45-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-39"><a href="#cb45-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-40"><a href="#cb45-40" aria-hidden="true" tabindex="-1"></a><span class="co"># Components</span></span>
+<span id="cb45-41"><a href="#cb45-41" aria-hidden="true" tabindex="-1"></a>draw_box(<span class="fl">0.5</span>, <span class="fl">1.5</span>, <span class="st">"Source Code</span><span class="ch">\n</span><span class="st">(.s)"</span>, <span class="st">"#ffcccc"</span>)  <span class="co"># Red</span></span>
+<span id="cb45-42"><a href="#cb45-42" aria-hidden="true" tabindex="-1"></a>draw_box(<span class="fl">3.0</span>, <span class="fl">1.5</span>, <span class="st">"Assembler"</span>, <span class="st">"#ccffcc"</span>)  <span class="co"># Green</span></span>
+<span id="cb45-43"><a href="#cb45-43" aria-hidden="true" tabindex="-1"></a>draw_box(<span class="fl">5.5</span>, <span class="fl">1.5</span>, <span class="st">"Object File</span><span class="ch">\n</span><span class="st">(.o)"</span>, <span class="st">"#ccccff"</span>)  <span class="co"># Blue</span></span>
+<span id="cb45-44"><a href="#cb45-44" aria-hidden="true" tabindex="-1"></a>draw_box(<span class="fl">8.0</span>, <span class="fl">1.5</span>, <span class="st">"Linker"</span>, <span class="st">"#ffffcc"</span>)  <span class="co"># Yellow</span></span>
+<span id="cb45-45"><a href="#cb45-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-46"><a href="#cb45-46" aria-hidden="true" tabindex="-1"></a><span class="co"># Arrows</span></span>
+<span id="cb45-47"><a href="#cb45-47" aria-hidden="true" tabindex="-1"></a>draw_arrow(<span class="fl">2.1</span>, <span class="fl">2.9</span>, <span class="fl">2.0</span>)</span>
+<span id="cb45-48"><a href="#cb45-48" aria-hidden="true" tabindex="-1"></a>draw_arrow(<span class="fl">4.6</span>, <span class="fl">5.4</span>, <span class="fl">2.0</span>)</span>
+<span id="cb45-49"><a href="#cb45-49" aria-hidden="true" tabindex="-1"></a>draw_arrow(<span class="fl">7.1</span>, <span class="fl">7.9</span>, <span class="fl">2.0</span>)</span>
+<span id="cb45-50"><a href="#cb45-50" aria-hidden="true" tabindex="-1"></a>draw_arrow(<span class="fl">9.6</span>, <span class="fl">9.95</span>, <span class="fl">2.0</span>)</span>
+<span id="cb45-51"><a href="#cb45-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-52"><a href="#cb45-52" aria-hidden="true" tabindex="-1"></a><span class="co"># Final output</span></span>
+<span id="cb45-53"><a href="#cb45-53" aria-hidden="true" tabindex="-1"></a>ax.text(<span class="fl">10.0</span>, <span class="fl">2.0</span>, <span class="st">"Executable</span><span class="ch">\n</span><span class="st">(.hex/.elf)"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"center"</span>, weight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb45-54"><a href="#cb45-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-55"><a href="#cb45-55" aria-hidden="true" tabindex="-1"></a><span class="co"># Descriptions</span></span>
+<span id="cb45-56"><a href="#cb45-56" aria-hidden="true" tabindex="-1"></a>ax.text(</span>
+<span id="cb45-57"><a href="#cb45-57" aria-hidden="true" tabindex="-1"></a>    <span class="fl">3.75</span>,</span>
+<span id="cb45-58"><a href="#cb45-58" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1.0</span>,</span>
+<span id="cb45-59"><a href="#cb45-59" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Translates Mnemonics</span><span class="ch">\n</span><span class="st">to Machine Code"</span>,</span>
+<span id="cb45-60"><a href="#cb45-60" aria-hidden="true" tabindex="-1"></a>    ha<span class="op">=</span><span class="st">"center"</span>,</span>
+<span id="cb45-61"><a href="#cb45-61" aria-hidden="true" tabindex="-1"></a>    va<span class="op">=</span><span class="st">"top"</span>,</span>
+<span id="cb45-62"><a href="#cb45-62" aria-hidden="true" tabindex="-1"></a>    fontsize<span class="op">=</span><span class="dv">9</span>,</span>
+<span id="cb45-63"><a href="#cb45-63" aria-hidden="true" tabindex="-1"></a>    style<span class="op">=</span><span class="st">"italic"</span>,</span>
+<span id="cb45-64"><a href="#cb45-64" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb45-65"><a href="#cb45-65" aria-hidden="true" tabindex="-1"></a>ax.text(</span>
+<span id="cb45-66"><a href="#cb45-66" aria-hidden="true" tabindex="-1"></a>    <span class="fl">8.75</span>,</span>
+<span id="cb45-67"><a href="#cb45-67" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1.0</span>,</span>
+<span id="cb45-68"><a href="#cb45-68" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Assigns Physical</span><span class="ch">\n</span><span class="st">Memory Addresses"</span>,</span>
+<span id="cb45-69"><a href="#cb45-69" aria-hidden="true" tabindex="-1"></a>    ha<span class="op">=</span><span class="st">"center"</span>,</span>
+<span id="cb45-70"><a href="#cb45-70" aria-hidden="true" tabindex="-1"></a>    va<span class="op">=</span><span class="st">"top"</span>,</span>
+<span id="cb45-71"><a href="#cb45-71" aria-hidden="true" tabindex="-1"></a>    fontsize<span class="op">=</span><span class="dv">9</span>,</span>
+<span id="cb45-72"><a href="#cb45-72" aria-hidden="true" tabindex="-1"></a>    style<span class="op">=</span><span class="st">"italic"</span>,</span>
+<span id="cb45-73"><a href="#cb45-73" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb45-74"><a href="#cb45-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-75"><a href="#cb45-75" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb45-76"><a href="#cb45-76" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-assembler-flow" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-assembler-flow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="assembly_files/figure-html/fig-assembler-flow-output-1.png" width="950" height="278" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-assembler-flow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: The Assembly Build Process. The Assembler translates human-readable mnemonics 1-to-1 into machine opcodes. The Linker combines these separate object files into a final executable, resolving exact memory addresses.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<ol type="1">
+<li><strong>Source (.s)</strong>: Your text file with mnemonics, labels, and directives</li>
+<li><strong>Assembler</strong>: Translates <code>MOV W0, W1</code> to binary opcode <code>0x778210</code> (example). Produces an <strong>Object File</strong> with machine code but unresolved addresses.</li>
+<li><strong>Linker</strong>: Takes all object files, assigns final memory addresses, resolves labels, and produces the final executable.</li>
+</ol>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<section id="assembly-fundamentals" class="level5">
+<h5 class="anchored" data-anchor-id="assembly-fundamentals">Assembly fundamentals</h5>
+<ul>
+<li><strong>Explicit control</strong>: You manage every register, memory access, and branch</li>
+<li><strong>Registers first</strong>: Arithmetic happens in registers; memory requires load/store</li>
+<li><strong>Flags enable branches</strong>: Conditional jumps depend on status flags from previous operations</li>
+<li><strong>Labels provide targets</strong>: Branch and jump destinations are marked with labels</li>
+</ul>
+</section>
+<section id="dspic-dsp-advantages" class="level5">
+<h5 class="anchored" data-anchor-id="dspic-dsp-advantages">dsPIC DSP advantages</h5>
+<ul>
+<li><strong>Hardware looping</strong>: <code>DO</code> and <code>REPEAT</code> enable zero-overhead loops</li>
+<li><strong>MAC instruction</strong>: Multiply-accumulate in one cycle</li>
+<li><strong>Modulo addressing</strong>: Automatic circular buffer pointer wraparound</li>
+<li><strong>40-bit accumulators</strong>: Guard bits prevent overflow in long summations</li>
+</ul>
+</section>
+<section id="practical-guidance" class="level5">
+<h5 class="anchored" data-anchor-id="practical-guidance">Practical guidance</h5>
+<ul>
+<li>Write C first, optimize critical sections in assembly</li>
+<li>Use compiler intrinsics before hand-writing assembly</li>
+<li>Comment assembly code heavily</li>
+<li>Understand your debugger’s disassembly view</li>
+</ul>
+</section>
+</section>
+<section id="further-reading" class="level2">
+<h2 class="anchored" data-anchor-id="further-reading">Further Reading</h2>
+<ul>
+<li><a href="https://gcc.gnu.org/onlinedocs/gcc/Using-Assembly-Language-with-C.html" target="_blank" rel="noopener">GCC Inline Assembly</a> - How to integrate assembly code within C programs</li>
+<li><a href="./reference/pcasm-book.pdf" target="_blank" rel="noopener">PC Assembly Language</a> by Paul A. Carter - Comprehensive assembly language textbook (x86 focused, but concepts apply)</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
