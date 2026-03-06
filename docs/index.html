@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2026-03-06">
+
+<title>Introduction – Computer Language Notebook</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="././favicon.png" rel="icon" type="image/png">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-238593fbc75c52b1713b5944fbe78712.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": true,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Computer Languager Notebook</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Languages</a></li><li class="breadcrumb-item"><a href="./index.html">Introduction</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+      <a href="./index.html" class="sidebar-logo-link">
+      <img src="././images/logo.png" alt="" class="sidebar-logo light-content py-0 d-lg-inline d-none">
+      <img src="././images/logo.png" alt="" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
+      </a>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Languages</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./assembly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Assembly Language</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./c.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The C Language</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./rust.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Rust Language</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Appendix</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Glossary</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="1">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#where-languages-come-from" id="toc-where-languages-come-from" class="nav-link active" data-scroll-target="#where-languages-come-from">Where Languages Come From</a></li>
+  <li><a href="#the-mathematical-roots" id="toc-the-mathematical-roots" class="nav-link" data-scroll-target="#the-mathematical-roots">The Mathematical Roots</a>
+  <ul>
+  <li><a href="#leibniz-and-the-dream-of-a-universal-calculus" id="toc-leibniz-and-the-dream-of-a-universal-calculus" class="nav-link" data-scroll-target="#leibniz-and-the-dream-of-a-universal-calculus">Leibniz and the Dream of a Universal Calculus</a></li>
+  <li><a href="#boole-and-the-algebra-of-thought" id="toc-boole-and-the-algebra-of-thought" class="nav-link" data-scroll-target="#boole-and-the-algebra-of-thought">Boole and the Algebra of Thought</a></li>
+  <li><a href="#babbage-and-lovelace-the-first-programmers" id="toc-babbage-and-lovelace-the-first-programmers" class="nav-link" data-scroll-target="#babbage-and-lovelace-the-first-programmers">Babbage and Lovelace: The First Programmers</a></li>
+  </ul></li>
+  <li><a href="#the-theoretical-foundations" id="toc-the-theoretical-foundations" class="nav-link" data-scroll-target="#the-theoretical-foundations">The Theoretical Foundations</a>
+  <ul>
+  <li><a href="#church-and-the-lambda-calculus" id="toc-church-and-the-lambda-calculus" class="nav-link" data-scroll-target="#church-and-the-lambda-calculus">Church and the Lambda Calculus</a></li>
+  <li><a href="#turing-and-the-machine" id="toc-turing-and-the-machine" class="nav-link" data-scroll-target="#turing-and-the-machine">Turing and the Machine</a></li>
+  <li><a href="#von-neumann-and-the-stored-program-architecture" id="toc-von-neumann-and-the-stored-program-architecture" class="nav-link" data-scroll-target="#von-neumann-and-the-stored-program-architecture">Von Neumann and the Stored-Program Architecture</a></li>
+  </ul></li>
+  <li><a href="#the-generations-of-language" id="toc-the-generations-of-language" class="nav-link" data-scroll-target="#the-generations-of-language">The Generations of Language</a>
+  <ul>
+  <li><a href="#first-generation-machine-code-1940s" id="toc-first-generation-machine-code-1940s" class="nav-link" data-scroll-target="#first-generation-machine-code-1940s">First Generation: Machine Code (1940s)</a></li>
+  <li><a href="#second-generation-assembly-language-1950s" id="toc-second-generation-assembly-language-1950s" class="nav-link" data-scroll-target="#second-generation-assembly-language-1950s">Second Generation: Assembly Language (1950s)</a></li>
+  <li><a href="#third-generation-high-level-languages-1950s1970s" id="toc-third-generation-high-level-languages-1950s1970s" class="nav-link" data-scroll-target="#third-generation-high-level-languages-1950s1970s">Third Generation: High-Level Languages (1950s–1970s)</a></li>
+  </ul></li>
+  <li><a href="#the-great-schisms" id="toc-the-great-schisms" class="nav-link" data-scroll-target="#the-great-schisms">The Great Schisms</a>
+  <ul>
+  <li><a href="#the-structured-programming-revolution" id="toc-the-structured-programming-revolution" class="nav-link" data-scroll-target="#the-structured-programming-revolution">The Structured Programming Revolution</a></li>
+  <li><a href="#object-oriented-programming" id="toc-object-oriented-programming" class="nav-link" data-scroll-target="#object-oriented-programming">Object-Oriented Programming</a></li>
+  <li><a href="#the-functional-renaissance" id="toc-the-functional-renaissance" class="nav-link" data-scroll-target="#the-functional-renaissance">The Functional Renaissance</a></li>
+  </ul></li>
+  <li><a href="#the-safety-problem" id="toc-the-safety-problem" class="nav-link" data-scroll-target="#the-safety-problem">The Safety Problem</a></li>
+  <li><a href="#the-modern-era-rust-and-the-safety-performance-synthesis" id="toc-the-modern-era-rust-and-the-safety-performance-synthesis" class="nav-link" data-scroll-target="#the-modern-era-rust-and-the-safety-performance-synthesis">The Modern Era: Rust and the Safety-Performance Synthesis</a></li>
+  <li><a href="#why-these-three-languages" id="toc-why-these-three-languages" class="nav-link" data-scroll-target="#why-these-three-languages">Why These Three Languages</a></li>
+  <li><a href="#a-note-on-what-gets-left-out" id="toc-a-note-on-what-gets-left-out" class="nav-link" data-scroll-target="#a-note-on-what-gets-left-out">A Note on What Gets Left Out</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content column-body" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Languages</a></li><li class="breadcrumb-item"><a href="./index.html">Introduction</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Introduction</h1>
+<p class="subtitle lead">A History of Computer Languages</p>
+</div>
+
+
+
+<div class="quarto-title-meta column-body">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">March 6, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="where-languages-come-from" class="level2">
+<h2 class="anchored" data-anchor-id="where-languages-come-from">Where Languages Come From</h2>
+<p>Every computer language ever written is, at its core, a notation for describing <em>computation</em>. That idea — that computation itself could be formalized, written down, and reasoned about — did not begin with silicon. It began with mathematics. To understand why programming languages look the way they do, why they fight the battles they fight, and why the three languages in this notebook were chosen, you have to follow the thread back to where it starts.</p>
+<hr>
+</section>
+<section id="the-mathematical-roots" class="level2">
+<h2 class="anchored" data-anchor-id="the-mathematical-roots">The Mathematical Roots</h2>
+<section id="leibniz-and-the-dream-of-a-universal-calculus" class="level3">
+<h3 class="anchored" data-anchor-id="leibniz-and-the-dream-of-a-universal-calculus">Leibniz and the Dream of a Universal Calculus</h3>
+<p>In the late 17th century, Gottfried Wilhelm Leibniz dreamed of a <em>calculus ratiocinator</em> — a universal calculating system that could reduce all reasoning to symbol manipulation. If arguments could be encoded as symbols and symbols manipulated by rule, then disputes between scholars could be resolved not by debate but by calculation: <em>“Let us compute.”</em> The dream was centuries ahead of its time. Leibniz did not achieve it. But he invented the binary number system and built mechanical calculators, and the dream itself proved contagious.</p>
+</section>
+<section id="boole-and-the-algebra-of-thought" class="level3">
+<h3 class="anchored" data-anchor-id="boole-and-the-algebra-of-thought">Boole and the Algebra of Thought</h3>
+<p>In 1854, George Boole published <em>An Investigation of the Laws of Thought</em>, establishing that logical propositions — AND, OR, NOT — could be treated as algebraic expressions. True and false became 1 and 0. Inference became arithmetic. This was not yet computing, but it was the algebra that would eventually run inside every transistor on every chip ever made. Boolean logic is the bedrock below the bedrock.</p>
+</section>
+<section id="babbage-and-lovelace-the-first-programmers" class="level3">
+<h3 class="anchored" data-anchor-id="babbage-and-lovelace-the-first-programmers">Babbage and Lovelace: The First Programmers</h3>
+<p>Charles Babbage spent decades designing mechanical computing engines. His <strong>Difference Engine</strong> (1822) could tabulate polynomial functions. His <strong>Analytical Engine</strong> (1837) was far more ambitious: it had a <em>store</em> (memory), a <em>mill</em> (processor), and it could be directed by punched cards. It was never built in his lifetime, but the design was sound.</p>
+<p>Ada Lovelace, working from Babbage’s notes, wrote what is now recognized as the first computer program: an algorithm for computing Bernoulli numbers on the Analytical Engine. More importantly, she saw what Babbage himself underestimated — that a machine that could manipulate <em>symbols by rule</em> was not merely a calculator. It was a general-purpose engine for transforming any information that could be encoded. She wrote in 1843:</p>
+<blockquote class="blockquote">
+<p><em>“The Analytical Engine has no pretensions whatever to originate anything. It can do whatever we know how to order it to perform.”</em></p>
+</blockquote>
+<p>That sentence contains both the power and the humility of every programming language ever written. The machine does exactly what you tell it. The craft is knowing how to tell it correctly.</p>
+<hr>
+</section>
+</section>
+<section id="the-theoretical-foundations" class="level2">
+<h2 class="anchored" data-anchor-id="the-theoretical-foundations">The Theoretical Foundations</h2>
+<section id="church-and-the-lambda-calculus" class="level3">
+<h3 class="anchored" data-anchor-id="church-and-the-lambda-calculus">Church and the Lambda Calculus</h3>
+<p>In the 1930s, Alonzo Church developed the <strong>lambda calculus</strong> — a formal system for expressing computation using function abstraction and application. On paper, with Greek letters, he showed that any computable function could be expressed as the application of anonymous functions to arguments. Lambda calculus has no loops, no variables in the imperative sense, no state. Just functions calling functions.</p>
+<p>This sounds abstract, but it is the direct ancestor of functional programming. Every time you write an anonymous function — a lambda, a closure, an arrow function — you are using Church’s notation, imported wholesale into modern languages.</p>
+</section>
+<section id="turing-and-the-machine" class="level3">
+<h3 class="anchored" data-anchor-id="turing-and-the-machine">Turing and the Machine</h3>
+<p>In 1936, Alan Turing published “On Computable Numbers,” introducing the <strong>Turing machine</strong>: an abstract device with an infinite tape, a read/write head, and a finite set of rules. Given the right rules, it could simulate any mechanical process. Turing proved that certain problems were <em>undecidable</em> — no algorithm could solve them — and in doing so, he defined the boundary of what computation can and cannot do.</p>
+<p>Church and Turing arrived at the same boundary from opposite directions. The <strong>Church-Turing thesis</strong> holds that any effectively computable function is computable by a Turing machine and expressible in the lambda calculus. This equivalence — between the procedural model (do this, then that, change this register) and the functional model (apply this function to that value) — echoes through the history of programming languages as a recurring argument about which style is more natural, more correct, more powerful.</p>
+</section>
+<section id="von-neumann-and-the-stored-program-architecture" class="level3">
+<h3 class="anchored" data-anchor-id="von-neumann-and-the-stored-program-architecture">Von Neumann and the Stored-Program Architecture</h3>
+<p>The theoretical work of Church and Turing became physical in the 1940s. John von Neumann’s 1945 report on the EDVAC computer articulated what became the dominant architecture of the modern computer: a processor and a memory that holds both <em>data</em> and <em>instructions</em>. Programs are not external configurations wired into the machine; they are data stored in the same space as the numbers they compute on.</p>
+<p>This insight — the <strong>stored-program computer</strong> — is why programming is possible at all. A program is data. You can write programs that read programs. You can write compilers. You can write operating systems. The entire software stack rests on this one architectural decision.</p>
+<hr>
+</section>
+</section>
+<section id="the-generations-of-language" class="level2">
+<h2 class="anchored" data-anchor-id="the-generations-of-language">The Generations of Language</h2>
+<p>With the theoretical groundwork laid and machines finally built, the question became practical: how do humans tell the machine what to do? The answer evolved through recognizable generations.</p>
+<section id="first-generation-machine-code-1940s" class="level3">
+<h3 class="anchored" data-anchor-id="first-generation-machine-code-1940s">First Generation: Machine Code (1940s)</h3>
+<p>The earliest computers were programmed in <strong>machine code</strong> — raw binary instructions specific to the processor’s hardware. A programmer working on the ENIAC in 1945 set switches, plugged cables, and read reference cards mapping decimal operation codes to physical behaviors. There was no abstraction. Every instruction was a direct hardware command.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Era</th>
+<th style="text-align: left;">Representation</th>
+<th style="text-align: left;">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Machine Code</td>
+<td style="text-align: left;">Binary / Hex opcodes</td>
+<td style="text-align: left;"><code>B8 01 00 00 00</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Assembly</td>
+<td style="text-align: left;">Mnemonic + operands</td>
+<td style="text-align: left;"><code>MOV EAX, 1</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">High-Level</td>
+<td style="text-align: left;">Language statement</td>
+<td style="text-align: left;"><code>int x = 1;</code></td>
+</tr>
+</tbody>
+</table>
+<p>Machine code is still what runs on every processor today. Every other generation is a translation layer.</p>
+</section>
+<section id="second-generation-assembly-language-1950s" class="level3">
+<h3 class="anchored" data-anchor-id="second-generation-assembly-language-1950s">Second Generation: Assembly Language (1950s)</h3>
+<p><strong>Assembly language</strong> replaced raw opcodes with human-readable mnemonics. <code>MOV</code>, <code>ADD</code>, <code>JMP</code>. An <strong>assembler</strong> — itself a program — translates these mnemonics one-for-one into machine code. One mnemonic becomes one instruction. The 1:1 relationship is the defining characteristic of assembly. There is no abstraction about what the processor will do; you are telling it exactly which registers to move, which memory addresses to read.</p>
+<p>Assembly gave programmers legibility without sacrificing control. It remains the language of choice anywhere the hardware itself must be negotiated directly: bootloaders, interrupt handlers, cycle-critical DSP routines, embedded microcontrollers with 256 bytes of RAM. It is covered in this notebook for exactly that reason.</p>
+</section>
+<section id="third-generation-high-level-languages-1950s1970s" class="level3">
+<h3 class="anchored" data-anchor-id="third-generation-high-level-languages-1950s1970s">Third Generation: High-Level Languages (1950s–1970s)</h3>
+<p>Third-generation languages introduced <strong>abstraction</strong> — one statement expanding into many machine instructions. A <code>for</code> loop, a function call, a variable — these have no direct equivalent in hardware. The compiler invents the translation.</p>
+<p>The major milestones:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 33%">
+<col style="width: 46%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Year</th>
+<th style="text-align: left;">Language</th>
+<th style="text-align: left;">Significance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1957</td>
+<td style="text-align: left;"><strong>FORTRAN</strong></td>
+<td style="text-align: left;">First compiled high-level language. Proved that compilers could match hand-tuned assembly in performance. Scientific computing.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1958</td>
+<td style="text-align: left;"><strong>LISP</strong></td>
+<td style="text-align: left;">First functional language. Lists and lambda abstraction. Influenced nearly every dynamic language since.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1959</td>
+<td style="text-align: left;"><strong>COBOL</strong></td>
+<td style="text-align: left;">Business data processing. English-like syntax. Ran the world’s financial infrastructure for decades (and still does).</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1960</td>
+<td style="text-align: left;"><strong>ALGOL 60</strong></td>
+<td style="text-align: left;">Introduced block structure, lexical scoping, and the grammar that most modern languages still use. Never widely deployed but enormously influential.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1964</td>
+<td style="text-align: left;"><strong>BASIC</strong></td>
+<td style="text-align: left;">Designed to be simple enough that non-specialists could program. Brought computing to universities and, eventually, homes.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1972</td>
+<td style="text-align: left;"><strong>C</strong></td>
+<td style="text-align: left;">Systems programming. Close enough to the machine to write operating systems, fast enough to replace assembly in most contexts. The lingua franca of computing.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1975</td>
+<td style="text-align: left;"><strong>Scheme</strong></td>
+<td style="text-align: left;">Minimal, elegant Lisp dialect. Lexical scope, tail recursion, first-class continuations. A language for teaching the nature of computation.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+</section>
+<section id="the-great-schisms" class="level2">
+<h2 class="anchored" data-anchor-id="the-great-schisms">The Great Schisms</h2>
+<section id="the-structured-programming-revolution" class="level3">
+<h3 class="anchored" data-anchor-id="the-structured-programming-revolution">The Structured Programming Revolution</h3>
+<p>In the 1960s, programs grew large enough to become unmanageable. The culprit, according to Edsger Dijkstra’s 1968 letter “Go To Statement Considered Harmful,” was the <code>GOTO</code> — the unconditional jump that let control flow anywhere in the program. Large programs with many <code>GOTO</code>s became impossible to reason about. Dijkstra argued that control flow should be structured: sequences, conditionals, and loops only.</p>
+<p><strong>Structured programming</strong> — the discipline of using <code>if</code>, <code>while</code>, and <code>for</code> instead of <code>GOTO</code> — is now so universal it is invisible. Every language in this notebook is a structured language. But the fight was real, and the resolution shaped what “good code” means to this day.</p>
+</section>
+<section id="object-oriented-programming" class="level3">
+<h3 class="anchored" data-anchor-id="object-oriented-programming">Object-Oriented Programming</h3>
+<p>In 1967, <strong>Simula</strong> introduced the concepts of <em>objects</em> and <em>classes</em> — bundles of data and behavior that could model real-world entities. Smalltalk, developed at Xerox PARC in the 1970s, refined the idea into a pure philosophy: everything is an object; computation is objects sending messages to each other.</p>
+<p><strong>C++</strong> brought object-oriented programming to the systems world in 1983, adding classes to C without abandoning its performance characteristics. <strong>Java</strong> (1995) brought it to the masses with a garbage-collected, platform-independent runtime. By the 1990s, OOP had won the mainstream. Almost every language taught in universities was object-oriented.</p>
+<p>OOP solved real problems. It gave large teams a vocabulary for decomposing complex systems. But it also introduced its own complexity: deep inheritance hierarchies, mutable shared state, a tendency toward architecture for architecture’s sake. The reaction against OOP’s excesses would shape the next generation of systems languages.</p>
+</section>
+<section id="the-functional-renaissance" class="level3">
+<h3 class="anchored" data-anchor-id="the-functional-renaissance">The Functional Renaissance</h3>
+<p>Lisp had been functional since 1958, but functional programming remained academic for decades. In the 1980s and 1990s, <strong>ML</strong> and <strong>Haskell</strong> developed rigorous type systems built around functional ideas: immutability, algebraic data types, pattern matching, monads. These were not primarily practical languages; they were laboratories for type theory.</p>
+<p>The ideas escaped the laboratory. <strong>Erlang</strong> (1986) used functional techniques to build massively concurrent, fault-tolerant telephone infrastructure. <strong>Scala</strong> (2004) fused functional and object-oriented programming on the JVM. <strong>Clojure</strong> (2007) brought a Lisp to the JVM with a pragmatic emphasis on immutability and concurrency. And mainstream languages — Java, C#, Python, JavaScript — absorbed functional features one by one: lambdas, map/filter/reduce, pattern matching, immutable data structures.</p>
+<p>The insight that functional programming gave the world was this: <strong>mutable shared state is the root of most concurrency bugs.</strong> If data cannot change, threads cannot corrupt each other. This insight became urgent as multi-core processors became standard, and it drove a resurgence of interest in functional design throughout the 2000s and 2010s.</p>
+<hr>
+</section>
+</section>
+<section id="the-safety-problem" class="level2">
+<h2 class="anchored" data-anchor-id="the-safety-problem">The Safety Problem</h2>
+<p>As software grew to run aircraft, medical devices, financial systems, and critical infrastructure, the cost of bugs became existential. And one category of bug proved devastatingly common: <strong>memory errors</strong>.</p>
+<p>C and C++ give programmers direct control over memory. That control enables extraordinary performance and hardware access. It also enables buffer overflows, use-after-free errors, null pointer dereferences, and data races — entire classes of vulnerabilities that have caused some of the most catastrophic security failures in computing history. The <strong>Morris Worm</strong> (1988), <strong>Heartbleed</strong> (2014), and countless others traced to memory mismanagement in C and C++ code.</p>
+<p>For decades, the response was tooling: valgrind, AddressSanitizer, static analyzers, fuzzing. The tools helped. But they were detective, not preventive.</p>
+<p>The alternative — garbage-collected languages like Java, Python, Go — solve memory safety by taking memory management away from the programmer entirely. The garbage collector tracks allocations and frees them when no references remain. This works remarkably well. But it comes with a cost: unpredictable pause times, higher memory overhead, and an inability to reason precisely about when and where resources are released. For systems programming — operating systems, device drivers, real-time signal processing — these costs are often unacceptable.</p>
+<hr>
+</section>
+<section id="the-modern-era-rust-and-the-safety-performance-synthesis" class="level2">
+<h2 class="anchored" data-anchor-id="the-modern-era-rust-and-the-safety-performance-synthesis">The Modern Era: Rust and the Safety-Performance Synthesis</h2>
+<p>For most of computing history, you chose between safety and control. Garbage-collected languages gave you safety at the cost of performance and predictability. C and C++ gave you control at the cost of safety. The assumption was that this tradeoff was fundamental.</p>
+<p><strong>Rust</strong> (1.0 released 2015) challenged that assumption directly. Its core innovation is the <strong>ownership system</strong>: a set of compile-time rules enforced by the type checker that guarantee memory safety and thread safety without a garbage collector. Every value has exactly one owner. When the owner goes out of scope, the value is freed — automatically, deterministically, at compile time. Borrowing rules prevent data races. The <strong>borrow checker</strong> rejects programs that would cause undefined behavior before they ever run.</p>
+<p>The result is a language with:</p>
+<ul>
+<li><strong>No garbage collector</strong> — deterministic performance, suitable for real-time systems</li>
+<li><strong>No runtime</strong> — small binary size, suitable for embedded targets</li>
+<li><strong>Memory safety</strong> — no buffer overflows, no use-after-free, no null pointer dereferences, guaranteed by the compiler</li>
+<li><strong>Thread safety</strong> — data races are compile errors, not runtime crashes</li>
+<li><strong>C-compatible FFI</strong> — can call into C libraries and be called from C</li>
+</ul>
+<p>Rust did not appear from nowhere. It synthesized decades of research: region-based memory management from ML, affine type systems from linear logic, ownership semantics from earlier systems research. But it was the first language to package these ideas into a practical, production-ready systems language with a coherent community and toolchain.</p>
+<p>The response from industry was unusual for a new systems language: enthusiastic adoption. Mozilla used Rust to rewrite performance-critical parts of Firefox. Microsoft began rewriting Windows components in Rust. The Linux kernel accepted Rust as a second implementation language in 2022. The U.S. National Security Agency and CISA issued guidance recommending Rust and other memory-safe languages for new systems development. The narrative that safety and systems performance were irreconcilable was broken.</p>
+<hr>
+</section>
+<section id="why-these-three-languages" class="level2">
+<h2 class="anchored" data-anchor-id="why-these-three-languages">Why These Three Languages</h2>
+<p>This notebook covers <strong>Assembly</strong>, <strong>C</strong>, and <strong>Rust</strong>. The choice is not arbitrary — it follows the spine of systems programming evolution:</p>
+<pre><code>Machine Code → Assembly → C → Rust</code></pre>
+<p>Each step adds abstraction while preserving the core concern: <em>control over what the machine actually does</em>.</p>
+<p><strong>Assembly</strong> is the floor. It is what the processor executes. Understanding assembly means understanding what a <code>for</code> loop actually is (a branch and a counter), what a function call actually costs (a stack frame), and why cache misses matter (a load instruction that stalls for 200 cycles). Every higher-level language compiles to this, and knowing it makes you a better programmer in every language above it.</p>
+<p><strong>C</strong> is the lingua franca. It is the language in which operating systems, compilers, databases, and embedded firmware are written. It is what assembly became when programmers needed to write programs larger than a single human could hold in mind. Understanding C means understanding pointers, stack and heap allocation, the cost of indirection, and why undefined behavior is the way it is. C is also the interface language of the world — the FFI that every other language speaks when it needs to talk to hardware or to existing systems.</p>
+<p><strong>Rust</strong> is the synthesis. It carries C’s performance and control into an era that demands safety guarantees C cannot provide. It is the answer to the question: <em>what would C look like if it were designed today, with everything we have learned in fifty years about type theory, memory safety, and concurrent programming?</em> Rust is not a replacement for C in the sense of being able to run everywhere C runs — not yet — but it is a demonstration that the tradeoffs C was built around are not immutable laws.</p>
+<p>Together, these three languages span from the metal to the modern, from direct hardware manipulation to compile-time safety proofs. Understanding all three means understanding not just how to write programs, but why programs are the shape they are — why the machine works as it does, why the language constrains you where it does, and what the tradeoffs cost.</p>
+<p>That is what this notebook is about.</p>
+<hr>
+</section>
+<section id="a-note-on-what-gets-left-out" class="level2">
+<h2 class="anchored" data-anchor-id="a-note-on-what-gets-left-out">A Note on What Gets Left Out</h2>
+<p>The history above covers the threads most relevant to systems programming. It omits or mentions only in passing:</p>
+<ul>
+<li><strong>SQL and declarative languages</strong> — a wholly different paradigm where you describe <em>what</em> you want, not <em>how</em> to compute it</li>
+<li><strong>Prolog and logic programming</strong> — computation as proof search</li>
+<li><strong>Scripting languages</strong> — Python, Ruby, Perl, JavaScript — which prioritized developer productivity and dynamic typing over static guarantees</li>
+<li><strong>Domain-specific languages</strong> — from TeX to VHDL to MATLAB — built for one purpose with the rest left out</li>
+</ul>
+<p>These are not lesser paths. They reflect different answers to the same question: <em>what does a useful notation for computation look like?</em> The answer depends entirely on what you need to compute, and for whom.</p>
+<p>The languages in this notebook are the ones you need if the machine itself is part of what you are programming. If you need to be close to the hardware — close enough that you care about register allocation, stack depth, cache behavior, and memory layout — this is your lineage.</p>
+<hr>
+<p><em>The next chapter begins where computation itself begins: assembly language and the direct instruction of hardware.</em></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

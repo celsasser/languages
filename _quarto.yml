@@ -1,0 +1,63 @@
+fig-align: center
+
+project:
+  type: website
+  output-dir: docs
+  render:
+    - "*.qmd"
+    - "!*.md"
+
+website:
+  title: "Computer Language Notebook"
+  description: "Everything computer languages and pretty much nothing to begin with"
+  favicon: ./favicon.png
+
+  search:
+    show-item-context: true
+
+  navbar:
+    title: "Computer Languager Notebook"
+    search: true
+
+  sidebar:
+    logo: ./images/logo.png
+    style: docked
+    collapse-level: 1
+
+    contents:
+      - section: "Languages"
+        contents:
+          - text: "Introduction"
+            file:  index.qmd
+          - text: "Assembly Language"
+            file: assembly.qmd
+          - text: "The C Language"
+            file: c.qmd
+          - text: "The Rust Language"
+            file: rust.qmd
+
+      - section: "Appendix"
+        contents:
+          - text: "Glossary"
+            file: glossary.qmd
+
+# Document defaults
+format:
+  html:
+    callout-appearance: default
+    code-fold: show
+    css: styles.css
+    date-format: "MMMM D, YYYY"
+    date: last-modified
+    embed-resources: false
+    link-external-newwindow: true
+    page-layout: full
+    theme: cosmo
+    toc-depth: 4
+    toc-expand: 1
+    toc: true
+    grid:
+      body-width: 1024px
+      gutter-width: 1.5em
+      margin-width: 290px
+      sidebar-width: 270px
