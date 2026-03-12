@@ -1,0 +1,460 @@
+/**** The following styles are shared by all notes  ****/
+
+/**** element styling ****/
+h1 {
+  color: #7c7c78;
+  font-size: 2.1em;
+}
+
+h2 {
+  color: #222;
+  font-size: 2.0em;
+}
+
+h3 {
+  color: #555;
+  font-size: 1.62em;
+}
+
+h4 {
+  color: #777;
+  font-size: 1.40em;
+  font-weight: 500;
+}
+
+h5 {
+  color: #777;
+  font-size: 1.25em;
+  font-weight: 400;
+  padding-top: 0.55em;
+  margin-bottom: 0.33em;
+}
+
+/* H6 is just a bold heading */
+h6 {
+  color: #555;
+  font-size: 1.12em;
+  font-weight: 600;
+  padding-top: 0.25em;
+  margin-bottom: 0.33em;
+}
+
+.sidebar li {
+  padding-bottom: 0;
+}
+
+li {
+  /* We have a lot of equations in lists and they get very dense */
+  padding-bottom: 0.15em;
+}
+
+/*
+  The following will center all equations. I like left justification, but not sure that
+  it makes sense for the whole document. I've gotten used to center alignment.
+*/
+/*
+.math > mjx-container[jax="CHTML"][display="true"] {
+  text-align: left;
+}
+*/
+
+table.table {
+  /* border-left: 1px solid #d6d8d9;
+  border-right: 1px solid #d6d8d9; */
+  margin-bottom: 2.0rem;
+}
+
+
+/**** class styling ****/
+.deep-thought,
+/* by jack handey */
+.definition,
+.explanation,
+.exploration,
+.example,
+.examples,
+.formula,
+.highlight,
+.note,
+.oracle,
+.panel,
+/* solid background with heading */
+.panel-hd,
+/* default dialog style heading */
+.panel-h2,
+/* dialog style heading */
+.panel-h3,
+/* dialog style heading */
+.panel-h4,
+/* dialog style heading */
+.panel-h5,
+/* dialog style heading */
+.panel-h6,
+/* dialog style heading */
+.proof-ce,
+.solution-ce,
+.stdout,
+.theorem,
+.todo {
+  border: 2px solid #988;
+  border-radius: 8px;
+  border-width: 1.0px;
+  font-size: 0.95em;
+  margin-bottom: 1em;
+  padding: 8px 8px 0px 10px;
+}
+
+.deep-thought::before,
+.deep-thought:not([data-label])::before,
+.definition::before,
+.definition:not([data-label])::before,
+.explanation::before,
+.explanation:not([data-label])::before,
+.exploration::before,
+.exploration:not([data-label])::before,
+.example::before,
+.example:not([data-label])::before,
+.examples::before,
+.examples:not([data-label])::before,
+.formula::before,
+.formula:not([data-label])::before,
+.note::before,
+.oracle::before,
+.oracle:not([data-label])::before,
+.panel::before,
+.panel-hd::before,
+.panel-h2::before,
+.panel-h3::before,
+.panel-h4::before,
+.panel-h5::before,
+.panel-h6::before,
+.proof-ce::before,
+.proof-ce:not([data-label])::before,
+.solution-ce::before,
+.solution-ce:not([data-label])::before,
+.stdout,
+.theorem::before,
+.theorem:not([data-label])::before,
+.todo::before {
+  color: #666;
+  display: block;
+  font-size: 1.25em;
+  font-weight: bold;
+  margin-bottom: 0.33em;
+  /* Increase vertical space below the title */
+  position: relative;
+}
+
+.deep-thought::before,
+.definition::before,
+.example::before,
+.examples::before,
+.explanation::before,
+.exploration::before,
+.formula::before,
+.note::before,
+.oracle::before,
+.panel::before,
+.proof-ce::before,
+.solution-ce::before,
+.theorem::before {
+  content: attr(data-label);
+}
+
+.centered-text,
+.centered-text-sm,
+.centered-text-md,
+.centered-text-lg {
+  text-align: center;
+}
+
+.centered-text-sm {
+  font-size: 0.9em;
+}
+.centered-text-md {
+  font-size: 1.25em;
+}
+.centered-text-lg {
+  font-size: 1.5em;
+}
+
+.definition,
+.formula {
+  background-color: #fffff6;
+}
+
+.definition:not([data-label])::before {
+  /* This targets any element with the class "definition"
+     that does NOT have a "data-label" attribute and gives it a default value. */
+  content: "Definition";
+}
+
+.deep-thought,
+.example,
+.examples,
+.highlight,
+.oracle,
+.panel,
+.solution-ce {
+  background-color: #fffff6;
+}
+
+.deep-thought:not([data-label])::before {
+  content: "Thinking 💡";
+}
+
+a.disable-link {
+  color: #bbb;
+  cursor: default;
+  font-style: italic;
+  pointer-events: none;
+}
+
+
+.example:not([data-label])::before {
+  content: "Example";
+}
+
+.examples:not([data-label])::before {
+  content: "Examples";
+}
+
+.explanation,
+.exploration {
+  background-color: #f7fff5;
+}
+
+.explanation:not([data-label])::before {
+  content: "Explanation"
+}
+
+.exploration:not([data-label])::before {
+  content: "Exploration";
+}
+
+.formula:not([data-label])::before {
+  content: "Formula"
+}
+
+.highlight,
+.panel {
+  font-size: 1em;
+}
+
+.note {
+  background-color: #e8fff4;
+}
+
+.oracle:not([data-label])::before {
+  content: "Oracle";
+}
+
+.panel-hd,
+.panel-h2,
+.panel-h3,
+.panel-h4,
+.panel-h5,
+.panel-h6 {
+  font-size: 1em;
+  position: relative;
+}
+
+.panel-h2 {
+  margin-top: 2em;
+  padding-top: 3.4em;
+}
+
+.panel-h3 {
+  margin-top: 1.7em;
+  padding-top: 2.9em;
+}
+
+.panel-h4 {
+  margin-top: 1.5em;
+  padding-top: 2.3em;
+}
+
+.panel-hd,
+.panel-h5 {
+  margin-top: 1.2em;
+  padding-top: 2.2em;
+}
+
+.panel-h6 {
+  padding-top: 2.0em;
+}
+
+.panel-hd::before,
+.panel-h2::before,
+.panel-h3::before,
+.panel-h4::before,
+.panel-h5::before,
+.panel-h6::before {
+  background-color: #eaf8ff;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-bottom: 1px solid rgb(190, 204, 218);
+  box-sizing: border-box;
+  content: attr(data-label);
+  height: 1.5em;
+  position: absolute;
+  padding-left: 8px;
+  top: 0;
+  right: 0;
+  width: 100%;
+}
+
+.panel-h2::before {
+  font-size: 1.9em;
+}
+
+.panel-h3::before {
+  font-size: 1.6em;
+}
+
+.panel-h4::before {
+  font-size: 1.315em;
+}
+
+.panel-hd::before,
+.panel-h5::before {
+  font-size: 1.15em;
+}
+
+.panel-h6::before {
+  font-size: 1em;
+}
+
+div.panel-hd:has(> table:first-child),
+div.panel-h2:has(> table:first-child),
+div.panel-h3:has(> table:first-child),
+div.panel-h4:has(> table:first-child),
+div.panel-h5:has(> table:first-child),
+div.panel-h6:has(> table:first-child) {
+  padding-top: 1.75em;
+}
+
+.panel table.table,
+.panel-hd table.table,
+.panel-h2 table.table,
+.panel-h3 table.table,
+.panel-h4 table.table,
+.panel-h5 table.table,
+.panel-h6 table.table {
+  border-top: none;
+}
+
+
+.proof-ce {
+  background-color: #f2f2f2;
+  border-color: #949494;
+  border-width: 2px;
+  font-size: 1em;
+}
+
+.proof-ce:not([data-label])::before {
+  content: "Proof"
+}
+
+.solution-ce:not([data-label])::before {
+  content: "Solution"
+}
+
+.stdout {
+  background-color: #fbfcfc;
+  border: 1px solid #C0CFD7;
+  border-radius: 5px;
+  font-family: Monospace;
+  font-size: 10pt;
+}
+
+/*
+ Styles a section subheading. To use (in quarto):
+  ```
+  ::: {.subheading}
+  This is a section subheading.
+  :::
+  ```
+*/
+.subheading>p {
+  display: inline-block;
+  background-color: #f0f0f4;
+  color: #787878;
+  font-weight: 800;
+  padding: 0px 4px;
+}
+
+.theorem {
+  background-color: #f2f2f2;
+  border-color: #c4c4c4;
+  border-width: 2px;
+  font-size: 1em;
+}
+
+.theorem:not([data-label])::before {
+  content: "Theorem"
+}
+
+.todo {
+  border: 1.5px solid rgb(255, 30, 135);
+  background-color: #fef7fa;
+}
+
+.todo::before {
+  color: #800;
+  content: "TODO";
+}
+
+/**** overrides ****/
+.cell-output-display code:not(.sourceCode),
+.cell-output-stdout code:not(.sourceCode) {
+  background-color: #fbfcfc;
+  border: 1px solid #C0CFD7;
+  border-radius: 5px;
+  font-family: Monospace;
+  font-size: 10pt;
+}
+
+.cell-output-stderr code:not(.sourceCode) {
+  background-color: #fee;
+  border: 2px solid #e00;
+  border-radius: 5px;
+  font-family: Monospace;
+  font-size: 10pt;
+}
+
+.sourceCode {
+  border-radius: 5px;
+  font-size: 10pt;
+}
+
+/**** spacing and layout ****/
+.indent-l-1em {
+  padding-left: 1em;
+}
+.indent-l-2em {
+  padding-left: 2em;
+}
+.indent-l-3em {
+  padding-left: 3em;
+}
+.indent-l-4em {
+  padding-left: 4em;
+}
+
+.indent-lr-1em {
+  padding-left: 1em;
+  padding-right: 1em;
+}
+.indent-lr-2em {
+  padding-left: 2em;
+  padding-right: 2em;
+}
+.indent-lr-3em {
+  padding-left: 3em;
+  padding-right: 3em;
+}
+.indent-lr-4em {
+  padding-left: 4em;
+  padding-right: 4em;
+}
