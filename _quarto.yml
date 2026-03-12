@@ -35,7 +35,17 @@ website:
             file: c.qmd
           - text: "The Rust Language"
             file: rust.qmd
+          - text: "The CSS Language"
+            file: css.qmd
 
+      - section: "Reference"
+        contents:
+          - text: "PC Assembly Language"
+            file: reference/assembly-pc.pdf
+          - text: "CSS Web Guide"
+            file: reference/cs-css-general.pdf
+          - text: "CSS Selector Guide"
+            file: reference/cs-css-selectors.pdf
       - section: "Appendix"
         contents:
           - text: "Glossary"
