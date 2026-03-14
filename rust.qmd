@@ -1,15 +1,9 @@
 ---
 title: "Rust for C/C++ Programmers"
 subtitle: "A practical bridge to Rust's fundamentals"
-date: today
-format:
-  html:
-    toc: true
-    toc-depth: 3
-    code-fold: false
 ---
 
-# Why Rust Exists
+## Why Rust Exists
 
 Rust was created at Mozilla Research around 2010 and reached 1.0 in 2015.
 The motivation was straightforward and familiar to anyone who has debugged a
@@ -21,7 +15,7 @@ memory safety guaranteed at compile time, without a garbage collector?*
 
 The answer is Rust.
 
-## The Core Design Decisions
+### The Core Design Decisions
 
 **1. Ownership replaces manual memory management.**
 Rather than `malloc`/`free` or smart pointers bolted on after the fact, Rust
@@ -50,11 +44,119 @@ builds and wraps in release (with explicit opt-in). Type coercions are almost
 never automatic. Mutability must be declared. This is intentionally more
 verbose than C++ in places, in exchange for fewer surprises.
 
----
 
-# The Basics
+## How a Rust Project Is Structured
 
-## Variables and Mutability
+Three nested concepts organize Rust code: **packages**, **crates**, and
+**modules**. They map roughly — but not exactly — onto what you know from C
+and Python.
+
+[![](images/rust-01.jpg){fig-align="center" width=9in}](https://iota-for-flutter.github.io/tutorial/fundamentals/rust/project-structure.html)
+
+### Packages and Crates
+
+A **crate** is the fundamental unit of compilation. The Rust compiler takes a
+crate and produces either an executable or a library. Think of it as the
+equivalent of a compiled C library (`.a`, `.so`) or a Python package on PyPI
+— the distributable unit that other projects depend on.
+
+Two kinds of crates:
+
+- **Binary crate** — has a `main()` entry point, produces an executable.
+  Root file is `src/main.rs`.
+- **Library crate** — no `main()`, produces a library for other code to use.
+  Root file is `src/lib.rs`.
+
+A **package** is what Cargo manages: a directory with a `Cargo.toml` manifest.
+A package contains at least one crate. Most projects you will work on are a
+single package with a single binary crate:
+
+```
+my_project/
+├── Cargo.toml      # manifest: name, version, dependencies
+├── Cargo.lock      # exact resolved dependency versions (commit this to git)
+└── src/
+    └── main.rs     # root of the binary crate
+```
+
+A library package looks the same but with `src/lib.rs` instead. A package can
+contain both a `main.rs` and a `lib.rs`, producing a binary and a library
+from the same source tree.
+
+### Modules
+
+A **module** is a namespace within a crate — the closest equivalent to a
+Python module. Modules organize code into logical units and control what is
+visible outside (`pub`) versus private.
+
+You can declare a module inline:
+
+```rust
+mod math {
+    pub fn add(a: i32, b: i32) -> i32 { a + b }
+
+    fn internal_helper() { }   // private: not accessible outside this module
+}
+
+// call it
+math::add(1, 2);
+```
+
+For larger code, modules live in their own files. Writing `mod math;` in
+`main.rs` tells Rust to look for the module's code in `src/math.rs`:
+
+```
+src/
+├── main.rs     ← contains: mod math;
+└── math.rs     ← the math module
+```
+
+A module that has its own submodules gets a directory instead:
+
+```
+src/
+├── main.rs
+└── math/
+    ├── mod.rs      # the math module root
+    └── geometry.rs # submodule, accessed as math::geometry
+```
+
+### External Dependencies
+
+Dependencies from crates.io (Rust's public registry, the equivalent of PyPI)
+go in `Cargo.toml`:
+
+```toml
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+regex = "1.10"
+```
+
+Run `cargo add regex` from the command line and Cargo writes the entry for
+you. Then use it in code:
+
+```rust
+use regex::Regex;
+```
+
+This is the `pip install` + `import` of Rust, collapsed into one tool that
+also handles building, testing, and formatting.
+
+### The Analogy Table
+
+| Concept | C | Python | Rust |
+|---|---|---|---|
+| Distributable unit | `.a` / `.so` | Package (PyPI) | Crate (crates.io) |
+| Project manifest | Makefile | `pyproject.toml` | `Cargo.toml` |
+| Namespace / file unit | (file, no formal system) | Module (`.py` file) | Module (`mod`) |
+| Import | `#include` | `import` | `use` |
+| Package manager | (none built in) | pip | cargo |
+
+
+## The Basics
+[Common Programming Concepts](https://doc.rust-lang.org/book/ch03-00-common-programming-concepts.html) by *The Rust Programming Language*.
+
+### Variables and Mutability
 
 In C you declare a variable and it's mutable by default. In Rust, variables
 are **immutable by default**. You opt into mutability with `mut`.
@@ -69,7 +171,7 @@ y += 1;             // fine
 This isn't just style — the compiler uses immutability information to reason
 about your program. It's a habit worth building early.
 
-## Types
+### Types
 
 Rust is statically typed. Types are usually inferred, but you can annotate
 explicitly. The primitive types will be familiar:
@@ -93,7 +195,7 @@ let x: i32 = 42;
 let y: f64 = x as f64;
 ```
 
-## Functions
+### Functions
 
 ```rust
 fn add(a: i32, b: i32) -> i32 {
@@ -108,7 +210,7 @@ fn greet(name: &str) {
 The last expression in a block is its value. `return` exists but is idiomatic
 only for early returns.
 
-## Control Flow
+### Control Flow
 
 ```rust
 // if is an expression
@@ -136,13 +238,62 @@ for n in &nums {
 }
 ```
 
----
 
-# Memory Management
+## Macros
+[Macros](https://doc.rust-lang.org/book/ch20-05-macros.html) as per *The Rust Programming Language*.
+
+Throughout this chapter you have seen `println!`, `vec!`, `format!`, and
+`panic!`. The `!` signals a **macro call**, not a function call. Macros in
+Rust are code that writes code at compile time, before the compiler
+type-checks anything.
+
+The practical reason macros exist: some things ordinary functions cannot do.
+`println!` accepts a variable number of arguments of different types —
+impossible for a regular Rust function without significant compromise. Macros
+solve this by expanding at compile time into whatever code is needed.
+
+```rust
+println!("hello");                    // no arguments
+println!("{}", x);                    // one argument
+println!("{} and {}", x, y);          // two arguments, different types fine
+```
+
+Common macros you will use regularly:
+
+| Macro | Purpose |
+|---|---|
+| `println!(...)` | Print to stdout with newline |
+| `eprintln!(...)` | Print to stderr with newline |
+| `format!(...)` | Build a `String` using the same syntax as `println!` |
+| `vec![...]` | Create a `Vec<T>` from a list of values |
+| `panic!(...)` | Terminate the program with an error message |
+| `assert!(cond)` | Panic if a condition is false |
+| `assert_eq!(a, b)` | Panic if two values are not equal (prints both on failure) |
+| `todo!()` | Placeholder that compiles but panics at runtime |
+| `dbg!(expr)` | Print the file, line, and value of an expression; returns the value |
+
+`#[derive(...)]` is a different kind of macro — a *procedural macro* — that
+generates trait implementations automatically:
+
+```rust
+#[derive(Debug, Clone, PartialEq)]
+struct Point { x: f64, y: f64 }
+
+// Now you can:
+println!("{:?}", p);    // Debug formatting
+let p2 = p.clone();     // Clone
+assert_eq!(p, p2);      // PartialEq
+```
+
+You can write your own macros with `macro_rules!` (declarative macros) or procedural macro crates. For most work, the standard library macros and [`derive`](https://doc.rust-lang.org/book/ch20-05-macros.html#custom-derive-macros) cover what you need.
+
+
+## Memory Management
+[Understanding Ownership](https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html) in *The Rust Programming Language*.
 
 This is the heart of Rust. If you understand this section, you understand Rust.
 
-## The Stack and the Heap
+### The Stack and the Heap
 
 Same as C/C++:
 
@@ -152,7 +303,7 @@ Same as C/C++:
 In C you manage the heap manually. In Rust the compiler does it for you via
 ownership rules, at zero runtime cost.
 
-## Ownership
+### Ownership
 
 Every value in Rust has exactly one **owner**. When the owner goes out of
 scope, the value is freed. This is RAII, but enforced by the type system rather
@@ -187,7 +338,7 @@ let y = x;  // x is copied, not moved
 println!("{}", x);  // fine: x still valid
 ```
 
-## Borrowing
+### Borrowing
 
 Moving ownership around constantly would be tedious. *Borrowing* lets you
 pass references to data without transferring ownership. Like pointers, but
@@ -227,7 +378,7 @@ This feels restrictive at first. In practice it eliminates a huge class of
 bugs: data races, iterator invalidation, use-after-free. The compiler is
 your enforcer.
 
-## Slices
+### Slices
 
 A slice is a reference to a contiguous sequence — a view into an array or
 string without copying:
@@ -243,7 +394,7 @@ let word = &s[0..5];     // "hello" — &str, no copy
 `&str` (string slice) and `&[T]` (array slice) are the idiomatic ways to
 pass read-only sequence data to functions.
 
-## The String Types
+### The String Types
 
 Rust has two main string types, which confuses newcomers:
 
@@ -261,7 +412,7 @@ let slice: &str = &owned[0..3];    // borrow part of owned
 Functions that just need to read a string should accept `&str` — it works
 with both `String` and string literals.
 
-## Lifetimes (Brief Introduction)
+### Lifetimes (Brief Introduction)
 
 Lifetimes are Rust's way of ensuring references don't outlive the data they
 point to. In most code the compiler infers them. You only write lifetime
@@ -278,11 +429,100 @@ The `'a` says "the returned reference lives at least as long as both inputs."
 Don't worry about this too deeply at first — the compiler will tell you when
 you need an annotation and the error messages are good.
 
----
 
-# Structs, Enums, and Traits
+## Smart Pointers
+[Smart Pointers](https://doc.rust-lang.org/book/ch15-00-smart-pointers.html) in *The Rust Programming Language*.
 
-## Structs
+When you need heap allocation beyond what `Vec` and `String` already handle,
+Rust provides smart pointer types. C++ developers will recognize the ideas.
+
+### `Box<T>` — Single Ownership on the Heap
+
+`Box<T>` allocates `T` on the heap and owns it. When the box goes out of
+scope, the memory is freed. This is the Rust equivalent of `std::unique_ptr<T>`.
+
+```rust
+let b = Box::new(5);
+println!("{}", *b);     // dereference with *
+```
+
+Boxes are useful in two main situations.
+
+**Recursive types** — a type that contains itself cannot be given a fixed size
+without a pointer, because the size calculation would be infinite:
+
+```rust
+enum List {
+    Cons(i32, Box<List>),   // Box breaks the infinite size cycle
+    Nil,
+}
+```
+
+**Large values** — moving a large struct by value copies all its bytes on the
+stack; boxing it moves only a pointer.
+
+### `Rc<T>` — Shared Ownership, Single Thread
+
+`Rc<T>` (reference counted) allows multiple owners of the same heap value.
+The value is freed when the last owner is dropped. Equivalent to
+`std::shared_ptr<T>`, but **not thread-safe**.
+
+```rust
+use std::rc::Rc;
+
+let a = Rc::new(String::from("shared"));
+let b = Rc::clone(&a);   // increments reference count, no copy of the data
+let c = Rc::clone(&a);
+
+println!("{} owners", Rc::strong_count(&a));  // 3
+// value freed when a, b, and c all go out of scope
+```
+
+`Rc<T>` gives you immutable shared access. To mutate through an `Rc`, combine
+it with `RefCell<T>` (interior mutability — an advanced topic for when you
+need it).
+
+### `Arc<T>` — Shared Ownership Across Threads
+
+`Arc<T>` (atomically reference counted) is the thread-safe version of `Rc<T>`.
+Use this when sharing data across threads.
+
+```rust
+use std::sync::Arc;
+use std::thread;
+
+let data = Arc::new(vec![1, 2, 3]);
+let data_clone = Arc::clone(&data);
+
+let handle = thread::spawn(move || {
+    println!("{:?}", data_clone);
+});
+
+handle.join().unwrap();
+println!("{:?}", data);   // original still valid
+```
+
+For mutable shared state across threads, pair `Arc` with `Mutex<T>`:
+
+```rust
+use std::sync::{Arc, Mutex};
+
+let counter = Arc::new(Mutex::new(0));
+```
+
+### Quick Reference
+
+| Type | Ownership | Thread-safe | C++ analogy |
+|---|---|---|---|
+| `Box<T>` | Single | Yes | `unique_ptr<T>` |
+| `Rc<T>` | Shared | No | `shared_ptr<T>` (single-threaded) |
+| `Arc<T>` | Shared | Yes | `shared_ptr<T>` with atomic ref count |
+
+
+## Structs, Enums, and Traits
+
+### Structs
+[Structs](https://doc.rust-lang.org/book/ch05-00-structs.html) as per *The Rust Programming Language*.
 
 ```rust
 struct Point {
@@ -308,7 +548,8 @@ println!("{}", p.distance_from_origin()); // 5.0
 
 No inheritance. Composition over inheritance is idiomatic Rust.
 
-## Enums
+### Enums
+[Enums and Pattern Matching](https://doc.rust-lang.org/book/ch06-00-enums.html) as per *The Rust Programming Language*.
 
 Rust enums are algebraic data types — each variant can carry different data.
 This is far more powerful than C enums.
@@ -347,7 +588,7 @@ enum Result<T, E> {
 }
 ```
 
-## Traits
+### Traits
 
 Traits are Rust's answer to interfaces. A trait defines behaviour; structs
 implement it.
@@ -376,6 +617,7 @@ fn print_description(item: &impl Describe) {
 ```
 
 Common standard library traits you'll encounter:
+
 - `Debug` — enables `{:?}` formatting (usually derived)
 - `Clone` — explicit deep copy
 - `Copy` — implicit copy on assignment (primitives)
@@ -390,44 +632,435 @@ struct Point { x: f64, y: f64 }
 // Now you can: println!("{:?}", p);
 ```
 
----
 
-# Pattern Matching
+## Generics and Trait Bounds
+[Generic Types, Traits, and Lifetimes](https://doc.rust-lang.org/book/ch10-00-generics.html) by *The Rust Programming Language*.
 
-`match` is a supercharged switch statement. It must be exhaustive — the
-compiler ensures you've handled every case.
+Generics are Rust's equivalent of C++ templates, but they interact with the
+trait system in a way that makes constraints explicit and checked at compile
+time. A generic function works over any type, constrained by trait bounds:
 
 ```rust
-let result: Result<i32, &str> = Ok(42);
+fn largest<T: PartialOrd>(a: T, b: T) -> T {
+    if a > b { a } else { b }
+}
+
+println!("{}", largest(5, 10));      // works with i32
+println!("{}", largest(3.0, 2.5));  // works with f64
+```
+
+The `T: PartialOrd` bound says "T must implement `PartialOrd`" — the trait
+that provides `>`, `<`, and so on. Without the bound, the compiler rejects the
+use of `>` on an unconstrained `T`. Unlike C++ templates, there are no
+surprise errors at instantiation time; the bounds are checked against the
+generic definition itself.
+
+Generic structs work the same way:
+
+```rust
+struct Pair<T> {
+    first: T,
+    second: T,
+}
+
+impl<T: std::fmt::Display> Pair<T> {
+    fn show(&self) {
+        println!("({}, {})", self.first, self.second);
+    }
+}
+```
+
+Multiple bounds use `+`:
+
+```rust
+fn print_debug<T: Debug + Clone>(item: T) {
+    let copy = item.clone();
+    println!("{:?}", copy);
+}
+```
+
+### `impl Trait` vs `dyn Trait`
+
+There are two ways to accept a trait in a function signature, and the choice
+matters for performance.
+
+**`impl Trait` — static dispatch.** The compiler generates a separate,
+specialized function for each concrete type at compile time. No runtime
+overhead, but the type must be known at compile time.
+
+```rust
+fn make_sound(animal: &impl Animal) {
+    animal.speak();
+}
+```
+
+**`dyn Trait` — dynamic dispatch.** A fat pointer containing the data address
+and a vtable of function pointers, resolved at runtime. Slightly slower, but
+lets you hold mixed types in a collection or return different concrete types
+from one function.
+
+```rust
+fn make_sounds(animals: &[Box<dyn Animal>]) {
+    for a in animals {
+        a.speak();   // resolved at runtime via vtable
+    }
+}
+```
+
+This is the Rust equivalent of virtual methods in C++. The analogy is direct:
+`Box<dyn Trait>` is roughly what a pointer-to-base class with a vtable is in
+C++. Prefer `impl Trait` when the type is known at compile time; reach for
+`dyn Trait` when you need runtime polymorphism or heterogeneous collections.
+
+
+## Pattern Matching
+[Pattern Matching](https://doc.rust-lang.org/book/ch19-00-patterns.html) as per *The Rust Programming Language*.
+
+Pattern matching in Rust is deeper than a switch statement. It simultaneously
+**tests the structure** of a value and **extracts** data from it. Every `match`
+arm is a pattern, and the compiler guarantees you have handled every possible
+case — exhaustiveness is enforced at compile time.
+
+### The `match` Expression
+[`match`](https://doc.rust-lang.org/book/ch19-01-all-the-places-for-patterns.html#match-arms) as per *The Rust Programming Language*.
+
+```rust
+let n = 7;
+
+match n {
+    1       => println!("one"),
+    2 | 3   => println!("two or three"),    // | means "or"
+    4..=9   => println!("four through nine"), // ..= is an inclusive range
+    _       => println!("something else"),  // _ is a wildcard, matches anything
+}
+```
+
+`match` is an expression — it produces a value, and all arms must have the
+same type:
+
+```rust
+let label = match n {
+    1       => "one",
+    2 | 3   => "two or three",
+    4..=9   => "single digit",
+    _       => "large",
+};
+```
+
+### Matching on `Option<T>`
+
+`Option<T>` represents a value that may or may not exist. It replaces `NULL`
+entirely and forces you to handle the absent case.
+
+```rust
+let maybe: Option<i32> = Some(42);
+
+match maybe {
+    Some(n) => println!("got {}", n),   // n is bound to 42
+    None    => println!("nothing here"),
+}
+```
+
+The `Some(n)` pattern does two things simultaneously: it checks that the value
+*is* a `Some`, and it binds the inner value to `n`. You cannot access `n`
+outside that arm — the compiler will not let you pretend a `None` is a value.
+
+Compare this to C:
+
+```c
+int *p = maybe_get_value();
+printf("%d\n", *p);   // crashes at runtime if p is NULL
+```
+
+In Rust, not handling `None` is a compile error, not a runtime discovery.
+
+Patterns compose. Nested `Option` values can be matched in one expression:
+
+```rust
+let nested: Option<Option<i32>> = Some(Some(7));
+
+match nested {
+    Some(Some(n)) => println!("deep value: {}", n),
+    Some(None)    => println!("outer Some, inner None"),
+    None          => println!("outer None"),
+}
+```
+
+### Matching on `Result<T, E>`
+
+`Result<T, E>` represents either success (`Ok`) or failure (`Err`). It is how
+Rust returns errors from functions — no exceptions, no out-of-band error codes.
+
+```rust
+let result: Result<i32, &str> = Ok(100);
 
 match result {
-    Ok(n) if n > 0  => println!("positive: {}", n),
-    Ok(n)           => println!("non-positive: {}", n),
-    Err(e)          => println!("error: {}", e),
+    Ok(n)  => println!("success: {}", n),
+    Err(e) => println!("failed: {}", e),
 }
 ```
 
-`if let` for when you care about one variant:
+The error variant can carry any type, and you can match on it just as deeply:
 
 ```rust
-if let Some(value) = some_option {
-    println!("got {}", value);
-}
-```
+use std::num::ParseIntError;
 
-`?` operator for propagating errors — the idiomatic replacement for
-`if (err) return err`:
-
-```rust
-fn read_number(s: &str) -> Result<i32, std::num::ParseIntError> {
-    let n = s.trim().parse::<i32>()?;  // ? returns Err early if parse fails
+fn parse_and_double(s: &str) -> Result<i32, ParseIntError> {
+    let n: i32 = s.trim().parse()?;   // ? propagates Err early
     Ok(n * 2)
 }
+
+match parse_and_double("21") {
+    Ok(n)  => println!("result: {}", n),   // prints 42
+    Err(e) => println!("parse error: {}", e),
+}
 ```
 
----
+### Destructuring Structs and Tuples
 
-# Error Handling
+Patterns work directly on the structure of any type. You are not comparing
+fields one at a time — you are writing the *shape* of the data you expect, and
+the compiler matches it.
+
+```rust
+struct Point { x: f64, y: f64 }
+
+let p = Point { x: 3.0, y: -1.0 };
+
+match p {
+    Point { x: 0.0, y: 0.0 } => println!("at origin"),
+    Point { x, y: 0.0 }      => println!("on x-axis at {}", x),
+    Point { x: 0.0, y }      => println!("on y-axis at {}", y),
+    Point { x, y }            => println!("at ({}, {})", x, y),
+}
+```
+
+Tuples destructure the same way:
+
+```rust
+let pair = (true, 42);
+
+match pair {
+    (true, n)  => println!("true with {}", n),
+    (false, _) => println!("false"),
+}
+```
+
+Enum variants that carry data are matched by their payload structure:
+
+```rust
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(String),
+    Color(u8, u8, u8),
+}
+
+match msg {
+    Message::Quit              => println!("quit"),
+    Message::Move { x, y }    => println!("move to {},{}", x, y),
+    Message::Write(text)       => println!("write: {}", text),
+    Message::Color(r, g, b)   => println!("color: {},{},{}", r, g, b),
+}
+```
+
+### Match Guards
+
+An `if` condition can be added to any arm. The pattern must match *and* the
+guard must be true for the arm to fire:
+
+```rust
+let n = 7;
+
+match n {
+    n if n < 0      => println!("negative"),
+    0               => println!("zero"),
+    n if n % 2 == 0 => println!("positive even"),
+    n               => println!("positive odd: {}", n),
+}
+```
+
+### Binding with `@`
+
+The `@` operator lets you bind a name to a value *while also* testing it
+against a sub-pattern. This is useful when you need to both check a range and
+use the specific value:
+
+```rust
+match n {
+    small @ 1..=9  => println!("{} is a single digit", small),
+    large          => println!("{} is large", large),
+}
+```
+
+### `if let` and `while let`
+
+When you only care about one variant, a full `match` is verbose. `if let`
+handles one case and ignores the rest:
+
+```rust
+let config: Option<&str> = Some("debug");
+
+if let Some(level) = config {
+    println!("log level: {}", level);
+}
+// None is silently ignored
+```
+
+`while let` loops until a pattern stops matching — useful for draining a
+collection:
+
+```rust
+let mut stack = vec![1, 2, 3];
+
+while let Some(top) = stack.pop() {
+    println!("{}", top);   // prints 3, 2, 1
+}
+```
+
+### `let` and Function Arguments Are Also Patterns
+
+This surprises people coming from other languages: `let` itself is a pattern
+match. Any irrefutable pattern (one that always matches) is valid on the
+left-hand side of a `let`:
+
+```rust
+let (a, b, c) = (1, 2, 3);     // tuple destructuring
+let Point { x, y } = p;         // struct destructuring
+```
+
+Function parameters destructure too:
+
+```rust
+fn sum_pair(&(a, b): &(i32, i32)) -> i32 {
+    a + b
+}
+```
+
+Pattern matching is not a special feature bolted onto Rust — it is woven into
+the language as the primary way to inspect and extract data.
+
+### Exhaustiveness
+
+The compiler rejects a `match` that does not cover all cases:
+
+```rust
+enum Direction { North, South, East, West }
+
+let dir = Direction::North;
+
+match dir {
+    Direction::North => println!("north"),
+    Direction::South => println!("south"),
+    // compile error: Direction::East and Direction::West not covered
+}
+```
+
+Adding a new variant to an enum breaks every exhaustive match in the codebase
+at compile time. You cannot silently miss a case. This is one of the most
+powerful refactoring guarantees Rust offers.
+
+
+## Closures and Iterators
+
+### Closures
+
+A closure is an anonymous function that can capture values from its surrounding
+scope. C++ programmers will recognize them as lambdas.
+
+```rust
+let add = |a, b| a + b;
+println!("{}", add(2, 3));   // 5
+
+let threshold = 10;
+let above = |n| n > threshold;   // captures threshold from the enclosing scope
+println!("{}", above(15));        // true
+```
+
+Closures infer parameter and return types from context. You can annotate
+explicitly if needed:
+
+```rust
+let square = |x: f64| -> f64 { x * x };
+```
+
+**Capture modes.** Rust closures capture by reference by default. If you need
+the closure to own its captured data — to send it to another thread, for
+example — use `move`:
+
+```rust
+let name = String::from("world");
+let greet = move || println!("hello, {}", name);   // name is moved in
+greet();
+// name is no longer accessible here
+```
+
+### Iterators
+
+The `Iterator` trait powers a functional-style pipeline over any collection.
+The adapters are *lazy* — nothing is computed until you drive the iterator with
+a terminal operation.
+
+```rust
+let nums = vec![1, 2, 3, 4, 5, 6];
+
+let result: Vec<i32> = nums.iter()
+    .filter(|&&x| x % 2 == 0)   // keep even numbers
+    .map(|&x| x * x)             // square each one
+    .collect();                  // drive the iteration, build a Vec
+
+println!("{:?}", result);   // [4, 16, 36]
+```
+
+Common adapters:
+
+| Method | What it does |
+|---|---|
+| `.map(f)` | Transform each element |
+| `.filter(p)` | Keep elements where the predicate is true |
+| `.fold(init, f)` | Reduce to a single accumulated value |
+| `.enumerate()` | Pair each element with its index |
+| `.zip(iter)` | Combine two iterators element by element |
+| `.take(n)` | Stop after n elements |
+| `.skip(n)` | Skip the first n elements |
+| `.flat_map(f)` | Map, then flatten one level |
+| `.any(p)` / `.all(p)` | Short-circuit boolean tests |
+| `.sum()` / `.product()` | Numeric reductions |
+
+Terminal operations that drive the iteration:
+
+```rust
+let v = vec![1, 2, 3, 4, 5];
+
+let total: i32  = v.iter().sum();                           // 15
+let count       = v.iter().filter(|&&x| x > 2).count();    // 3
+let found       = v.iter().find(|&&x| x == 3);             // Some(&3)
+let doubled: Vec<i32> = v.iter().map(|&x| x * 2).collect();
+```
+
+**`.iter()` vs `.into_iter()` vs `.iter_mut()`:**
+
+| Method | Yields | Effect on collection |
+|---|---|---|
+| `.iter()` | `&T` | Borrows |
+| `.iter_mut()` | `&mut T` | Mutably borrows |
+| `.into_iter()` | `T` | Consumes |
+
+```rust
+let mut v = vec![1, 2, 3];
+
+for x in v.iter_mut() {
+    *x *= 2;
+}
+println!("{:?}", v);   // [2, 4, 6]
+```
+
+The compiler optimizes iterator chains aggressively. A chain of
+`.filter().map().collect()` typically compiles to the same machine code as an
+equivalent hand-written loop.
+
+
+## Error Handling
 
 Rust has no exceptions. Errors are values, returned via `Result<T, E>`.
 
@@ -447,13 +1080,134 @@ match read_file("data.txt") {
 }
 ```
 
+### `Result` Is Just an Enum
+
+It is worth pausing on this. `Result<T, E>` is not a special language
+construct. It is an ordinary enum defined in the standard library:
+
+```rust
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+```
+
+That's it. Everything you have learned about matching enums applies directly.
+`Ok` and `Err` are variants that carry data, exactly like `Shape::Circle(f64)`
+or `Message::Write(String)`. The compiler treats them no differently. What
+makes `Result` powerful is the combination of that simple structure with the
+pattern matching tools built into the language.
+
+### `if let` for Error Handling
+
+Because `Result` is an enum, `if let` works on it naturally. The most common
+form you will see in real code handles only the error case and ignores success:
+
+```rust
+if let Err(e) = commander.dispatch(command, &mut stdout) {
+    eprintln!("Error: {}", e);
+    std::process::exit(1);
+}
+```
+
+Read this as: "if the result matches the `Err(e)` pattern, bind the error
+value to `e` and run the block." If `dispatch` returned `Ok(...)`, the pattern
+does not match, the block is skipped, and execution continues normally.
+
+The full `match` equivalent makes the relationship clear:
+
+```rust
+match commander.dispatch(command, &mut stdout) {
+    Ok(_)  => {}    // success — do nothing, keep going
+    Err(e) => {
+        eprintln!("Error: {}", e);
+        std::process::exit(1);
+    }
+}
+```
+
+`if let` is the compact form for when you only care about one variant. You
+can go the other direction too — handle success and ignore errors:
+
+```rust
+if let Ok(content) = read_file("data.txt") {
+    println!("{}", content);
+}
+// if it failed, silently move on
+```
+
+### `while let` for Repeated Operations
+
+`while let` extends the same idea into a loop. It keeps running as long as
+the pattern matches and stops the moment it does not:
+
+```rust
+while let Ok(line) = read_next_line(&mut reader) {
+    process(line);
+}
+// loop ends when read_next_line returns Err (end of file, I/O error, etc.)
+```
+
+This is particularly natural for anything that produces a stream of results:
+reading lines, polling a queue, consuming an iterator of fallible operations.
+The loop structure mirrors the data structure.
+
+### The `?` Operator
+
+Inside a function that returns `Result`, the `?` operator is shorthand for
+"if this is an `Err`, return it immediately to the caller; if it is `Ok`,
+unwrap and continue."
+
+```rust
+fn read_file(path: &str) -> Result<String, io::Error> {
+    let content = fs::read_to_string(path)?;  // returns Err early if it fails
+    Ok(content)
+}
+```
+
+Without `?`, the equivalent code is:
+
+```rust
+fn read_file(path: &str) -> Result<String, io::Error> {
+    let content = match fs::read_to_string(path) {
+        Ok(c)  => c,
+        Err(e) => return Err(e),
+    };
+    Ok(content)
+}
+```
+
+`?` eliminates that boilerplate. In a function that makes several fallible
+calls, it keeps the happy path readable while still propagating every error
+to the caller.
+
+### Choosing the Right Tool
+
+| Situation | Use |
+|---|---|
+| Handle both `Ok` and `Err` explicitly | `match` |
+| Act only on error, ignore success | `if let Err(e) = ...` |
+| Act only on success, ignore error | `if let Ok(v) = ...` |
+| Loop until failure | `while let Ok(v) = ...` |
+| Propagate error to caller | `?` |
+| Prototype or test — crash on error | `.unwrap()` or `.expect("msg")` |
+
+### `.unwrap()` and `.expect()`
+
 For quick scripts or prototypes, `.unwrap()` panics on error (like an
-unchecked assertion). Use it in tests and exploratory code; prefer explicit
-handling in production code.
+unchecked assertion). `.expect("message")` does the same but prints your
+message alongside the error, which makes debugging easier:
 
----
+```rust
+let content = read_file("data.txt").unwrap();           // panics with default message
+let content = read_file("data.txt").expect("could not read data file");  // clearer
+```
 
-# Modules and Visibility
+Use both only in tests and exploratory code. Prefer explicit handling in
+production code.
+
+
+## Modules and Visibility
 
 ```rust
 // In src/geometry/mod.rs
@@ -466,7 +1220,9 @@ pub struct Circle {
     center: Point,    // private field
 }
 
-pub fn area(c: &Circle) -> f64 { ... }
+pub fn area(c: &Circle) -> f64 {
+    std::f64::consts::PI * c.radius * c.radius
+}
 ```
 
 ```rust
@@ -480,17 +1236,17 @@ use geometry::shapes::area;
 Items are private by default. `pub` makes them visible outside their module.
 `pub(crate)` makes them visible within the crate but not to external users.
 
----
 
-# Common Collections
+## Common Collections
 
 ```rust
 // Vec<T> — growable array (like std::vector)
 let mut v: Vec<i32> = Vec::new();
 v.push(1);
 v.push(2);
-let third = v[2];           // panics if out of bounds
-let safe = v.get(2);        // returns Option<&i32>
+v.push(3);
+let third = v[2];           // 3 — panics if index is out of bounds
+let safe = v.get(10);       // None — returns Option<&i32> instead of panicking
 
 // HashMap<K, V>
 use std::collections::HashMap;
@@ -504,9 +1260,9 @@ for (k, v) in &map {
 }
 ```
 
----
 
-# Cargo: The Build System
+## Cargo: The Build System
+[Packages, Crates, and Modules](https://doc.rust-lang.org/book/ch07-00-managing-growing-projects-with-packages-crates-and-modules.html) as per *The Rust Programming Language*.
 
 Cargo is Rust's build tool, package manager, and test runner. You'll use it
 for everything.
@@ -533,9 +1289,8 @@ regex = "1.10"
 `cargo add serde` adds a dependency from the command line. The ecosystem
 (crates.io) is large and high quality.
 
----
 
-# Key Differences from C/C++ — Quick Reference
+## Key Differences from C/C++ — Quick Reference
 
 | C/C++ | Rust |
 |---|---|
@@ -553,14 +1308,11 @@ regex = "1.10"
 | Undefined behaviour on misuse | Compile error on misuse |
 | `printf` | `println!("{}",  val)` |
 
----
 
-# Where to Go Next
+## Where to Go Next
 
-The [Rust Book](https://doc.rust-lang.org/book/) is free online and excellent.
-[Rustlings](https://github.com/rust-lang/rustlings) is a set of small exercises
-that build muscle memory quickly. [docs.rs](https://docs.rs) is the standard
-library and crate documentation hub — well worth bookmarking.
+- The [Rust Book](https://doc.rust-lang.org/book/) is free online and excellent.
+- [Rustlings](https://github.com/rust-lang/rustlings) is a set of small exercises that build muscle memory quickly.
+- [docs.rs](https://docs.rs) is the standard library and crate documentation hub — well worth bookmarking.
 
-The compiler error messages are unusually good. Read them carefully —
-they usually tell you exactly what's wrong and often suggest the fix.
+The compiler error messages are unusually good. Read them carefully — they usually tell you exactly what's wrong and often suggest the fix.

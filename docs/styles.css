@@ -96,9 +96,8 @@ table.table {
 .stdout,
 .theorem,
 .todo {
-  border: 2px solid #988;
+  border: 1px solid #988;
   border-radius: 8px;
-  border-width: 1.0px;
   font-size: 0.95em;
   margin-bottom: 1em;
   padding: 8px 8px 0px 10px;
@@ -132,7 +131,6 @@ table.table {
 .proof-ce:not([data-label])::before,
 .solution-ce::before,
 .solution-ce:not([data-label])::before,
-.stdout,
 .theorem::before,
 .theorem:not([data-label])::before,
 .todo::before {
