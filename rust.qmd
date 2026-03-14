@@ -45,6 +45,114 @@ never automatic. Mutability must be declared. This is intentionally more
 verbose than C++ in places, in exchange for fewer surprises.
 
 
+## How a Rust Project Is Structured
+
+Three nested concepts organize Rust code: **packages**, **crates**, and
+**modules**. They map roughly — but not exactly — onto what you know from C
+and Python.
+
+[![](images/rust-01.jpg){fig-align="center" width=9in}](https://iota-for-flutter.github.io/tutorial/fundamentals/rust/project-structure.html)
+
+### Packages and Crates
+
+A **crate** is the fundamental unit of compilation. The Rust compiler takes a
+crate and produces either an executable or a library. Think of it as the
+equivalent of a compiled C library (`.a`, `.so`) or a Python package on PyPI
+— the distributable unit that other projects depend on.
+
+Two kinds of crates:
+
+- **Binary crate** — has a `main()` entry point, produces an executable.
+  Root file is `src/main.rs`.
+- **Library crate** — no `main()`, produces a library for other code to use.
+  Root file is `src/lib.rs`.
+
+A **package** is what Cargo manages: a directory with a `Cargo.toml` manifest.
+A package contains at least one crate. Most projects you will work on are a
+single package with a single binary crate:
+
+```
+my_project/
+├── Cargo.toml      # manifest: name, version, dependencies
+├── Cargo.lock      # exact resolved dependency versions (commit this to git)
+└── src/
+    └── main.rs     # root of the binary crate
+```
+
+A library package looks the same but with `src/lib.rs` instead. A package can
+contain both a `main.rs` and a `lib.rs`, producing a binary and a library
+from the same source tree.
+
+### Modules
+
+A **module** is a namespace within a crate — the closest equivalent to a
+Python module. Modules organize code into logical units and control what is
+visible outside (`pub`) versus private.
+
+You can declare a module inline:
+
+```rust
+mod math {
+    pub fn add(a: i32, b: i32) -> i32 { a + b }
+
+    fn internal_helper() { }   // private: not accessible outside this module
+}
+
+// call it
+math::add(1, 2);
+```
+
+For larger code, modules live in their own files. Writing `mod math;` in
+`main.rs` tells Rust to look for the module's code in `src/math.rs`:
+
+```
+src/
+├── main.rs     ← contains: mod math;
+└── math.rs     ← the math module
+```
+
+A module that has its own submodules gets a directory instead:
+
+```
+src/
+├── main.rs
+└── math/
+    ├── mod.rs      # the math module root
+    └── geometry.rs # submodule, accessed as math::geometry
+```
+
+### External Dependencies
+
+Dependencies from crates.io (Rust's public registry, the equivalent of PyPI)
+go in `Cargo.toml`:
+
+```toml
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+regex = "1.10"
+```
+
+Run `cargo add regex` from the command line and Cargo writes the entry for
+you. Then use it in code:
+
+```rust
+use regex::Regex;
+```
+
+This is the `pip install` + `import` of Rust, collapsed into one tool that
+also handles building, testing, and formatting.
+
+### The Analogy Table
+
+| Concept | C | Python | Rust |
+|---|---|---|---|
+| Distributable unit | `.a` / `.so` | Package (PyPI) | Crate (crates.io) |
+| Project manifest | Makefile | `pyproject.toml` | `Cargo.toml` |
+| Namespace / file unit | (file, no formal system) | Module (`.py` file) | Module (`mod`) |
+| Import | `#include` | `import` | `use` |
+| Package manager | (none built in) | pip | cargo |
+
+
 ## The Basics
 [Common Programming Concepts](https://doc.rust-lang.org/book/ch03-00-common-programming-concepts.html) by *The Rust Programming Language*.
 
@@ -972,9 +1080,131 @@ match read_file("data.txt") {
 }
 ```
 
+### `Result` Is Just an Enum
+
+It is worth pausing on this. `Result<T, E>` is not a special language
+construct. It is an ordinary enum defined in the standard library:
+
+```rust
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+```
+
+That's it. Everything you have learned about matching enums applies directly.
+`Ok` and `Err` are variants that carry data, exactly like `Shape::Circle(f64)`
+or `Message::Write(String)`. The compiler treats them no differently. What
+makes `Result` powerful is the combination of that simple structure with the
+pattern matching tools built into the language.
+
+### `if let` for Error Handling
+
+Because `Result` is an enum, `if let` works on it naturally. The most common
+form you will see in real code handles only the error case and ignores success:
+
+```rust
+if let Err(e) = commander.dispatch(command, &mut stdout) {
+    eprintln!("Error: {}", e);
+    std::process::exit(1);
+}
+```
+
+Read this as: "if the result matches the `Err(e)` pattern, bind the error
+value to `e` and run the block." If `dispatch` returned `Ok(...)`, the pattern
+does not match, the block is skipped, and execution continues normally.
+
+The full `match` equivalent makes the relationship clear:
+
+```rust
+match commander.dispatch(command, &mut stdout) {
+    Ok(_)  => {}    // success — do nothing, keep going
+    Err(e) => {
+        eprintln!("Error: {}", e);
+        std::process::exit(1);
+    }
+}
+```
+
+`if let` is the compact form for when you only care about one variant. You
+can go the other direction too — handle success and ignore errors:
+
+```rust
+if let Ok(content) = read_file("data.txt") {
+    println!("{}", content);
+}
+// if it failed, silently move on
+```
+
+### `while let` for Repeated Operations
+
+`while let` extends the same idea into a loop. It keeps running as long as
+the pattern matches and stops the moment it does not:
+
+```rust
+while let Ok(line) = read_next_line(&mut reader) {
+    process(line);
+}
+// loop ends when read_next_line returns Err (end of file, I/O error, etc.)
+```
+
+This is particularly natural for anything that produces a stream of results:
+reading lines, polling a queue, consuming an iterator of fallible operations.
+The loop structure mirrors the data structure.
+
+### The `?` Operator
+
+Inside a function that returns `Result`, the `?` operator is shorthand for
+"if this is an `Err`, return it immediately to the caller; if it is `Ok`,
+unwrap and continue."
+
+```rust
+fn read_file(path: &str) -> Result<String, io::Error> {
+    let content = fs::read_to_string(path)?;  // returns Err early if it fails
+    Ok(content)
+}
+```
+
+Without `?`, the equivalent code is:
+
+```rust
+fn read_file(path: &str) -> Result<String, io::Error> {
+    let content = match fs::read_to_string(path) {
+        Ok(c)  => c,
+        Err(e) => return Err(e),
+    };
+    Ok(content)
+}
+```
+
+`?` eliminates that boilerplate. In a function that makes several fallible
+calls, it keeps the happy path readable while still propagating every error
+to the caller.
+
+### Choosing the Right Tool
+
+| Situation | Use |
+|---|---|
+| Handle both `Ok` and `Err` explicitly | `match` |
+| Act only on error, ignore success | `if let Err(e) = ...` |
+| Act only on success, ignore error | `if let Ok(v) = ...` |
+| Loop until failure | `while let Ok(v) = ...` |
+| Propagate error to caller | `?` |
+| Prototype or test — crash on error | `.unwrap()` or `.expect("msg")` |
+
+### `.unwrap()` and `.expect()`
+
 For quick scripts or prototypes, `.unwrap()` panics on error (like an
-unchecked assertion). Use it in tests and exploratory code; prefer explicit
-handling in production code.
+unchecked assertion). `.expect("message")` does the same but prints your
+message alongside the error, which makes debugging easier:
+
+```rust
+let content = read_file("data.txt").unwrap();           // panics with default message
+let content = read_file("data.txt").expect("could not read data file");  // clearer
+```
+
+Use both only in tests and exploratory code. Prefer explicit handling in
+production code.
 
 
 ## Modules and Visibility
