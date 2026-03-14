@@ -7,8 +7,6 @@ subtitle: "A History of Computer Languages"
 
 Every computer language ever written is, at its core, a notation for describing *computation*. That idea — that computation itself could be formalized, written down, and reasoned about — did not begin with silicon. It began with mathematics. To understand why programming languages look the way they do, why they fight the battles they fight, and why the three languages in this notebook were chosen, you have to follow the thread back to where it starts.
 
----
-
 ## The Mathematical Roots
 
 ### Leibniz and the Dream of a Universal Calculus
@@ -28,8 +26,6 @@ Ada Lovelace, working from Babbage's notes, wrote what is now recognized as the 
 > *"The Analytical Engine has no pretensions whatever to originate anything. It can do whatever we know how to order it to perform."*
 
 That sentence contains both the power and the humility of every programming language ever written. The machine does exactly what you tell it. The craft is knowing how to tell it correctly.
-
----
 
 ## The Theoretical Foundations
 
@@ -51,7 +47,6 @@ The theoretical work of Church and Turing became physical in the 1940s. John von
 
 This insight — the **stored-program computer** — is why programming is possible at all. A program is data. You can write programs that read programs. You can write compilers. You can write operating systems. The entire software stack rests on this one architectural decision.
 
----
 
 ## The Generations of Language
 
@@ -91,7 +86,6 @@ The major milestones:
 | 1972 | **C** | Systems programming. Close enough to the machine to write operating systems, fast enough to replace assembly in most contexts. The lingua franca of computing. |
 | 1975 | **Scheme** | Minimal, elegant Lisp dialect. Lexical scope, tail recursion, first-class continuations. A language for teaching the nature of computation. |
 
----
 
 ## The Great Schisms
 
@@ -117,7 +111,6 @@ The ideas escaped the laboratory. **Erlang** (1986) used functional techniques t
 
 The insight that functional programming gave the world was this: **mutable shared state is the root of most concurrency bugs.** If data cannot change, threads cannot corrupt each other. This insight became urgent as multi-core processors became standard, and it drove a resurgence of interest in functional design throughout the 2000s and 2010s.
 
----
 
 ## The Safety Problem
 
@@ -129,7 +122,6 @@ For decades, the response was tooling: valgrind, AddressSanitizer, static analyz
 
 The alternative — garbage-collected languages like Java, Python, Go — solve memory safety by taking memory management away from the programmer entirely. The garbage collector tracks allocations and frees them when no references remain. This works remarkably well. But it comes with a cost: unpredictable pause times, higher memory overhead, and an inability to reason precisely about when and where resources are released. For systems programming — operating systems, device drivers, real-time signal processing — these costs are often unacceptable.
 
----
 
 ## The Modern Era: Rust and the Safety-Performance Synthesis
 
@@ -149,7 +141,6 @@ Rust did not appear from nowhere. It synthesized decades of research: region-bas
 
 The response from industry was unusual for a new systems language: enthusiastic adoption. Mozilla used Rust to rewrite performance-critical parts of Firefox. Microsoft began rewriting Windows components in Rust. The Linux kernel accepted Rust as a second implementation language in 2022. The U.S. National Security Agency and CISA issued guidance recommending Rust and other memory-safe languages for new systems development. The narrative that safety and systems performance were irreconcilable was broken.
 
----
 
 ## Why These Three Languages
 
@@ -171,7 +162,6 @@ Together, these three languages span from the metal to the modern, from direct h
 
 That is what this notebook is about.
 
----
 
 ## A Note on What Gets Left Out
 
@@ -186,6 +176,5 @@ These are not lesser paths. They reflect different answers to the same question:
 
 The languages in this notebook are the ones you need if the machine itself is part of what you are programming. If you need to be close to the hardware — close enough that you care about register allocation, stack depth, cache behavior, and memory layout — this is your lineage.
 
----
 
 *The next chapter begins where computation itself begins: assembly language and the direct instruction of hardware.*

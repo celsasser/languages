@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-03-06">
+<meta name="dcterms.date" content="2026-03-14">
 
 <title>Introduction – Computer Language Notebook</title>
 <style>
@@ -262,7 +262,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">March 6, 2026</p>
+      <p class="date">March 14, 2026</p>
     </div>
   </div>
   
@@ -277,7 +277,6 @@ ul.task-list li input[type="checkbox"] {
 <section id="where-languages-come-from" class="level2">
 <h2 class="anchored" data-anchor-id="where-languages-come-from">Where Languages Come From</h2>
 <p>Every computer language ever written is, at its core, a notation for describing <em>computation</em>. That idea — that computation itself could be formalized, written down, and reasoned about — did not begin with silicon. It began with mathematics. To understand why programming languages look the way they do, why they fight the battles they fight, and why the three languages in this notebook were chosen, you have to follow the thread back to where it starts.</p>
-<hr>
 </section>
 <section id="the-mathematical-roots" class="level2">
 <h2 class="anchored" data-anchor-id="the-mathematical-roots">The Mathematical Roots</h2>
@@ -297,7 +296,6 @@ ul.task-list li input[type="checkbox"] {
 <p><em>“The Analytical Engine has no pretensions whatever to originate anything. It can do whatever we know how to order it to perform.”</em></p>
 </blockquote>
 <p>That sentence contains both the power and the humility of every programming language ever written. The machine does exactly what you tell it. The craft is knowing how to tell it correctly.</p>
-<hr>
 </section>
 </section>
 <section id="the-theoretical-foundations" class="level2">
@@ -316,7 +314,6 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="von-neumann-and-the-stored-program-architecture">Von Neumann and the Stored-Program Architecture</h3>
 <p>The theoretical work of Church and Turing became physical in the 1940s. John von Neumann’s 1945 report on the EDVAC computer articulated what became the dominant architecture of the modern computer: a processor and a memory that holds both <em>data</em> and <em>instructions</em>. Programs are not external configurations wired into the machine; they are data stored in the same space as the numbers they compute on.</p>
 <p>This insight — the <strong>stored-program computer</strong> — is why programming is possible at all. A program is data. You can write programs that read programs. You can write compilers. You can write operating systems. The entire software stack rests on this one architectural decision.</p>
-<hr>
 </section>
 </section>
 <section id="the-generations-of-language" class="level2">
@@ -413,7 +410,6 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
-<hr>
 </section>
 </section>
 <section id="the-great-schisms" class="level2">
@@ -434,7 +430,6 @@ ul.task-list li input[type="checkbox"] {
 <p>Lisp had been functional since 1958, but functional programming remained academic for decades. In the 1980s and 1990s, <strong>ML</strong> and <strong>Haskell</strong> developed rigorous type systems built around functional ideas: immutability, algebraic data types, pattern matching, monads. These were not primarily practical languages; they were laboratories for type theory.</p>
 <p>The ideas escaped the laboratory. <strong>Erlang</strong> (1986) used functional techniques to build massively concurrent, fault-tolerant telephone infrastructure. <strong>Scala</strong> (2004) fused functional and object-oriented programming on the JVM. <strong>Clojure</strong> (2007) brought a Lisp to the JVM with a pragmatic emphasis on immutability and concurrency. And mainstream languages — Java, C#, Python, JavaScript — absorbed functional features one by one: lambdas, map/filter/reduce, pattern matching, immutable data structures.</p>
 <p>The insight that functional programming gave the world was this: <strong>mutable shared state is the root of most concurrency bugs.</strong> If data cannot change, threads cannot corrupt each other. This insight became urgent as multi-core processors became standard, and it drove a resurgence of interest in functional design throughout the 2000s and 2010s.</p>
-<hr>
 </section>
 </section>
 <section id="the-safety-problem" class="level2">
@@ -443,7 +438,6 @@ ul.task-list li input[type="checkbox"] {
 <p>C and C++ give programmers direct control over memory. That control enables extraordinary performance and hardware access. It also enables buffer overflows, use-after-free errors, null pointer dereferences, and data races — entire classes of vulnerabilities that have caused some of the most catastrophic security failures in computing history. The <strong>Morris Worm</strong> (1988), <strong>Heartbleed</strong> (2014), and countless others traced to memory mismanagement in C and C++ code.</p>
 <p>For decades, the response was tooling: valgrind, AddressSanitizer, static analyzers, fuzzing. The tools helped. But they were detective, not preventive.</p>
 <p>The alternative — garbage-collected languages like Java, Python, Go — solve memory safety by taking memory management away from the programmer entirely. The garbage collector tracks allocations and frees them when no references remain. This works remarkably well. But it comes with a cost: unpredictable pause times, higher memory overhead, and an inability to reason precisely about when and where resources are released. For systems programming — operating systems, device drivers, real-time signal processing — these costs are often unacceptable.</p>
-<hr>
 </section>
 <section id="the-modern-era-rust-and-the-safety-performance-synthesis" class="level2">
 <h2 class="anchored" data-anchor-id="the-modern-era-rust-and-the-safety-performance-synthesis">The Modern Era: Rust and the Safety-Performance Synthesis</h2>
@@ -459,7 +453,6 @@ ul.task-list li input[type="checkbox"] {
 </ul>
 <p>Rust did not appear from nowhere. It synthesized decades of research: region-based memory management from ML, affine type systems from linear logic, ownership semantics from earlier systems research. But it was the first language to package these ideas into a practical, production-ready systems language with a coherent community and toolchain.</p>
 <p>The response from industry was unusual for a new systems language: enthusiastic adoption. Mozilla used Rust to rewrite performance-critical parts of Firefox. Microsoft began rewriting Windows components in Rust. The Linux kernel accepted Rust as a second implementation language in 2022. The U.S. National Security Agency and CISA issued guidance recommending Rust and other memory-safe languages for new systems development. The narrative that safety and systems performance were irreconcilable was broken.</p>
-<hr>
 </section>
 <section id="why-these-three-languages" class="level2">
 <h2 class="anchored" data-anchor-id="why-these-three-languages">Why These Three Languages</h2>
@@ -471,7 +464,6 @@ ul.task-list li input[type="checkbox"] {
 <p><strong>Rust</strong> is the synthesis. It carries C’s performance and control into an era that demands safety guarantees C cannot provide. It is the answer to the question: <em>what would C look like if it were designed today, with everything we have learned in fifty years about type theory, memory safety, and concurrent programming?</em> Rust is not a replacement for C in the sense of being able to run everywhere C runs — not yet — but it is a demonstration that the tradeoffs C was built around are not immutable laws.</p>
 <p>Together, these three languages span from the metal to the modern, from direct hardware manipulation to compile-time safety proofs. Understanding all three means understanding not just how to write programs, but why programs are the shape they are — why the machine works as it does, why the language constrains you where it does, and what the tradeoffs cost.</p>
 <p>That is what this notebook is about.</p>
-<hr>
 </section>
 <section id="a-note-on-what-gets-left-out" class="level2">
 <h2 class="anchored" data-anchor-id="a-note-on-what-gets-left-out">A Note on What Gets Left Out</h2>
@@ -484,7 +476,6 @@ ul.task-list li input[type="checkbox"] {
 </ul>
 <p>These are not lesser paths. They reflect different answers to the same question: <em>what does a useful notation for computation look like?</em> The answer depends entirely on what you need to compute, and for whom.</p>
 <p>The languages in this notebook are the ones you need if the machine itself is part of what you are programming. If you need to be close to the hardware — close enough that you care about register allocation, stack depth, cache behavior, and memory layout — this is your lineage.</p>
-<hr>
 <p><em>The next chapter begins where computation itself begins: assembly language and the direct instruction of hardware.</em></p>
 
 
