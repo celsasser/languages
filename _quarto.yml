@@ -37,6 +37,8 @@ website:
             file: rust.qmd
           - text: "The CSS Language"
             file: css.qmd
+          - text: "The Python Language"
+            file: python.qmd
 
       - section: "Reference"
         contents:

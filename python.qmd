@@ -1,0 +1,843 @@
+---
+title: "Python"
+subtitle: "A practical introduction for systems programmers"
+---
+
+## Why Python Exists
+
+Python was created by Guido van Rossum in the late 1980s and first released in
+1991. Van Rossum was working at CWI in the Netherlands and wanted a language
+that filled the gap between shell scripting (too limited) and C (too verbose
+for rapid development). He named it after Monty Python, not the snake.
+
+The motivation was philosophical as much as practical: productivity matters.
+A program you can write in an afternoon and read back six months later is often
+more valuable than a highly optimized one that takes weeks to get right. Python
+made a deliberate bet that developer time is usually the bottleneck, not CPU
+time.
+
+That bet paid off. Python is now the dominant language for data science,
+machine learning, scientific computing, web backends, and automation. It runs
+everywhere from Raspberry Pis to GPU clusters.
+
+### The Core Design Decisions
+
+**1. Everything is an object.**
+Every value in Python — integers, strings, functions, classes, modules — is a
+first-class object with an identity, a type, and a value. There are no
+primitives in the C sense. This uniformity makes the language consistent and
+extensible, at the cost of memory overhead.
+
+**2. Dynamic typing.**
+Variables have no declared type. A variable is a name bound to an object, and
+that binding can be rebound to any object at any time. The type lives with the
+object, not the variable. This eliminates boilerplate but shifts type errors
+from compile time to runtime.
+
+**3. Reference semantics throughout.**
+Assignment never copies an object. It copies a reference to an object. This
+has profound implications for mutable data, covered in depth below.
+
+**4. Automatic memory management.**
+CPython (the reference implementation) uses reference counting as its primary
+garbage collection strategy, augmented by a cycle collector for circular
+references. Memory is managed for you, but understanding how it works prevents
+subtle bugs.
+
+**5. Readability as a design constraint.**
+Python's syntax enforces structure through indentation rather than braces.
+The language includes exactly one obvious way to do most things, by design.
+This is not a limitation: it is a feature that makes code written by others
+readable.
+
+**6. Batteries included.**
+The standard library is enormous. Networking, file I/O, JSON, regular
+expressions, HTTP, CSV, database access, unit testing: most of what you need
+for a typical program is already there.
+
+::: {.callout-note title="The Zen of Python"}
+Tim Peters wrote nineteen aphorisms that capture Python's design philosophy.
+You can read them any time:
+
+```python
+import this
+```
+
+The most relevant ones for programmers coming from C or Rust:
+
+- *Explicit is better than implicit.*
+- *Simple is better than complex.*
+- *Readability counts.*
+- *There should be one — and preferably only one — obvious way to do it.*
+- *Errors should never pass silently.*
+:::
+
+
+## How a Python Project Is Structured
+
+| Concept | C | Rust | Python |
+|---|---|---|---|
+| Distributable unit | `.a` / `.so` | Crate (crates.io) | Package (PyPI) |
+| Project manifest | Makefile | `Cargo.toml` | `pyproject.toml` |
+| Namespace / file unit | (file, no formal system) | Module (`mod`) | Module (`.py` file) |
+| Import | `#include` | `use` | `import` |
+| Package manager | (none built in) | cargo | pip |
+| Isolated environment | (none) | (per project by default) | virtual environment |
+
+### Modules
+
+Every `.py` file is a module. Its name is the filename without the extension.
+You import it with `import`:
+
+```python
+# math_utils.py
+def add(a, b):
+    return a + b
+
+# main.py
+import math_utils
+print(math_utils.add(2, 3))
+
+# or import specific names directly
+from math_utils import add
+print(add(2, 3))
+```
+
+### Packages
+
+A directory containing an `__init__.py` file is a **package**: a namespace
+that groups related modules.
+
+```
+my_project/
+├── main.py
+└── geometry/
+    ├── __init__.py       # makes geometry/ a package
+    ├── shapes.py         # geometry.shapes
+    └── transforms.py     # geometry.transforms
+```
+
+`__init__.py` can be empty or can run initialization code and re-export names
+to shape the package's public API — the Python equivalent of `pub use` in Rust.
+
+### Virtual Environments
+
+Python is installed system-wide, but dependencies differ per project. A
+**virtual environment** is an isolated Python installation for a single project:
+
+```bash
+python -m venv .venv            # create a virtual environment
+source .venv/bin/activate       # activate it (macOS/Linux)
+pip install requests            # install into this environment only
+```
+
+Dependencies are recorded in `pyproject.toml` or `requirements.txt`. Always
+use a virtual environment; installing packages system-wide causes conflicts
+across projects.
+
+
+## The Basics
+
+### Variables and Types
+
+Python variables are not declarations: they are name bindings. A name comes
+into existence the moment you assign to it, and its type is determined by the
+object it is bound to:
+
+```python
+x = 42          # x is bound to an int object
+x = "hello"     # x is now bound to a str object — no error
+x = [1, 2, 3]   # x is now bound to a list object
+```
+
+The built-in scalar types:
+
+```python
+i = 42              # int (arbitrary precision: no overflow ever)
+f = 3.14            # float (64-bit IEEE 754)
+c = 2 + 3j          # complex
+b = True            # bool (subclass of int: True == 1, False == 0)
+s = "hello"         # str (immutable Unicode sequence)
+n = None            # NoneType: the absence of a value (Python's null)
+```
+
+No integer overflow. Python integers are arbitrary precision — they grow as
+large as memory allows. This is convenient and occasionally surprising in
+performance-sensitive code.
+
+Type annotations exist but are optional and not enforced at runtime:
+
+```python
+def add(a: int, b: int) -> int:
+    return a + b
+```
+
+Static type checkers (`mypy`, `pyright`) can enforce annotations, but the
+interpreter ignores them entirely.
+
+### Functions
+
+```python
+def greet(name):
+    print(f"Hello, {name}!")        # f-string: embed expressions in strings
+
+def add(a, b):
+    return a + b
+
+# default arguments
+def connect(host, port=8080, timeout=30):
+    ...
+
+# variable positional arguments
+def total(*numbers):
+    return sum(numbers)
+
+total(1, 2, 3, 4)   # 10
+
+# variable keyword arguments
+def create_user(**fields):
+    print(fields)   # {'name': 'alice', 'role': 'admin'}
+
+create_user(name="alice", role="admin")
+```
+
+Functions are first-class objects. They can be stored in variables, passed as
+arguments, and returned from other functions.
+
+### Control Flow
+
+```python
+# if / elif / else
+if x > 0:
+    print("positive")
+elif x == 0:
+    print("zero")
+else:
+    print("negative")
+
+# for iterates over any iterable
+for item in [1, 2, 3]:
+    print(item)
+
+for i in range(10):                     # 0 to 9
+    print(i)
+
+for i, item in enumerate(["a", "b", "c"]):
+    print(i, item)                      # 0 a, 1 b, 2 c
+
+# while
+while x > 0:
+    x -= 1
+
+# comprehensions: a Python hallmark
+squares = [x**2 for x in range(10)]
+evens   = [x for x in range(20) if x % 2 == 0]
+```
+
+`for` in Python iterates over any **iterable**: lists, strings, dicts, files,
+generators, database cursors. There is no index-based loop by default; use
+`enumerate` when you need the index.
+
+
+## Reference Semantics and Memory
+
+This section is the Python equivalent of the Memory Management section in the
+Rust chapter. Python hides the mechanics, but understanding them prevents a
+whole class of bugs that are otherwise very hard to track down.
+
+### Everything Is a Heap Object
+
+In C, `int x = 5` allocates four bytes on the stack. In Python, `x = 5`
+creates an `int` object on the heap and binds the name `x` to it. Every Python
+value — integers, strings, functions, classes — lives on the heap. The
+interpreter manages all of it.
+
+The variable `x` is not a box containing a value. It is a name in a namespace
+dictionary that points to an object. This distinction matters.
+
+### Assignment Copies the Reference, Not the Object
+
+```python
+a = [1, 2, 3]
+b = a           # b points to the SAME list object
+b.append(4)
+
+print(a)        # [1, 2, 3, 4] — a is affected
+```
+
+This is not a copy. Both `a` and `b` are names bound to the same list. The
+list has one identity and two names. Modifying the list through either name
+modifies the one shared object.
+
+For comparison, the Rust equivalent would be a compile error: the borrow
+checker would reject two mutable references to the same data. Python has no
+such check; the aliasing is silent.
+
+You can inspect identity with `id()` and the `is` operator:
+
+```python
+a = [1, 2, 3]
+b = a
+print(id(a) == id(b))   # True: same object in memory
+print(a is b)           # True: `is` checks identity, not equality
+print(a == b)           # True: `==` checks value equality
+```
+
+### Mutable vs Immutable Types
+
+The behavior of assignment depends on whether the type is mutable or immutable.
+
+**Immutable types**: `int`, `float`, `bool`, `str`, `tuple`, `frozenset`,
+`bytes`. You cannot change the object after it is created. Any operation that
+looks like modification creates a new object instead:
+
+```python
+x = "hello"
+y = x
+x += " world"   # x is now bound to a NEW str object
+
+print(y)        # "hello": y still points to the original
+```
+
+**Mutable types**: `list`, `dict`, `set`, `bytearray`, and most user-defined
+objects. The object can be modified in place, and all references see the change:
+
+```python
+a = {"key": 1}
+b = a
+a["key"] = 99
+
+print(b)        # {"key": 99}: same dict, one change visible through both names
+```
+
+This asymmetry is one of the most common sources of bugs for programmers new
+to Python. The rule to remember: assignment always copies the reference. For
+immutable types, this is safe because the object cannot change. For mutable
+types, it creates an alias.
+
+### Copying Mutable Objects
+
+Three levels of copy:
+
+```python
+import copy
+
+original = [[1, 2], [3, 4]]
+
+# 1. Alias: no copy at all
+alias = original
+
+# 2. Shallow copy: new container, same inner objects
+shallow = original.copy()         # or list(original) or original[:]
+shallow.append([5, 6])            # original unaffected: new container
+shallow[0].append(99)             # original[0] IS affected: inner list is shared
+
+# 3. Deep copy: new everything, recursively
+deep = copy.deepcopy(original)
+deep[0].append(99)                # original unaffected at every level
+```
+
+A shallow copy creates a new container but does not copy the objects inside
+it. If those objects are themselves mutable, the shallow copy shares them with
+the original. Deep copy recurses through the entire structure. For nested
+mutable data, the difference matters.
+
+### Identity, Equality, and Interning
+
+`is` tests whether two names point to the same object. `==` tests whether two
+objects have equal values. They usually agree, but not always:
+
+```python
+a = [1, 2, 3]
+b = [1, 2, 3]
+
+print(a == b)   # True: equal values
+print(a is b)   # False: two distinct list objects
+```
+
+One exception worth knowing: CPython caches small integers (typically -5
+through 256) and short strings that look like identifiers. These objects are
+reused rather than re-created, so `is` may return `True` even for separately
+created values in that range:
+
+```python
+x = 42
+y = 42
+print(x is y)   # True in CPython: the integer 42 is cached
+
+x = 1000
+y = 1000
+print(x is y)   # False: large integers are not cached
+```
+
+Never rely on this caching behavior. Use `==` to compare values and `is` only
+when you specifically mean to test object identity (most commonly: `if x is
+None`).
+
+### How Lists Allocate Memory
+
+Python lists are dynamic arrays, similar to `Vec<T>` in Rust or `std::vector`
+in C++. They maintain an internal buffer that is larger than the current
+length, so that `append` is fast most of the time.
+
+When the buffer is full and you append another element, Python reallocates: it
+allocates a new, larger buffer, copies the elements over, and frees the old
+one. The new capacity follows a growth formula that adds roughly one-eighth of
+the current size (plus a small constant for small lists). This gives a growth
+factor approaching 1.125 for large lists, smaller than Rust's factor of 2 but
+still amortized O(1) per append.
+
+You can observe the reallocation steps directly:
+
+```python
+import sys
+
+a = []
+prev_size = 0
+for i in range(20):
+    a.append(i)
+    size = sys.getsizeof(a)
+    if size != prev_size:
+        print(f"len={len(a):2d}  buffer size: {size} bytes")
+        prev_size = size
+```
+
+The buffer grows in steps, not on every append. You pay for reallocation
+infrequently. If you know the final size in advance, a list comprehension
+avoids all intermediate reallocations by building the list in one pass:
+
+```python
+# repeated append: may reallocate several times
+result = []
+for i in range(10000):
+    result.append(compute(i))
+
+# comprehension: single allocation, then fill
+result = [compute(i) for i in range(10000)]
+```
+
+### Dict and Set Internals
+
+Dicts and sets are hash tables. Lookup, insertion, and deletion are O(1)
+average case. The hash table resizes when the load factor exceeds roughly
+two-thirds capacity, at which point it doubles in size. As with lists, this
+reallocation is amortized over many insertions.
+
+Python dicts preserve insertion order as of Python 3.7. This is guaranteed by
+the language specification.
+
+### Reference Counting and Garbage Collection
+
+CPython tracks a **reference count** on every object: the number of names and
+data structures that point to it. When the count drops to zero, the object is
+freed immediately and deterministically. This is similar in spirit to RAII in
+C++ or Rust's ownership system, but managed automatically by the runtime.
+
+```python
+import sys
+
+a = [1, 2, 3]
+b = a                       # reference count is now 2
+print(sys.getrefcount(a))   # 3 (getrefcount itself adds one temporarily)
+
+del a                       # count drops to 1: not freed yet
+del b                       # count drops to 0: freed immediately
+```
+
+Reference counting has one weakness: cycles. If object A holds a reference to
+object B, and B holds a reference back to A, neither count ever reaches zero,
+even if nothing else refers to them. CPython includes a separate **cycle
+garbage collector** that periodically detects and clears these cycles. It runs
+automatically; you rarely need to think about it.
+
+The practical implication of reference counting: CPython's memory release is
+more predictable than a generational GC. Objects are usually freed as soon as
+they go out of scope, not at some future collection point. This matters for
+resources like file handles and network connections: the `with` statement
+exploits this predictability.
+
+```python
+with open("data.txt") as f:
+    content = f.read()
+# file is closed here, immediately, when the block exits
+```
+
+### The Global Interpreter Lock
+
+CPython has a **Global Interpreter Lock (GIL)**: only one thread executes
+Python bytecode at a time. This makes CPython's internals thread-safe without
+fine-grained locking, but it prevents true CPU parallelism across threads.
+
+The practical implications:
+
+- **I/O-bound work**: threads work well. The GIL is released during I/O
+  operations, so multiple threads can overlap network calls, file reads, and
+  so on without blocking each other.
+- **CPU-bound work**: use `multiprocessing` (separate processes, each with
+  their own GIL) or offload to C extensions like NumPy, which release the GIL
+  for their inner loops.
+
+Python 3.13 introduced an experimental free-threaded build (no GIL) as an
+opt-in option. It is not yet the default.
+
+### Memory-Efficient Patterns: Generators
+
+A list comprehension builds the entire result in memory at once. For large or
+infinite sequences, a **generator** computes values lazily, one at a time:
+
+```python
+# list comprehension: allocates all 10 million integers immediately
+big_list = [x * 2 for x in range(10_000_000)]
+
+# generator expression: allocates one integer at a time
+big_gen = (x * 2 for x in range(10_000_000))
+
+# generator function: same behavior, more control
+def doubled(n):
+    for i in range(n):
+        yield i * 2         # suspends here, resumes on next iteration
+
+for value in doubled(10_000_000):
+    process(value)          # only one integer in memory at a time
+```
+
+The `yield` keyword turns a function into a generator. Its local state is
+suspended between calls and resumed on the next iteration. Generators are the
+idiomatic way to handle large data streams, infinite sequences, and processing
+pipelines without holding everything in memory.
+
+
+## Data Structures
+
+### list — Dynamic Array
+
+```python
+a = [1, 2, 3]
+a.append(4)         # O(1) amortized
+a.insert(0, 0)      # O(n): shifts all elements
+a.pop()             # O(1): remove last element
+a.pop(0)            # O(n): remove first (use collections.deque if you need this often)
+a[1:3]              # [2, 3]: slice — creates a shallow copy of that range
+len(a)              # O(1)
+3 in a              # O(n): linear scan
+```
+
+Lists are heterogeneous: they can hold objects of different types, including
+other lists. In practice, homogeneous lists (all the same type) are far more
+common and perform better with libraries like NumPy.
+
+### tuple — Immutable Sequence
+
+```python
+t = (1, 2, 3)
+t[0]                # 1
+# t[0] = 99        # TypeError: tuples do not support assignment
+```
+
+Use tuples for fixed-size collections of heterogeneous data (coordinates, a
+record, a function return with multiple values). Use lists for variable-length
+collections of homogeneous data. Tuples as dict keys work; lists do not
+(mutable objects cannot be hashed).
+
+### dict — Hash Map
+
+```python
+d = {"name": "alice", "age": 30}
+d["name"]                       # "alice"
+d.get("missing", "default")     # "default": no KeyError
+d["new_key"] = 42               # insert or update
+"name" in d                     # True: O(1) membership test
+del d["age"]
+
+for key, value in d.items():
+    print(key, value)
+```
+
+### set — Hash Set
+
+```python
+s = {1, 2, 3}
+s.add(4)
+s.discard(10)       # no error if missing (remove() raises KeyError)
+3 in s              # True: O(1)
+
+a | b               # union
+a & b               # intersection
+a - b               # difference
+a ^ b               # symmetric difference
+```
+
+### str — Immutable Unicode Sequence
+
+```python
+s = "hello"
+s.upper()                       # "HELLO": returns a new string
+s.split(" ")                    # ["hello"]
+s.startswith("hel")             # True
+f"value is {x:.2f}"            # f-strings for inline formatting
+", ".join(["a", "b", "c"])     # "a, b, c"
+```
+
+Strings are immutable. Concatenating in a loop (`s += x`) allocates a new
+string on every iteration. For building strings from many parts, collect into
+a list and join at the end:
+
+```python
+parts = []
+for item in data:
+    parts.append(str(item))
+result = ", ".join(parts)       # one allocation
+```
+
+
+## Functions and Closures
+
+### First-Class Functions
+
+Functions are objects. They can be passed, returned, and stored:
+
+```python
+def apply(func, value):
+    return func(value)
+
+def double(x):
+    return x * 2
+
+apply(double, 5)            # 10
+apply(lambda x: x * 3, 5)  # 15: anonymous function
+```
+
+### Closures
+
+A nested function can capture variables from its enclosing scope:
+
+```python
+def make_multiplier(n):
+    def multiply(x):
+        return x * n   # captures n from the enclosing scope
+    return multiply
+
+triple = make_multiplier(3)
+triple(7)   # 21
+```
+
+This is the same concept as Rust closures or C++ lambdas with captures. Unlike
+Rust, Python does not distinguish capture by reference from capture by value:
+closures always capture a reference to the enclosing scope's variable binding.
+
+### Decorators
+
+A decorator is a function that wraps another function. The `@` syntax is
+shorthand for applying the wrapper:
+
+```python
+def log_calls(func):
+    def wrapper(*args, **kwargs):
+        print(f"calling {func.__name__}")
+        return func(*args, **kwargs)
+    return wrapper
+
+@log_calls
+def add(a, b):
+    return a + b
+
+# equivalent to: add = log_calls(add)
+add(2, 3)   # prints "calling add", returns 5
+```
+
+Decorators are used throughout web frameworks, testing libraries, and the
+standard library (`@staticmethod`, `@classmethod`, `@property`).
+
+
+## Classes and Objects
+
+```python
+class Point:
+    def __init__(self, x, y):           # constructor
+        self.x = x                      # instance attributes
+        self.y = y
+
+    def distance_from_origin(self):
+        return (self.x**2 + self.y**2) ** 0.5
+
+    def __repr__(self):                 # string representation for debugging
+        return f"Point({self.x}, {self.y})"
+
+    def __eq__(self, other):            # equality operator
+        return self.x == other.x and self.y == other.y
+
+p = Point(3, 4)
+print(p.distance_from_origin())   # 5.0
+print(p)                          # Point(3, 4)
+```
+
+`self` is explicit: Python does not inject it invisibly. Every instance method
+takes `self` as its first parameter, giving you a clear signal that the method
+operates on the object.
+
+**Dunder methods** (double underscore: `__init__`, `__repr__`, `__eq__`) let
+you hook into Python's built-in operations. They are the mechanism behind
+operator overloading, iteration, context managers, and more.
+
+### Inheritance
+
+```python
+class Shape:
+    def area(self):
+        raise NotImplementedError
+
+class Circle(Shape):
+    def __init__(self, radius):
+        self.radius = radius
+
+    def area(self):
+        import math
+        return math.pi * self.radius ** 2
+```
+
+Python supports multiple inheritance. Unlike C++, there is no `virtual`
+keyword: all method calls are dynamically dispatched by default. The method
+resolution order (MRO) is deterministic and inspectable via `ClassName.__mro__`.
+
+### No Access Control
+
+Python has no `private` or `protected` keywords. Convention uses a leading
+underscore to signal "internal: do not use this from outside":
+
+```python
+class Cache:
+    def __init__(self):
+        self._data = {}         # by convention, internal
+        self.__secret = "x"    # name-mangled to _Cache__secret: harder to reach
+```
+
+The language does not enforce these conventions. "We are all adults here" is
+the cultural attitude.
+
+### Dataclasses
+
+For classes that are primarily data containers, `@dataclass` generates
+`__init__`, `__repr__`, and `__eq__` automatically:
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class Point:
+    x: float
+    y: float
+
+p = Point(3.0, 4.0)
+print(p)            # Point(x=3.0, y=4.0)
+```
+
+This is the Python equivalent of `#[derive(Debug, PartialEq)]` in Rust.
+
+
+## Error Handling
+
+Python uses exceptions. Errors are raised with `raise` and caught with
+`try / except`:
+
+```python
+def divide(a, b):
+    if b == 0:
+        raise ValueError("cannot divide by zero")
+    return a / b
+
+try:
+    result = divide(10, 0)
+except ValueError as e:
+    print(f"error: {e}")
+except ZeroDivisionError:
+    print("division by zero")
+else:
+    print(f"result: {result}")  # runs only if no exception was raised
+finally:
+    print("always runs")        # cleanup: always executes, exception or not
+```
+
+Exceptions are classes. The standard library defines a hierarchy; catching a
+base class catches all its subclasses:
+
+```python
+try:
+    f = open("data.txt")
+except OSError as e:            # catches FileNotFoundError, PermissionError, etc.
+    print(e)
+```
+
+### Context Managers
+
+The `with` statement ensures cleanup happens even if an exception is raised.
+It is Python's answer to RAII:
+
+```python
+with open("data.txt") as f:
+    content = f.read()
+# file is closed here, regardless of whether an exception occurred
+
+# multiple resources in one statement
+with open("input.txt") as src, open("output.txt", "w") as dst:
+    dst.write(src.read())
+```
+
+Any object implementing `__enter__` and `__exit__` can be used as a context
+manager. The standard library provides them for files, locks, database
+connections, and more.
+
+
+## The Ecosystem
+
+Python's package index (PyPI) hosts hundreds of thousands of packages. A
+representative sample of what you will likely encounter:
+
+| Domain | Package | Notes |
+|---|---|---|
+| Data science | `numpy`, `pandas` | Array computing, data frames |
+| Machine learning | `pytorch`, `tensorflow` | Neural networks |
+| Scientific computing | `scipy` | Math, signal processing, statistics |
+| Visualization | `matplotlib`, `seaborn` | Plotting |
+| Web frameworks | `fastapi`, `flask`, `django` | HTTP servers |
+| HTTP client | `requests`, `httpx` | Making HTTP calls |
+| Testing | `pytest` | The standard test runner |
+| Type checking | `mypy`, `pyright` | Static analysis |
+| Data validation | `pydantic` | Parsing and validation with type hints |
+
+`pip install package_name` installs from PyPI. `uv` is a modern, significantly
+faster alternative to pip that is worth knowing.
+
+
+## Key Differences from C and Rust
+
+| Concept | C / Rust | Python |
+|---|---|---|
+| Variable declaration | Required (`int x`, `let x`) | Not needed: just assign |
+| Types | Static, checked at compile time | Dynamic, checked at runtime |
+| Integer overflow | Wraps or undefined (C); checked (Rust) | Never: arbitrary precision |
+| Memory management | Manual (C); ownership (Rust) | Automatic reference counting |
+| Null | `NULL` / `None` in `Option<T>` | `None` |
+| Strings | `char*` / `&str` + `String` | `str` (immutable Unicode) |
+| Arrays | Fixed-size / `Vec<T>` | `list` (dynamic, heterogeneous) |
+| Error handling | Return codes / `Result<T, E>` | Exceptions |
+| Compilation | Compiled to machine code | Interpreted (CPython bytecode) |
+| Performance | Near-metal | 10x to 100x slower for CPU-bound code |
+| Parallelism | Full multi-threading | GIL limits CPU-bound threads |
+| Interfaces | Virtual classes (C++) / Traits (Rust) | Duck typing + ABCs |
+
+
+## Where to Go Next
+
+- The [Python Tutorial](https://docs.python.org/3/tutorial/) in the official
+  docs is clear and comprehensive.
+- [Fluent Python](https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/)
+  by Luciano Ramalho is the definitive book for understanding how Python
+  actually works under the hood.
+- [Real Python](https://realpython.com) has well-written tutorials on almost
+  every Python topic imaginable.
+- `python -m pdb` is the built-in debugger. `breakpoint()` drops you into it
+  from code, at any line.
+
+The most important habit: use a virtual environment for every project, read the
+error tracebacks carefully (they are good), and reach for the standard library
+before reaching for a third-party package.
