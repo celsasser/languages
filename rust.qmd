@@ -35,10 +35,8 @@ A **crate** is the fundamental unit of compilation. The Rust compiler takes a cr
 
 Two kinds of crates:
 
-- **Binary crate** — has a `main()` entry point, produces an executable.
-    Root file is `src/main.rs`.
-- **Library crate** — no `main()`, produces a library for other code to use.
-    Root file is `src/lib.rs`.
+- **Binary crate** — has a `main()` entry point, produces an executable. Root file is `src/main.rs`.
+- **Library crate** — no `main()`, produces a library for other code to use. Root file is `src/lib.rs`.
 
 A **package** is what Cargo manages: a directory with a `Cargo.toml` manifest. A package contains at least one crate. Most projects you will work on are a single package with a single binary crate:
 
@@ -443,8 +441,7 @@ println!("{}", s);           // s still valid after the call
 
 **The borrow rules** (enforced at compile time):
 
-1. You can have *either* one mutable reference *or* any number of immutable
-   references — never both at the same time.
+1. You can have *either* one mutable reference *or* any number of immutable references — never both at the same time.
 2. References must always be valid (no dangling references).
 
 ```rust
