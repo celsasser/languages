@@ -13,12 +13,12 @@ h2 {
 
 h3 {
   color: #555;
-  font-size: 1.62em;
+  font-size: 1.7em;
 }
 
 h4 {
-  color: #777;
-  font-size: 1.40em;
+  color: #555;
+  font-size: 1.50em;
   font-weight: 500;
 }
 
@@ -27,16 +27,16 @@ h5 {
   font-size: 1.25em;
   font-weight: 400;
   padding-top: 0.55em;
-  margin-bottom: 0.33em;
+  margin-bottom: 0.30em;
 }
 
 /* H6 is just a bold heading */
 h6 {
   color: #555;
-  font-size: 1.12em;
+  font-size: 1.1em;
   font-weight: 600;
   padding-top: 0.25em;
-  margin-bottom: 0.33em;
+  margin-bottom: 0.25em;
 }
 
 .sidebar li {
