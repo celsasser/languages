@@ -146,18 +146,18 @@ The analysis demonstrates that Python's performance characteristics are not simp
 Python's performance landscape continues to evolve. The acceptance of PEP 703 and the development of a free-threaded Python build promise to remove the GIL limitation that has constrained multi-threaded performance for decades. Ongoing work on the adaptive interpreter and potential future JIT compilation in CPython may narrow the gap with alternative implementations. The growth of Python in performance-sensitive domains like machine learning drives continued investment in optimization, benefiting the entire ecosystem. For practitioners, the key insights from this analysis inform effective Python development: leverage optimized libraries, profile before optimizing, consider C extensions for critical paths, and understand the architectural factors that influence performance to make informed design decisions.
 
 ## References
-1. Python Software Foundation. ["CPython Source Code"](https://github.com/python/cpython). GitHub Repository, 2024.
-2. D. Beazley, ["Understanding the Python GIL"](https://www.dabeaz.com/python/UnderstandingGIL.pdf), PyCon 2015.
-3. PEP 703, ["Making the Global Interpreter Lock Optional in CPython"](https://peps.python.org/pep-0703/). Python Enhancement Proposals, 2023.
-4. Real Python. ["What Is the Python Global Interpreter Lock (GIL)?"](https://realpython.com/python-gil/)
-5. Python Documentation. ["Extending Python with C or C++"](https://docs.python.org/3/extending/extending.html).
-6. Real Python. ["Python Bindings: Calling C or C++ From Python"](https://realpython.com/python-bindings-overview/).
-7. Itamar Turner-Trauring. ["The limits of Python vectorization as a performance technique"](https://pythonspeed.com/articles/vectorization-python-alternatives/).
-8. GeeksforGeeks. ["Garbage Collection in Python"](https://www.geeksforgeeks.org/python/garbage-collection-python/).
-9. S. Behnel et al., ["Cython: C-Extensions for Python"](https://cython.readthedocs.io/).
-10. W. Jakob, ["pybind11 — Seamless operability between C++11 and Python"](https://`pybind11`.readthedocs.io/).
-11. Ten Thousand Meters Blog. ["Python behind the scenes \#1: How the CPython VM Works"](https://tenthousandmeters.com/blog/python-behind-the-scenes-1-how-the-cpython-vm-works).
-12. Abhik.ai. ["CPython Internals: How Python Really Works Under the Hood"](https://www.abhik.ai/articles/cpython-internals).
-13. Machine Learning Mastery. ["Everything You Need to Know About How Python Manages Memory"](https://machinelearningmastery.com/everything-you-need-to-know-about-how-python-manages-memory/).
-14. JetBrains Blog. ["Faster Python: Unlocking the Python Global Interpreter Lock"](https://blog.jetbrains.com/pycharm/2025/07/faster-python-unlocking-the-python-global-interpreter-lock/).
-15. Medium. ["Vectorization in NumPy — The Real Engine Behind Python's Performance"](https://medium.com/@nishant.25bmr7017/vectorization-in-numpy-the-real-engine-behind-pythons-performance-cf350964ba98).
+1. Python Software Foundation. ["CPython Source Code"](https://github.com/python/cpython){target=_blank}. GitHub Repository, 2024.
+2. D. Beazley, ["Understanding the Python GIL"](https://www.dabeaz.com/python/UnderstandingGIL.pdf){target=_blank}, PyCon 2015.
+3. PEP 703, ["Making the Global Interpreter Lock Optional in CPython"](https://peps.python.org/pep-0703/){target=_blank}. Python Enhancement Proposals, 2023.
+4. Real Python. ["What Is the Python Global Interpreter Lock (GIL)?"](https://realpython.com/python-gil/){target=_blank}
+5. Python Documentation. ["Extending Python with C or C++"](https://docs.python.org/3/extending/extending.html){target=_blank}.
+6. Real Python. ["Python Bindings: Calling C or C++ From Python"](https://realpython.com/python-bindings-overview/){target=_blank}.
+7. Itamar Turner-Trauring. ["The limits of Python vectorization as a performance technique"](https://pythonspeed.com/articles/vectorization-python-alternatives/){target=_blank}.
+8. GeeksforGeeks. ["Garbage Collection in Python"](https://www.geeksforgeeks.org/python/garbage-collection-python/){target=_blank}.
+9. S. Behnel et al., ["Cython: C-Extensions for Python"](https://cython.readthedocs.io/){target=_blank}.
+10. W. Jakob, ["pybind11 — Seamless operability between C++11 and Python"](https://pybind11.readthedocs.io/){target=_blank}.
+11. Ten Thousand Meters Blog. ["Python behind the scenes \#1: How the CPython VM Works"](https://tenthousandmeters.com/blog/python-behind-the-scenes-1-how-the-cpython-vm-works){target=_blank}.
+12. Abhik.ai. ["CPython Internals: How Python Really Works Under the Hood"](https://www.abhik.ai/articles/cpython-internals){target=_blank}.
+13. Machine Learning Mastery. ["Everything You Need to Know About How Python Manages Memory"](https://machinelearningmastery.com/everything-you-need-to-know-about-how-python-manages-memory/){target=_blank}.
+14. JetBrains Blog. ["Faster Python: Unlocking the Python Global Interpreter Lock"](https://blog.jetbrains.com/pycharm/2025/07/faster-python-unlocking-the-python-global-interpreter-lock/){target=_blank}.
+15. Medium. ["Vectorization in NumPy — The Real Engine Behind Python's Performance"](https://medium.com/@nishant.25bmr7017/vectorization-in-numpy-the-real-engine-behind-pythons-performance-cf350964ba98){target=_blank}.

@@ -35,10 +35,10 @@ website:
             file: c.qmd
           - text: "The Rust Language"
             file: rust.qmd
-          - text: "The CSS Language"
-            file: css.qmd
           - text: "The Python Language"
             file: python.qmd
+          - text: "The CSS Language"
+            file: css.qmd
 
       - section: "Briefs"
         contents:

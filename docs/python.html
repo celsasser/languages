@@ -215,14 +215,14 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./css.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The CSS Language</span></a>
+  <a href="./python.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">The Python Language</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./python.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">The Python Language</span></a>
+  <a href="./css.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The CSS Language</span></a>
   </div>
 </li>
       </ul>
@@ -425,7 +425,7 @@ window.Quarto = {
 </section>
 <section id="batteries-included." class="level6">
 <h6 class="anchored" data-anchor-id="batteries-included.">6. Batteries included.</h6>
-<p>The standard library is enormous. Networking, file I/O, JSON, regular expressions, HTTP, CSV, database access, unit testing: most of what you need for a typical program is already there.</p>
+<p>The <a href="https://docs.python.org/3/library/index.html">standard library</a> is enormous. Networking, file I/O, JSON, regular expressions, HTTP, CSV, database access, unit testing: most of what you need for a typical program is already there.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="The Zen of Python">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -891,7 +891,7 @@ window.Quarto = {
 <span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a><span class="co"># equivalent to: add = log_calls(add)</span></span>
 <span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>add(<span class="dv">2</span>, <span class="dv">3</span>)   <span class="co"># prints "calling add", returns 5</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Decorators are used throughout web frameworks, testing libraries, and the standard library (<code>@staticmethod</code>, <code>@classmethod</code>, <code>@property</code>).</p>
+<p>Decorators are used throughout web frameworks, testing libraries, and the <a href="https://docs.python.org/3/library/index.html">standard library</a> (<code>@staticmethod</code>, <code>@classmethod</code>, <code>@property</code>).</p>
 </section>
 </section>
 <section id="classes-and-objects" class="level2">
@@ -972,7 +972,7 @@ window.Quarto = {
 <span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"result: </span><span class="sc">{</span>result<span class="sc">}</span><span class="ss">"</span>)  <span class="co"># runs only if no exception was raised</span></span>
 <span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a><span class="cf">finally</span>:</span>
 <span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"always runs"</span>)        <span class="co"># cleanup: always executes, exception or not</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Exceptions are classes. The standard library defines a hierarchy; catching a base class catches all its subclasses:</p>
+<p>Exceptions are classes. The <a href="https://docs.python.org/3/library/index.html">standard library</a> defines a hierarchy; catching a base class catches all its subclasses:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    f <span class="op">=</span> <span class="bu">open</span>(<span class="st">"data.txt"</span>)</span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">OSError</span> <span class="im">as</span> e:            <span class="co"># catches FileNotFoundError, PermissionError, etc.</span></span>
@@ -987,12 +987,12 @@ window.Quarto = {
 <span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="co"># multiple resources in one statement</span></span>
 <span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"input.txt"</span>) <span class="im">as</span> src, <span class="bu">open</span>(<span class="st">"output.txt"</span>, <span class="st">"w"</span>) <span class="im">as</span> dst:</span>
 <span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>    dst.write(src.read())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Any object implementing <code>__enter__</code> and <code>__exit__</code> can be used as a context manager. The standard library provides them for files, locks, database connections, and more.</p>
+<p>Any object implementing <code>__enter__</code> and <code>__exit__</code> can be used as a context manager. The <a href="https://docs.python.org/3/library/index.html">standard library</a> provides them for files, locks, database connections, and more.</p>
 </section>
 </section>
 <section id="performance" class="level2">
 <h2 class="anchored" data-anchor-id="performance">Performance</h2>
-<p>See <a href="./b-pyperf.html">Python Performance Analysis</a> for more information.</p>
+<p>See <a href="./b-pyperf.html">Python Performance Analysis</a> for a deeper dive.</p>
 <p>Python is often criticized for being “slow.” For a systems programmer used to C or Rust, this is true: Python’s abstraction layer is thick. Every operation involves dynamic dispatch and object management overhead. However, Python is rarely the bottleneck for I/O-bound tasks, and for CPU-bound tasks, it provides excellent facilities for offloading work to compiled code.</p>
 <section id="the-cost-of-dynamic-dispatch" class="level3">
 <h3 class="anchored" data-anchor-id="the-cost-of-dynamic-dispatch">The Cost of Dynamic Dispatch</h3>
@@ -1031,7 +1031,7 @@ window.Quarto = {
 <div class="subheading">
 <p>FFI (Foreign Function Interface)</p>
 </div>
-<p>Libraries like <code>ctypes</code> (standard library) and <code>cffi</code> allow you to load shared libraries (<code>.so</code>, <code>.dll</code>, <code>.dylib</code>) and call functions within them directly from Python. This is ideal for wrapping existing C libraries.</p>
+<p>Libraries like <code>ctypes</code> (<a href="https://docs.python.org/3/library/index.html">standard library</a>) and <code>cffi</code> allow you to load shared libraries (<code>.so</code>, <code>.dll</code>, <code>.dylib</code>) and call functions within them directly from Python. This is ideal for wrapping existing C libraries.</p>
 <div class="subheading">
 <p>The Rust Bridge</p>
 </div>
@@ -1232,13 +1232,13 @@ window.Quarto = {
 <section id="where-to-go-next" class="level2">
 <h2 class="anchored" data-anchor-id="where-to-go-next">Where to Go Next</h2>
 <ul>
-<li><a href="https://celsasser.github.io/sps-602-notes/">Python Notebook (DATA 602)</a> by Curtis is the definitive notebook of bears in the winter time. And you thought they were sleeping. Ha!</li>
-<li>The <a href="https://docs.python.org/3/tutorial/">Python Tutorial</a> in the official docs is clear and comprehensive.</li>
-<li><a href="https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/">Fluent Python</a> by Luciano Ramalho is the definitive book for understanding how Python actually works under the hood.</li>
-<li><a href="https://realpython.com">Real Python</a> has well-written tutorials on almost every Python topic imaginable.</li>
+<li><a href="https://celsasser.github.io/sps-602-notes/" target="_blank">Python Notebook (DATA 602)</a> by Curtis is the definitive notebook for bears in the winter time. And you thought they were sleeping. Ha!</li>
+<li>The <a href="https://docs.python.org/3/tutorial/" target="_blank">Python Tutorial</a> in the official docs is clear and comprehensive.</li>
+<li><a href="https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/" target="_blank">Fluent Python</a> by Luciano Ramalho is the definitive book for understanding how Python actually works under the hood.</li>
+<li><a href="https://realpython.com" target="_blank">Real Python</a> has well-written tutorials on almost every Python topic imaginable.</li>
 <li><code>python -m pdb</code> is the built-in debugger. <code>breakpoint()</code> drops you into it from code, at any line.</li>
 </ul>
-<p>The most important habit: use a virtual environment for every project, read the error tracebacks carefully (they are good), and reach for the standard library before reaching for a third-party package.</p>
+<p>The most important habit: use a virtual environment for every project, read the error tracebacks carefully (they are good), and reach for the <a href="https://docs.python.org/3/library/index.html">standard library</a> before reaching for a third-party package.</p>
 
 
 </section>

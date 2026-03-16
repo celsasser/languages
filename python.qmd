@@ -27,7 +27,7 @@ CPython (the reference implementation) uses reference counting as its primary ga
 Python's syntax enforces structure through indentation rather than braces. The language includes exactly one obvious way to do most things, by design. This is not a limitation: it is a feature that makes code written by others readable.
 
 ###### 6. Batteries included.
-The standard library is enormous. Networking, file I/O, JSON, regular expressions, HTTP, CSV, database access, unit testing: most of what you need for a typical program is already there.
+The [standard library](https://docs.python.org/3/library/index.html) is enormous. Networking, file I/O, JSON, regular expressions, HTTP, CSV, database access, unit testing: most of what you need for a typical program is already there.
 
 ::: {.callout-note title="The Zen of Python"}
 Tim Peters wrote nineteen aphorisms that capture Python's design philosophy. You can read them any time:
@@ -524,7 +524,7 @@ def add(a, b):
 add(2, 3)   # prints "calling add", returns 5
 ```
 
-Decorators are used throughout web frameworks, testing libraries, and the standard library (`@staticmethod`, `@classmethod`, `@property`).
+Decorators are used throughout web frameworks, testing libraries, and the [standard library](https://docs.python.org/3/library/index.html) (`@staticmethod`, `@classmethod`, `@property`).
 
 ## Classes and Objects
 ```python
@@ -618,7 +618,7 @@ finally:
     print("always runs")        # cleanup: always executes, exception or not
 ```
 
-Exceptions are classes. The standard library defines a hierarchy; catching a base class catches all its subclasses:
+Exceptions are classes. The [standard library](https://docs.python.org/3/library/index.html) defines a hierarchy; catching a base class catches all its subclasses:
 
 ```python
 try:
@@ -640,10 +640,10 @@ with open("input.txt") as src, open("output.txt", "w") as dst:
     dst.write(src.read())
 ```
 
-Any object implementing `__enter__` and `__exit__` can be used as a context manager. The standard library provides them for files, locks, database connections, and more.
+Any object implementing `__enter__` and `__exit__` can be used as a context manager. The [standard library](https://docs.python.org/3/library/index.html) provides them for files, locks, database connections, and more.
 
 ## Performance
-See [Python Performance Analysis](b-pyperf.qmd) for more information.
+See [Python Performance Analysis](b-pyperf.qmd) for a deeper dive.
 
 Python is often criticized for being "slow." For a systems programmer used to C or Rust, this is true: Python's abstraction layer is thick. Every operation involves dynamic dispatch and object management overhead. However, Python is rarely the bottleneck for I/O-bound tasks, and for CPU-bound tasks, it provides excellent facilities for offloading work to compiled code.
 
@@ -680,7 +680,7 @@ You can write modules in C using the **Python C API**. This gives you full contr
 FFI (Foreign Function Interface)
 :::
 
-Libraries like `ctypes` (standard library) and `cffi` allow you to load shared libraries (`.so`, `.dll`, `.dylib`) and call functions within them directly from Python. This is ideal for wrapping existing C libraries.
+Libraries like `ctypes` ([standard library](https://docs.python.org/3/library/index.html)) and `cffi` allow you to load shared libraries (`.so`, `.dll`, `.dylib`) and call functions within them directly from Python. This is ideal for wrapping existing C libraries.
 
 ::: {.subheading}
 The Rust Bridge
@@ -749,10 +749,10 @@ Python's package index (PyPI) hosts hundreds of thousands of packages. A represe
 | Interfaces           | Virtual classes (C++) / Traits (Rust)  | Duck typing + ABCs                    |
 
 ## Where to Go Next
-- [Python Notebook (DATA 602)](https://celsasser.github.io/sps-602-notes/) by Curtis is the definitive notebook of bears in the winter time. And you thought they were sleeping. Ha!
-- The [Python Tutorial](https://docs.python.org/3/tutorial/) in the official docs is clear and comprehensive.
-- [Fluent Python](https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/) by Luciano Ramalho is the definitive book for understanding how Python actually works under the hood.
-- [Real Python](https://realpython.com) has well-written tutorials on almost every Python topic imaginable.
+- [Python Notebook (DATA 602)](https://celsasser.github.io/sps-602-notes/){target=_blank} by Curtis is the definitive notebook for bears in the winter time. And you thought they were sleeping. Ha!
+- The [Python Tutorial](https://docs.python.org/3/tutorial/){target=_blank} in the official docs is clear and comprehensive.
+- [Fluent Python](https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/){target=_blank} by Luciano Ramalho is the definitive book for understanding how Python actually works under the hood.
+- [Real Python](https://realpython.com){target=_blank} has well-written tutorials on almost every Python topic imaginable.
 - `python -m pdb` is the built-in debugger. `breakpoint()` drops you into it from code, at any line.
 
-The most important habit: use a virtual environment for every project, read the error tracebacks carefully (they are good), and reach for the standard library before reaching for a third-party package.
+The most important habit: use a virtual environment for every project, read the error tracebacks carefully (they are good), and reach for the [standard library](https://docs.python.org/3/library/index.html) before reaching for a third-party package.

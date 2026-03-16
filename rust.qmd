@@ -53,25 +53,11 @@ A library package looks the same but with `src/lib.rs` instead. A package can co
 ### Modules
 A **module** is a namespace within a crate — the closest equivalent to a Python module. Modules organize code into logical units and control what is visible outside (`pub`) versus private. Items are **private by default** — you opt into visibility explicitly.
 
-#### Declaring a Module
-A module declared in `main.rs` or `lib.rs` can be defined three ways:
-
-```rust
-// 1. Inline — defined right here in the same file
-mod math {
-    pub fn area() -> f64 { 0.0 }
-}
-
-// 2. File-based — Rust looks for src/math.rs
-mod math;
-
-// 3. Directory-based — Rust looks for src/math/mod.rs
-mod math;
-```
-
-For cases 1 and 2, Rust decides which to use based on which file exists. You cannot have both `src/math.rs` and `src/math/mod.rs`.
-
 ##### 1. Inline
+:::{.subheading}
+Right here, right now!
+:::
+
 You can declare a module inline:
 
 ```rust
@@ -86,6 +72,10 @@ math::add(1, 2);
 ```
 
 ##### 2. File Based
+:::{.subheading}
+Rust looks for src/math.rs
+:::
+
 For larger code, modules live in their own files. Writing `mod math;` in `main.rs` tells Rust to look for the module's code in `src/math.rs`:
 
 ```
@@ -95,6 +85,10 @@ src/
 ```
 
 ##### 3. Directory Based
+:::{.subheading}
+Rust looks for src/math/mod.rs
+:::
+
 A module that has its own submodules gets a directory instead:
 
 ```
@@ -104,6 +98,10 @@ src/
     ├── mod.rs      # the math module root
     └── geometry.rs # submodule, accessed as math::geometry
 ```
+
+:::{.callout-warning title="Rauchen est Verbotten"}
+For cases 2 and 3, Rust decides which to use based on which file exists. You cannot have both `src/math.rs` and `src/math/mod.rs`.
+:::
 
 #### Visibility
 Four levels, from narrowest to widest:
