@@ -643,6 +643,8 @@ with open("input.txt") as src, open("output.txt", "w") as dst:
 Any object implementing `__enter__` and `__exit__` can be used as a context manager. The standard library provides them for files, locks, database connections, and more.
 
 ## Performance
+See [Python Performance Analysis](b-pyperf.qmd) for more information.
+
 Python is often criticized for being "slow." For a systems programmer used to C or Rust, this is true: Python's abstraction layer is thick. Every operation involves dynamic dispatch and object management overhead. However, Python is rarely the bottleneck for I/O-bound tasks, and for CPU-bound tasks, it provides excellent facilities for offloading work to compiled code.
 
 ### The Cost of Dynamic Dispatch
@@ -747,6 +749,7 @@ Python's package index (PyPI) hosts hundreds of thousands of packages. A represe
 | Interfaces           | Virtual classes (C++) / Traits (Rust)  | Duck typing + ABCs                    |
 
 ## Where to Go Next
+- [Python Notebook (DATA 602)](https://celsasser.github.io/sps-602-notes/) by Curtis is the definitive notebook of bears in the winter time. And you thought they were sleeping. Ha!
 - The [Python Tutorial](https://docs.python.org/3/tutorial/) in the official docs is clear and comprehensive.
 - [Fluent Python](https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/) by Luciano Ramalho is the definitive book for understanding how Python actually works under the hood.
 - [Real Python](https://realpython.com) has well-written tutorials on almost every Python topic imaginable.

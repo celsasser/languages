@@ -40,6 +40,11 @@ website:
           - text: "The Python Language"
             file: python.qmd
 
+      - section: "Briefs"
+        contents:
+          - text: "Python Performance Analysis"
+            file: b-pyperf.qmd
+
       - section: "Reference"
         contents:
           - text: "PC Assembly Language"

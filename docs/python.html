@@ -230,12 +230,29 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
- <span class="menu-text">Reference</span></a>
+ <span class="menu-text">Briefs</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./b-pyperf.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Python Performance Analysis</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Reference</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./reference/assembly-pc.pdf" class="sidebar-item-text sidebar-link">
@@ -258,13 +275,13 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
  <span class="menu-text">Appendix</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./glossary.html" class="sidebar-item-text sidebar-link">
@@ -975,6 +992,7 @@ window.Quarto = {
 </section>
 <section id="performance" class="level2">
 <h2 class="anchored" data-anchor-id="performance">Performance</h2>
+<p>See <a href="./b-pyperf.html">Python Performance Analysis</a> for more information.</p>
 <p>Python is often criticized for being “slow.” For a systems programmer used to C or Rust, this is true: Python’s abstraction layer is thick. Every operation involves dynamic dispatch and object management overhead. However, Python is rarely the bottleneck for I/O-bound tasks, and for CPU-bound tasks, it provides excellent facilities for offloading work to compiled code.</p>
 <section id="the-cost-of-dynamic-dispatch" class="level3">
 <h3 class="anchored" data-anchor-id="the-cost-of-dynamic-dispatch">The Cost of Dynamic Dispatch</h3>
@@ -1214,6 +1232,7 @@ window.Quarto = {
 <section id="where-to-go-next" class="level2">
 <h2 class="anchored" data-anchor-id="where-to-go-next">Where to Go Next</h2>
 <ul>
+<li><a href="https://celsasser.github.io/sps-602-notes/">Python Notebook (DATA 602)</a> by Curtis is the definitive notebook of bears in the winter time. And you thought they were sleeping. Ha!</li>
 <li>The <a href="https://docs.python.org/3/tutorial/">Python Tutorial</a> in the official docs is clear and comprehensive.</li>
 <li><a href="https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/">Fluent Python</a> by Luciano Ramalho is the definitive book for understanding how Python actually works under the hood.</li>
 <li><a href="https://realpython.com">Real Python</a> has well-written tutorials on almost every Python topic imaginable.</li>
