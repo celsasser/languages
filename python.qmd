@@ -4,10 +4,7 @@ subtitle: "A practical introduction for systems programmers"
 ---
 
 ## Why Python Exists
-Python was created by Guido van Rossum in the late 1980s and first released in
-1991. Van Rossum was working at CWI in the Netherlands and wanted a language
-that filled the gap between shell scripting (too limited) and C (too verbose
-for rapid development). He named it after Monty Python, not the snake.
+Python was created by Guido van Rossum in the late 1980s and first released in 1991. Van Rossum was working at CWI in the Netherlands and wanted a language that filled the gap between shell scripting (too limited) and C (too verbose for rapid development). He named it after Monty Python, not the snake.
 
 The motivation was philosophical as much as practical: productivity matters. A program you can write in an afternoon and read back six months later is often more valuable than a highly optimized one that takes weeks to get right. Python made a deliberate bet that developer time is usually the bottleneck, not CPU time.
 
@@ -658,14 +655,12 @@ In C, `a + b` might be a single assembly instruction. In Python, it is a method 
 This overhead exists for every variable access, function call, and attribute lookup. This is why Python is 10x to 100x slower than C for raw numerical loops.
 
 ### What Improves Performance
-
 - **Use built-in functions.** Functions like `sum()`, `min()`, `max()`, `any()`, and `all()` are implemented in C. They iterate over data at C speed.
 - **List comprehensions.** These are optimized at the bytecode level. They are faster than a `for` loop that calls `.append()` because they avoid the repeated lookup of the `append` method on the list object.
 - **Local variables.** Accessing a local variable is faster than a global variable. In a tight loop, binding a global function or method to a local name can yield measurable gains.
 - **Generators.** While not necessarily faster in CPU time, they are significantly more memory-efficient for large datasets, preventing the performance degradation caused by memory pressure.
 
 ### What Hurts Performance
-
 - **The GIL.** The **Global Interpreter Lock** (GIL) prevents multiple threads from executing Python bytecode simultaneously. For CPU-bound work, threads will actually slow down your program due to context switching overhead without any parallelism gain.
 - **String concatenation.** Since strings are immutable, `s += "part"` creates a new string object and copies the old content. In a loop, this is $O(n^2)$. Always use `"".join(list_of_parts)`.
 - **Manual loops.** Writing `while i < len(lst): x = lst[i]` is significantly slower than `for x in lst:`. Always prefer `for x in lst:`.
