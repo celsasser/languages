@@ -13,12 +13,12 @@ h2 {
 
 h3 {
   color: #555;
-  font-size: 1.62em;
+  font-size: 1.7em;
 }
 
 h4 {
-  color: #777;
-  font-size: 1.40em;
+  color: #555;
+  font-size: 1.50em;
   font-weight: 500;
 }
 
@@ -27,16 +27,16 @@ h5 {
   font-size: 1.25em;
   font-weight: 400;
   padding-top: 0.55em;
-  margin-bottom: 0.33em;
+  margin-bottom: 0.30em;
 }
 
 /* H6 is just a bold heading */
 h6 {
   color: #555;
-  font-size: 1.12em;
+  font-size: 1.1em;
   font-weight: 600;
   padding-top: 0.25em;
-  margin-bottom: 0.33em;
+  margin-bottom: 0.25em;
 }
 
 .sidebar li {
@@ -45,7 +45,7 @@ h6 {
 
 li {
   /* We have a lot of equations in lists and they get very dense */
-  padding-bottom: 0.15em;
+  padding-bottom: 0.45em;
 }
 
 /*
@@ -92,6 +92,7 @@ table.table {
 .panel-h6,
 /* dialog style heading */
 .proof-ce,
+.quote,
 .solution-ce,
 .stdout,
 .theorem,
@@ -129,6 +130,7 @@ table.table {
 .panel-h6::before,
 .proof-ce::before,
 .proof-ce:not([data-label])::before,
+.quote::before,
 .solution-ce::before,
 .solution-ce:not([data-label])::before,
 .theorem::before,
@@ -154,6 +156,7 @@ table.table {
 .oracle::before,
 .panel::before,
 .proof-ce::before,
+.quote::before,
 .solution-ce::before,
 .theorem::before {
   content: attr(data-label);
@@ -218,7 +221,8 @@ a.disable-link {
 }
 
 .explanation,
-.exploration {
+.exploration,
+.quote {
   background-color: #f7fff5;
 }
 
@@ -375,11 +379,13 @@ div.panel-h6:has(> table:first-child) {
   ```
 */
 .subheading>p {
+  border-radius: 4px;
+  box-shadow: 2px 2px 7px 0px rgba(0, 0, 0, 0.3);
   display: inline-block;
   background-color: #f0f0f4;
   color: #787878;
   font-weight: 800;
-  padding: 0px 4px;
+  padding: 2px 4px;
 }
 
 .theorem {
