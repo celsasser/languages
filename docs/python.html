@@ -106,6 +106,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -281,15 +310,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#dict-and-set-internals" id="toc-dict-and-set-internals" class="nav-link" data-scroll-target="#dict-and-set-internals">Dict and Set Internals</a></li>
   <li><a href="#reference-counting-and-garbage-collection" id="toc-reference-counting-and-garbage-collection" class="nav-link" data-scroll-target="#reference-counting-and-garbage-collection">Reference Counting and Garbage Collection</a></li>
   <li><a href="#the-global-interpreter-lock" id="toc-the-global-interpreter-lock" class="nav-link" data-scroll-target="#the-global-interpreter-lock">The Global Interpreter Lock</a></li>
-  <li><a href="#memory-efficient-patterns-generators" id="toc-memory-efficient-patterns-generators" class="nav-link" data-scroll-target="#memory-efficient-patterns-generators">Memory-Efficient Patterns: Generators</a></li>
+  <li><a href="#memory-efficient-patterns" id="toc-memory-efficient-patterns" class="nav-link" data-scroll-target="#memory-efficient-patterns">Memory-Efficient Patterns</a></li>
   </ul></li>
   <li><a href="#data-structures" id="toc-data-structures" class="nav-link" data-scroll-target="#data-structures">Data Structures</a>
   <ul>
-  <li><a href="#list-dynamic-array" id="toc-list-dynamic-array" class="nav-link" data-scroll-target="#list-dynamic-array">list — Dynamic Array</a></li>
-  <li><a href="#tuple-immutable-sequence" id="toc-tuple-immutable-sequence" class="nav-link" data-scroll-target="#tuple-immutable-sequence">tuple — Immutable Sequence</a></li>
-  <li><a href="#dict-hash-map" id="toc-dict-hash-map" class="nav-link" data-scroll-target="#dict-hash-map">dict — Hash Map</a></li>
-  <li><a href="#set-hash-set" id="toc-set-hash-set" class="nav-link" data-scroll-target="#set-hash-set">set — Hash Set</a></li>
-  <li><a href="#str-immutable-unicode-sequence" id="toc-str-immutable-unicode-sequence" class="nav-link" data-scroll-target="#str-immutable-unicode-sequence">str — Immutable Unicode Sequence</a></li>
+  <li><a href="#list" id="toc-list" class="nav-link" data-scroll-target="#list">list</a></li>
+  <li><a href="#tuple" id="toc-tuple" class="nav-link" data-scroll-target="#tuple">tuple</a></li>
+  <li><a href="#dict" id="toc-dict" class="nav-link" data-scroll-target="#dict">dict</a></li>
+  <li><a href="#set" id="toc-set" class="nav-link" data-scroll-target="#set">set</a></li>
+  <li><a href="#str" id="toc-str" class="nav-link" data-scroll-target="#str">str</a></li>
   </ul></li>
   <li><a href="#functions-and-closures" id="toc-functions-and-closures" class="nav-link" data-scroll-target="#functions-and-closures">Functions and Closures</a>
   <ul>
@@ -306,6 +335,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#error-handling" id="toc-error-handling" class="nav-link" data-scroll-target="#error-handling">Error Handling</a>
   <ul>
   <li><a href="#context-managers" id="toc-context-managers" class="nav-link" data-scroll-target="#context-managers">Context Managers</a></li>
+  </ul></li>
+  <li><a href="#performance" id="toc-performance" class="nav-link" data-scroll-target="#performance">Performance</a>
+  <ul>
+  <li><a href="#the-cost-of-dynamic-dispatch" id="toc-the-cost-of-dynamic-dispatch" class="nav-link" data-scroll-target="#the-cost-of-dynamic-dispatch">The Cost of Dynamic Dispatch</a></li>
+  <li><a href="#what-improves-performance" id="toc-what-improves-performance" class="nav-link" data-scroll-target="#what-improves-performance">What Improves Performance</a></li>
+  <li><a href="#what-hurts-performance" id="toc-what-hurts-performance" class="nav-link" data-scroll-target="#what-hurts-performance">What Hurts Performance</a></li>
+  <li><a href="#interfacing-with-c-and-rust" id="toc-interfacing-with-c-and-rust" class="nav-link" data-scroll-target="#interfacing-with-c-and-rust">Interfacing with C and Rust</a></li>
+  <li><a href="#efficient-iteration-and-data-structures" id="toc-efficient-iteration-and-data-structures" class="nav-link" data-scroll-target="#efficient-iteration-and-data-structures">Efficient Iteration and Data Structures</a></li>
   </ul></li>
   <li><a href="#the-ecosystem" id="toc-the-ecosystem" class="nav-link" data-scroll-target="#the-ecosystem">The Ecosystem</a></li>
   <li><a href="#key-differences-from-c-and-rust" id="toc-key-differences-from-c-and-rust" class="nav-link" data-scroll-target="#key-differences-from-c-and-rust">Key Differences from C and Rust</a></li>
@@ -349,12 +386,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>That bet paid off. Python is now the dominant language for data science, machine learning, scientific computing, web backends, and automation. It runs everywhere from Raspberry Pis to GPU clusters.</p>
 <section id="the-core-design-decisions" class="level3">
 <h3 class="anchored" data-anchor-id="the-core-design-decisions">The Core Design Decisions</h3>
-<p><strong>1. Everything is an object.</strong> Every value in Python — integers, strings, functions, classes, modules — is a first-class object with an identity, a type, and a value. There are no primitives in the C sense. This uniformity makes the language consistent and extensible, at the cost of memory overhead.</p>
-<p><strong>2. Dynamic typing.</strong> Variables have no declared type. A variable is a name bound to an object, and that binding can be rebound to any object at any time. The type lives with the object, not the variable. This eliminates boilerplate but shifts type errors from compile time to runtime.</p>
-<p><strong>3. Reference semantics throughout.</strong> Assignment never copies an object. It copies a reference to an object. This has profound implications for mutable data, covered in depth below.</p>
-<p><strong>4. Automatic memory management.</strong> CPython (the reference implementation) uses reference counting as its primary garbage collection strategy, augmented by a cycle collector for circular references. Memory is managed for you, but understanding how it works prevents subtle bugs.</p>
-<p><strong>5. Readability as a design constraint.</strong> Python’s syntax enforces structure through indentation rather than braces. The language includes exactly one obvious way to do most things, by design. This is not a limitation: it is a feature that makes code written by others readable.</p>
-<p><strong>6. Batteries included.</strong> The standard library is enormous. Networking, file I/O, JSON, regular expressions, HTTP, CSV, database access, unit testing: most of what you need for a typical program is already there.</p>
+<section id="everything-is-an-object." class="level6">
+<h6 class="anchored" data-anchor-id="everything-is-an-object.">1. Everything is an object.</h6>
+<p>Every value in Python — integers, strings, functions, classes, modules — is a first-class object with an identity, a type, and a value. There are no primitives in the C sense. This uniformity makes the language consistent and extensible, at the cost of memory overhead.</p>
+</section>
+<section id="dynamic-typing." class="level6">
+<h6 class="anchored" data-anchor-id="dynamic-typing.">2. Dynamic typing.</h6>
+<p>Variables have no declared type. A variable is a name bound to an object, and that binding can be rebound to any object at any time. The type lives with the object, not the variable. This eliminates boilerplate but shifts type errors from compile time to runtime.</p>
+</section>
+<section id="reference-semantics-throughout." class="level6">
+<h6 class="anchored" data-anchor-id="reference-semantics-throughout.">3. Reference semantics throughout.</h6>
+<p>Assignment never copies an object. It copies a reference to an object. This has profound implications for mutable data, covered in depth below.</p>
+</section>
+<section id="automatic-memory-management." class="level6">
+<h6 class="anchored" data-anchor-id="automatic-memory-management.">4. Automatic memory management.</h6>
+<p>CPython (the reference implementation) uses reference counting as its primary garbage collection strategy, augmented by a cycle collector for circular references. Memory is managed for you, but understanding how it works prevents subtle bugs.</p>
+</section>
+<section id="readability-as-a-design-constraint." class="level6">
+<h6 class="anchored" data-anchor-id="readability-as-a-design-constraint.">5. Readability as a design constraint.</h6>
+<p>Python’s syntax enforces structure through indentation rather than braces. The language includes exactly one obvious way to do most things, by design. This is not a limitation: it is a feature that makes code written by others readable.</p>
+</section>
+<section id="batteries-included." class="level6">
+<h6 class="anchored" data-anchor-id="batteries-included.">6. Batteries included.</h6>
+<p>The standard library is enormous. Networking, file I/O, JSON, regular expressions, HTTP, CSV, database access, unit testing: most of what you need for a typical program is already there.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="The Zen of Python">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -379,14 +433,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </section>
 </section>
+</section>
 <section id="how-a-python-project-is-structured" class="level2">
 <h2 class="anchored" data-anchor-id="how-a-python-project-is-structured">How a Python Project Is Structured</h2>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
+<col style="width: 23%">
+<col style="width: 27%">
+<col style="width: 27%">
+<col style="width: 21%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -681,8 +736,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p>Python 3.13 introduced an experimental free-threaded build (no GIL) as an opt-in option. It is not yet the default.</p>
 </section>
-<section id="memory-efficient-patterns-generators" class="level3">
-<h3 class="anchored" data-anchor-id="memory-efficient-patterns-generators">Memory-Efficient Patterns: Generators</h3>
+<section id="memory-efficient-patterns" class="level3">
+<h3 class="anchored" data-anchor-id="memory-efficient-patterns">Memory-Efficient Patterns</h3>
+<div class="subheading">
+<p>Generators</p>
+</div>
 <p>A list comprehension builds the entire result in memory at once. For large or infinite sequences, a <strong>generator</strong> computes values lazily, one at a time:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># list comprehension: allocates all 10 million integers immediately</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>big_list <span class="op">=</span> [x <span class="op">*</span> <span class="dv">2</span> <span class="cf">for</span> x <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10_000_000</span>)]</span>
@@ -702,8 +760,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="data-structures" class="level2">
 <h2 class="anchored" data-anchor-id="data-structures">Data Structures</h2>
-<section id="list-dynamic-array" class="level3">
-<h3 class="anchored" data-anchor-id="list-dynamic-array">list — Dynamic Array</h3>
+<section id="list" class="level3">
+<h3 class="anchored" data-anchor-id="list">list</h3>
+<div class="subheading">
+<p>Dynamic Array</p>
+</div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>a.append(<span class="dv">4</span>)         <span class="co"># O(1) amortized</span></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>a.insert(<span class="dv">0</span>, <span class="dv">0</span>)      <span class="co"># O(n): shifts all elements</span></span>
@@ -714,15 +775,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span> <span class="kw">in</span> a              <span class="co"># O(n): linear scan</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Lists are heterogeneous: they can hold objects of different types, including other lists. In practice, homogeneous lists (all the same type) are far more common and perform better with libraries like NumPy.</p>
 </section>
-<section id="tuple-immutable-sequence" class="level3">
-<h3 class="anchored" data-anchor-id="tuple-immutable-sequence">tuple — Immutable Sequence</h3>
+<section id="tuple" class="level3">
+<h3 class="anchored" data-anchor-id="tuple">tuple</h3>
+<div class="subheading">
+<p>Immutable Sequence</p>
+</div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>t[<span class="dv">0</span>]                <span class="co"># 1</span></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co"># t[0] = 99        # TypeError: tuples do not support assignment</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Use tuples for fixed-size collections of heterogeneous data (coordinates, a record, a function return with multiple values). Use lists for variable-length collections of homogeneous data. Tuples as dict keys work; lists do not (mutable objects cannot be hashed).</p>
 </section>
-<section id="dict-hash-map" class="level3">
-<h3 class="anchored" data-anchor-id="dict-hash-map">dict — Hash Map</h3>
+<section id="dict" class="level3">
+<h3 class="anchored" data-anchor-id="dict">dict</h3>
+<div class="subheading">
+<p>Hash Map</p>
+</div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> {<span class="st">"name"</span>: <span class="st">"alice"</span>, <span class="st">"age"</span>: <span class="dv">30</span>}</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>d[<span class="st">"name"</span>]                       <span class="co"># "alice"</span></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>d.get(<span class="st">"missing"</span>, <span class="st">"default"</span>)     <span class="co"># "default": no KeyError</span></span>
@@ -733,8 +800,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> key, value <span class="kw">in</span> d.items():</span>
 <span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(key, value)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="set-hash-set" class="level3">
-<h3 class="anchored" data-anchor-id="set-hash-set">set — Hash Set</h3>
+<section id="set" class="level3">
+<h3 class="anchored" data-anchor-id="set">set</h3>
+<div class="subheading">
+<p>Hash Set</p>
+</div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> {<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>}</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>s.add(<span class="dv">4</span>)</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>s.discard(<span class="dv">10</span>)       <span class="co"># no error if missing (remove() raises KeyError)</span></span>
@@ -745,8 +815,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>a <span class="op">-</span> b               <span class="co"># difference</span></span>
 <span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>a <span class="op">^</span> b               <span class="co"># symmetric difference</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="str-immutable-unicode-sequence" class="level3">
-<h3 class="anchored" data-anchor-id="str-immutable-unicode-sequence">str — Immutable Unicode Sequence</h3>
+<section id="str" class="level3">
+<h3 class="anchored" data-anchor-id="str">str</h3>
+<div class="subheading">
+<p>Immutable Unicode Sequence</p>
+</div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> <span class="st">"hello"</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>s.upper()                       <span class="co"># "HELLO": returns a new string</span></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>s.split(<span class="st">" "</span>)                    <span class="co"># ["hello"]</span></span>
@@ -900,14 +973,107 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Any object implementing <code>__enter__</code> and <code>__exit__</code> can be used as a context manager. The standard library provides them for files, locks, database connections, and more.</p>
 </section>
 </section>
+<section id="performance" class="level2">
+<h2 class="anchored" data-anchor-id="performance">Performance</h2>
+<p>Python is often criticized for being “slow.” For a systems programmer used to C or Rust, this is true: Python’s abstraction layer is thick. Every operation involves dynamic dispatch and object management overhead. However, Python is rarely the bottleneck for I/O-bound tasks, and for CPU-bound tasks, it provides excellent facilities for offloading work to compiled code.</p>
+<section id="the-cost-of-dynamic-dispatch" class="level3">
+<h3 class="anchored" data-anchor-id="the-cost-of-dynamic-dispatch">The Cost of Dynamic Dispatch</h3>
+<p>In C, <code>a + b</code> might be a single assembly instruction. In Python, it is a method lookup:</p>
+<ul>
+<li>Check if <code>a</code> has an <code>__add__</code> method.</li>
+<li>If not, check if <code>b</code> has an <code>__radd__</code> method.</li>
+<li>Execute the method, which involves type checking and creating a new heap-allocated object for the result.</li>
+</ul>
+<p>This overhead exists for every variable access, function call, and attribute lookup. This is why Python is 10x to 100x slower than C for raw numerical loops.</p>
+</section>
+<section id="what-improves-performance" class="level3">
+<h3 class="anchored" data-anchor-id="what-improves-performance">What Improves Performance</h3>
+<ul>
+<li><strong>Use built-in functions.</strong> Functions like <code>sum()</code>, <code>min()</code>, <code>max()</code>, <code>any()</code>, and <code>all()</code> are implemented in C. They iterate over data at C speed.</li>
+<li><strong>List comprehensions.</strong> These are optimized at the bytecode level. They are faster than a <code>for</code> loop that calls <code>.append()</code> because they avoid the repeated lookup of the <code>append</code> method on the list object.</li>
+<li><strong>Local variables.</strong> Accessing a local variable is faster than a global variable. In a tight loop, binding a global function or method to a local name can yield measurable gains.</li>
+<li><strong>Generators.</strong> While not necessarily faster in CPU time, they are significantly more memory-efficient for large datasets, preventing the performance degradation caused by memory pressure.</li>
+</ul>
+</section>
+<section id="what-hurts-performance" class="level3">
+<h3 class="anchored" data-anchor-id="what-hurts-performance">What Hurts Performance</h3>
+<ul>
+<li><strong>The GIL.</strong> The <strong>Global Interpreter Lock</strong> (GIL) prevents multiple threads from executing Python bytecode simultaneously. For CPU-bound work, threads will actually slow down your program due to context switching overhead without any parallelism gain.</li>
+<li><strong>String concatenation.</strong> Since strings are immutable, <code>s += "part"</code> creates a new string object and copies the old content. In a loop, this is <span class="math inline">\(O(n^2)\)</span>. Always use <code>"".join(list_of_parts)</code>.</li>
+<li><strong>Manual loops.</strong> Writing <code>while i &lt; len(lst): x = lst[i]</code> is significantly slower than <code>for x in lst:</code>. Always prefer <code>for x in lst:</code>.</li>
+</ul>
+</section>
+<section id="interfacing-with-c-and-rust" class="level3">
+<h3 class="anchored" data-anchor-id="interfacing-with-c-and-rust">Interfacing with C and Rust</h3>
+<p>The “Pythonic” way to handle performance-critical code is to write it in C, C++, or Rust and call it from Python. This is how libraries like NumPy, TensorFlow, and Pydantic achieve near-native speed.</p>
+<div class="subheading">
+<p>Extension Modules</p>
+</div>
+<p>You can write modules in C using the <strong>Python C API</strong>. This gives you full control but is verbose and error-prone. <strong>Cython</strong> is a popular alternative: it allows you to write Python-like code with optional type declarations, which it then compiles to C.</p>
+<div class="subheading">
+<p>FFI (Foreign Function Interface)</p>
+</div>
+<p>Libraries like <code>ctypes</code> (standard library) and <code>cffi</code> allow you to load shared libraries (<code>.so</code>, <code>.dll</code>, <code>.dylib</code>) and call functions within them directly from Python. This is ideal for wrapping existing C libraries.</p>
+<div class="subheading">
+<p>The Rust Bridge</p>
+</div>
+<p><strong>PyO3</strong> is the modern standard for writing Python extensions in Rust. It provides a safe, idiomatic interface that handles the conversion between Python objects and Rust types, allowing you to bypass the GIL safely and leverage Rust’s performance.</p>
+</section>
+<section id="efficient-iteration-and-data-structures" class="level3">
+<h3 class="anchored" data-anchor-id="efficient-iteration-and-data-structures">Efficient Iteration and Data Structures</h3>
+<p>Choosing the right structure is the most impactful performance decision.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Task</th>
+<th>Data Structure</th>
+<th>Efficiency</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Membership testing</td>
+<td><code>set</code> or <code>dict</code></td>
+<td><span class="math inline">\(O(1)\)</span></td>
+</tr>
+<tr class="even">
+<td>Membership testing</td>
+<td><code>list</code></td>
+<td><span class="math inline">\(O(n)\)</span></td>
+</tr>
+<tr class="odd">
+<td>Frequent insertions at start</td>
+<td><code>collections.deque</code></td>
+<td><span class="math inline">\(O(1)\)</span></td>
+</tr>
+<tr class="even">
+<td>Frequent insertions at start</td>
+<td><code>list</code></td>
+<td><span class="math inline">\(O(n)\)</span></td>
+</tr>
+</tbody>
+</table>
+<div class="subheading">
+<p>The Power of Vectorization</p>
+</div>
+<p>If you are doing heavy math, do not iterate at all. Use <strong>NumPy</strong>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> double_elements(my_list: <span class="bu">list</span>[<span class="bu">float</span>]) <span class="op">-&gt;</span> np.ndarray:</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">"""Vectorized doubling of list elements."""</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  arr: np.ndarray <span class="op">=</span> np.array(my_list)</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> arr <span class="op">*</span> <span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Vectorized operations apply a single instruction to multiple data points (<strong>SIMD</strong>) at the C level, bypassing the Python interpreter entirely for the bulk of the work.</p>
+</section>
+</section>
 <section id="the-ecosystem" class="level2">
 <h2 class="anchored" data-anchor-id="the-ecosystem">The Ecosystem</h2>
 <p>Python’s package index (PyPI) hosts hundreds of thousands of packages. A representative sample of what you will likely encounter:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
+<col style="width: 23%">
+<col style="width: 32%">
+<col style="width: 43%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -970,9 +1136,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="key-differences-from-c-and-rust">Key Differences from C and Rust</h2>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
+<col style="width: 21%">
+<col style="width: 39%">
+<col style="width: 38%">
 </colgroup>
 <thead>
 <tr class="header">
