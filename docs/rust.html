@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-03-16">
+<meta name="dcterms.date" content="2026-03-17">
 
 <title>Rust for C/C++ Programmers – Computer Language Notebook</title>
 <style>
@@ -372,7 +372,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">March 16, 2026</p>
+      <p class="date">March 17, 2026</p>
     </div>
   </div>
   
@@ -432,7 +432,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 ├── Cargo.lock      # exact resolved dependency versions (commit this to git)
 └── src/
     └── main.rs     # root of the binary crate</code></pre>
-<p>A library package looks the same but with <code>src/lib.rs</code> instead. A package can contain both a <code>main.rs</code> and a <code>lib.rs</code>, producing a binary and a library from the same source tree.</p>
+<p>A library package looks the same but with <code>src/</code> instead. A package can contain both a <code>main.rs</code> and a <code>lib.rs</code>, producing a binary and a library from the same source tree.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="`lib.rs` vs `mod.rs`?">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span><code>lib.rs</code> vs <code>mod.rs</code>?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>They are the same in that they are both “roots” that define how code is organized, but they differ in scope:</p>
+<ul>
+<li><code>lib.rs</code> (Crate Root): The entry point for the entire library. It defines the top-level API exposed to external users and integration tests.</li>
+<li><code>mod.rs</code> (Module Root): The entry point for a sub-module located in a directory. It tells Rust that a folder (like src/commands/) is a module and manages the visibility of the files within that folder.</li>
+</ul>
+<p>In modern Rust (since 2018), <code>mod.rs</code> is often replaced by a file with the same name as the folder (e.g., <code>src/commands.rs</code> instead of <code>src/commands/mod.rs</code>) to keep the file tree flatter, but their purpose remains identical.</p>
+</div>
+</div>
 </section>
 <section id="modules" class="level3">
 <h3 class="anchored" data-anchor-id="modules">Modules</h3>

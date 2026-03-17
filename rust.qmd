@@ -48,13 +48,23 @@ my_project/
     └── main.rs     # root of the binary crate
 ```
 
-A library package looks the same but with `src/lib.rs` instead. A package can contain both a `main.rs` and a `lib.rs`, producing a binary and a library from the same source tree.
+A library package looks the same but with `src/` instead. A package can contain both a `main.rs` and a `lib.rs`, producing a binary and a library from the same source tree.
+
+::: {.callout-note title="`lib.rs` vs `mod.rs`?"}
+They are the same in that they are both "roots" that define how code is organized, but they differ in scope:
+
+- `lib.rs` (Crate Root): The entry point for the entire library. It defines the top-level API exposed to external users and integration tests.
+- `mod.rs` (Module Root): The entry point for a sub-module located in a directory. It tells Rust that a folder (like src/commands/) is a module and manages the visibility of the files within that folder.
+
+In modern Rust (since 2018), `mod.rs` is often replaced by a file with the same name as the folder (e.g., `src/commands.rs` instead of
+`src/commands/mod.rs`) to keep the file tree flatter, but their purpose remains identical.
+:::
 
 ### Modules
 A **module** is a namespace within a crate — the closest equivalent to a Python module. Modules organize code into logical units and control what is visible outside (`pub`) versus private. Items are **private by default** — you opt into visibility explicitly.
 
 ##### 1. Inline
-:::{.subheading}
+::: {.subheading}
 Right here, right now!
 :::
 
@@ -72,7 +82,7 @@ math::add(1, 2);
 ```
 
 ##### 2. File Based
-:::{.subheading}
+::: {.subheading}
 Rust looks for src/math.rs
 :::
 
@@ -85,7 +95,7 @@ src/
 ```
 
 ##### 3. Directory Based
-:::{.subheading}
+::: {.subheading}
 Rust looks for src/math/mod.rs
 :::
 
@@ -99,7 +109,7 @@ src/
     └── geometry.rs # submodule, accessed as math::geometry
 ```
 
-:::{.callout-warning title="Rauchen est Verbotten"}
+::: {.callout-warning title="Rauchen est Verbotten"}
 For cases 2 and 3, Rust decides which to use based on which file exists. You cannot have both `src/math.rs` and `src/math/mod.rs`.
 :::
 

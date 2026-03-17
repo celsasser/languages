@@ -380,7 +380,7 @@ div.panel-h6:has(> table:first-child) {
 */
 .subheading>p {
   border-radius: 4px;
-  box-shadow: 2.5px 2px 6px 0px rgba(0, 0, 0, 0.4);
+  box-shadow: 1px 2px 4px 0px rgba(0, 0, 0, 0.35);
   display: inline-block;
   background-color: #f0f0f4;
   color: #787878;
