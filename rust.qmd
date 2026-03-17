@@ -292,7 +292,11 @@ y += 1;             // fine
 This isn't just style — the compiler uses immutability information to reason about your program. It's a habit worth building early.
 
 ### Types
-Rust is statically typed. Types are usually inferred, but you can annotate explicitly. The primitive types will be familiar:
+::: {.definition data-label="Scalar Type"}
+A **scalar type** represents a single value.
+:::
+
+Rust is statically typed. Types are usually inferred, but you can annotate explicitly. Rust has four primary *scalar types*: integers, floating-point numbers, Booleans, and characters:
 
 ```rust
 let a: i32  = -42;       // signed 32-bit integer
@@ -310,6 +314,40 @@ No implicit numeric conversions. You cast explicitly with `as`:
 let x: i32 = 42;
 let y: f64 = x as f64;
 ```
+
+### Values
+::: {.subheading}
+The "Null Problem"
+:::
+
+In languages like Java, Python, or C++, any variable can technically be *null*. This leads to the infamous "Null Pointer Exception" or "Segment Fault" when you try to use a variable that isn't actually there. The rust way is: `Option<T>`. If a value might be missing, you must explicitly wrap it in an Option:
+
+```rust
+enum Option<T> {
+    Some(T), // The value is present
+    None,    // The "null" equivalent
+}
+```
+
+Why this is better:
+
+1. **The Compiler Forces You to Handle It**: If you have an `Option<String>`, you cannot call methods like `.len()` on it directly. You must use a match statement or an if let to "unwrap" the value first.
+2. **Type Safety**: You can never accidentally treat a "null" value as a real one. If a variable is just a `String`, it is guaranteed to be a valid string. If it's an `Option<String>`, you know it might be empty.
+3. **Efficiency**: Rust uses a "null-pointer optimization." For types like references or Box, an `Option<T>` takes up the same amount of memory as a regular `T`. The None case is represented by a literal null pointer under the hood, but the language makes it impossible for you to interact with that pointer unsafely.
+
+#### Unit Type
+In Rust, `()` is called the **unit type** (and also the **unit value**). It is essentially Rust's version of `void` from languages like C, C++, or Java, but with a key difference: it is an actual value that occupies zero bytes of memory. You will frequently see it used in `Okay(...)` statements: `Okay(())`. Looks a little weird doesn't it? It looks like we are calling a function without specifying the function name. Here is the breakdown of `Ok(())`:
+
+1. The inner `()`: This is the "unit value." It represents "nothing" or "empty success."
+2. The outer `Ok(...)`: This is the success variant of the Result enum.
+
+
+**Why do we use it?** Most of our command functions (like execute) return a `Result<(), Box<dyn Error>>`. Since the Result type must contain something in the Ok case, we use () to say: "The operation finished successfully, but there isn't a specific piece of data (like an integer or a string) to return to the caller." Gemini told me to think of it like this:
+
+* `Ok(42)` -> "I succeeded, and here is the answer: 42."
+* `Ok(())` -> "I succeeded. That's all you need to know."
+
+Instead, Rust uses an enum called Option<T> which we saw up above.
 
 ### Functions
 ```rust
