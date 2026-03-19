@@ -444,7 +444,7 @@ Same as C/C++:
 In C you manage the heap manually. In Rust the compiler does it for you via ownership rules, at zero runtime cost.
 
 ### Ownership
-Every value in Rust has exactly one **owner**. When the owner goes out of scope, the value is freed. This is RAII, but enforced by the type system rather than by convention.
+Every value in Rust has exactly one **owner**. When the owner goes out of scope, the value is freed. This is *RAII* (Resource Acquisition Is Initialization), but enforced by the type system rather than by convention.
 
 ```rust
 {
@@ -452,6 +452,8 @@ Every value in Rust has exactly one **owner**. When the owner goes out of scope,
     // use s...
 }   // s goes out of scope: memory freed automatically. No free(), no delete.
 ```
+
+When `s` goes out of scope, there are no remaining pointers to the memory that `s` held. This is an ideal point at which we may return `s`'s memory to the allocator. When a variable goes out of scope, Rust calls a special function for us: `drop`. It’s where the author of `String` *can* put the code to return the memory to the allocator. Rust calls `drop` automatically at the closing curly bracket. This is sort of analagous to what happens in C++ when `delete` is called on an pointer: its destructor[s] is called and the memory is freed. The difference here is that it seems that its up to the author to release the memory. My memory of C++ destructors is foggy; I think that by the time a destructor was called, his fate was sealed: he's a goner.
 
 **Move semantics** — when you assign an owned value to another variable, the original owner is invalidated. This prevents double-free:
 
@@ -1225,15 +1227,89 @@ fn read_file(path: &str) -> Result<String, io::Error> {
 | Propagate error to caller             | `?`                             |
 | Prototype or test — crash on error    | `.unwrap()` or `.expect("msg")` |
 
-### `.unwrap()` and `.expect()`
-For quick scripts or prototypes, `.unwrap()` panics on error (like an unchecked assertion). `.expect("message")` does the same but prints your message alongside the error, which makes debugging easier:
+### The Extraction Family
+::: {.subheading}
+Getting the value out of `Option` and `Result`
+:::
+
+Both `Option<T>` and `Result<T, E>` are enum wrappers around a value. At some point you need the bare `T` out of that wrapper. The extraction family is the group of methods that do this, differing only in what they do when the value is absent or is an error.
+
+The name "unwrap" is literal: remove the enum wrapper and return the inner value. It has nothing to do with `Box` or heap allocation.
+
+#### `.unwrap()` and `.expect()`
+
+`.unwrap()` returns the inner value if it is present, and **panics** if it is not:
 
 ```rust
-let content = read_file("data.txt").unwrap();           // panics with default message
-let content = read_file("data.txt").expect("could not read data file");  // clearer
+let s: Option<&str> = Some("hello");
+let val = s.unwrap();   // val = "hello"
+
+let n: Option<i32> = None;
+let val = n.unwrap();   // panic: "called `Option::unwrap()` on a `None` value"
 ```
 
-Use both only in tests and exploratory code. Prefer explicit handling in production code.
+`.expect("msg")` is identical, but you supply the panic message. This message ends up in the crash output, so it should explain what went wrong in terms of your program's logic:
+
+```rust
+let user_id = get_user_id().expect("user ID must be set before this point");
+let content = read_file("data.txt").expect("could not read data file");
+```
+
+Both work on `Option<T>` and `Result<T, E>`. On a `Result`, panicking on `Err` includes the error value in the message:
+
+```rust
+let n: Result<i32, &str> = Err("overflow");
+n.unwrap();   // panic: "called `Result::unwrap()` on an `Err` value: \"overflow\""
+```
+
+Prefer `.expect()` over `.unwrap()` whenever you use either one. The message costs nothing at runtime and is invaluable when debugging a crash.
+
+#### Fallback Variants
+
+When you have a sensible default, these avoid the panic entirely:
+
+```rust
+// unwrap_or: return a literal fallback value
+let port: u16 = parsed_port.unwrap_or(8080);
+
+// unwrap_or_else: compute the fallback only if needed (lazy)
+let config = load_config().unwrap_or_else(|_| Config::default());
+
+// unwrap_or_default: use the type's Default implementation
+let count: i32 = maybe_count.unwrap_or_default();   // 0 if None
+let name: String = maybe_name.unwrap_or_default();  // "" if None
+```
+
+`unwrap_or_else` takes a closure, which means the fallback value is only computed when the `None` or `Err` branch is actually reached. Prefer it over `unwrap_or` when the default is expensive to produce.
+
+#### Testing the Error Side
+
+`unwrap_err()` and `expect_err()` are the mirror image: they extract the error value and panic if the result was actually `Ok`. These are almost exclusively used in tests where you want to assert that an operation failed:
+
+```rust
+#[test]
+fn rejects_negative_input() {
+    let result = parse_positive(-5);
+    let err = result.unwrap_err();   // panics if parse_positive returned Ok
+    assert!(err.to_string().contains("negative"));
+}
+```
+
+#### Quick Reference
+
+| Method | Absent/error case | Typical use |
+|---|---|---|
+| `.unwrap()` | Panic with generic message | Prototyping; values that cannot be absent |
+| `.expect("msg")` | Panic with your message | Same, but with a useful crash message |
+| `.unwrap_or(val)` | Return `val` | Literal fallback is cheap and obvious |
+| `.unwrap_or_else(\|\| ...)` | Call closure, return result | Fallback requires computation |
+| `.unwrap_or_default()` | Return `T::default()` | Zero/empty is a sensible fallback |
+| `.unwrap_err()` | Panic if it was `Ok` | Tests asserting failure |
+| `.expect_err("msg")` | Panic with your message if `Ok` | Same, with a useful message |
+
+::: {.callout-warning title="Panics in production code"}
+`.unwrap()` and `.expect()` are appropriate in tests and prototypes. In production code, a panic is a crash with no recovery. Prefer `?`, `match`, `if let`, or the `unwrap_or` variants, which give callers a chance to handle the failure.
+:::
 
 ## Common Collections
 ```rust
@@ -1286,6 +1362,156 @@ regex = "1.10"
 ```
 
 `cargo add serde` adds a dependency from the command line. The ecosystem (crates.io) is large and high quality.
+
+### `Cargo.toml` in Full
+
+A complete manifest with all common fields looks like this:
+
+```toml
+[package]
+name        = "my_project"
+version     = "0.1.0"
+edition     = "2021"
+rust-version = "1.70"           # minimum Rust version required to compile this crate
+authors     = ["Alice <alice@example.com>"]
+description = "A short description"
+license     = "MIT OR Apache-2.0"
+repository  = "https://github.com/alice/my_project"
+
+[dependencies]
+serde  = { version = "1.0", features = ["derive"] }
+regex  = "1.10"
+rand   = { version = "0.8", optional = true }       # only included if the feature is enabled
+my_lib = { path = "../my_lib" }                     # local crate on disk
+some_fork = { git = "https://github.com/...", branch = "fix/thing" }
+
+[dev-dependencies]
+pretty_assertions = "1.4"   # only compiled for tests and benchmarks
+
+[build-dependencies]
+cc = "1.0"                  # only compiled for build.rs
+
+[features]
+default  = []               # features enabled by default (none here)
+graphics = ["rand"]         # enable this feature to pull in rand
+
+[profile.release]
+opt-level = 3               # maximum optimization
+lto       = true            # link-time optimization
+strip     = true            # strip debug symbols from the binary
+```
+
+### Editions
+::: {.subheading}
+Opt-in language evolution without breaking the ecosystem
+:::
+
+Yes, editions are named by year: `2015`, `2018`, `2021`, and `2024`. Each edition allows the Rust team to make changes to the language's syntax and semantics that would otherwise be backward-incompatible, without forcing anyone to upgrade immediately.
+
+The key insight is that **editions are per-crate, and all editions can link together**. A crate compiled with edition 2015 and a crate compiled with edition 2021 produce compatible object code. The edition setting lives in `Cargo.toml` and affects only the crate it belongs to. This means the ecosystem never splits the way Python 2 vs Python 3 did.
+
+What changes between editions is **language syntax and a small number of semantic rules**, not the standard library. The standard library API is versioned by the Rust release channel separately. An example: in edition 2015 you had to write `extern crate serde;` at the top of `main.rs` to bring an external crate into scope. In 2018 that was removed entirely. Both editions call the same `serde` functions at runtime.
+
+| Edition | Notable changes |
+|---|---|
+| 2015 | Original Rust. `extern crate` required. Old module path rules. |
+| 2018 | `extern crate` no longer needed. Clearer `use` paths (`crate::`, `super::`). `async`/`await` syntax. `?` usable in `main`. Non-lexical lifetimes. |
+| 2021 | More precise closure captures (captures only what it uses, not the whole struct). `IntoIterator` implemented for arrays. Cargo feature resolver v2. |
+| 2024 | `gen` blocks and coroutines. `impl Trait` lifetime improvements. Stricter `unsafe` requirements. |
+
+Migrating is low-friction. Running `cargo fix --edition` rewrites the parts of your code that need updating automatically, then you change the `edition` field in `Cargo.toml`. Most migrations take a few minutes.
+
+::: {.callout-note title="Which edition to use?"}
+Start new projects with the latest edition (`2021` at minimum, `2024` if your toolchain supports it). There is no reason to start on an older edition. When reading existing code, the edition tells you which syntax rules apply, which matters when looking up path resolution or closure capture behavior.
+:::
+
+### Dependency Version Constraints
+
+Cargo uses [semantic versioning](https://semver.org). The version string in `Cargo.toml` is a *requirement*, not an exact pin. Cargo selects the newest version that satisfies all constraints in the dependency graph:
+
+| Requirement | Meaning | Resolves to (e.g.) |
+|---|---|---|
+| `"1.0"` or `"^1.0"` | `>=1.0.0, <2.0.0` (default) | `1.9.4` |
+| `"1.2.3"` or `"^1.2.3"` | `>=1.2.3, <2.0.0` | `1.9.4` |
+| `"~1.2.3"` | `>=1.2.3, <1.3.0` (patch only) | `1.2.9` |
+| `"=1.2.3"` | Exactly `1.2.3` | `1.2.3` |
+| `"*"` | Any version | latest |
+
+The caret rule (`^`) is the default and the most common. It reflects semver's promise: a library increment its major version when it makes breaking changes, so `>=1.0, <2.0` is safe to let Cargo update freely within.
+
+`Cargo.lock` records the exact resolved versions. Commit `Cargo.lock` for binaries (so builds are reproducible) and typically do not commit it for libraries (so downstream users get the benefit of patch updates).
+
+### Dependency Scopes
+
+Not every dependency is needed in every context:
+
+```toml
+[dependencies]       # always compiled, included in the final binary
+serde = "1.0"
+
+[dev-dependencies]   # compiled only for `cargo test` and `cargo bench`
+mockall = "0.12"
+criterion = "0.5"
+
+[build-dependencies] # compiled only for build.rs (runs before the main build)
+cc = "1.0"
+```
+
+`dev-dependencies` are the right place for test helpers, assertion libraries, and benchmarking frameworks. They are absent from release builds entirely.
+
+`build-dependencies` are for `build.rs`, a special script Cargo runs before compiling your crate. Common uses: compiling C code, generating Rust source from a schema, or probing the build environment.
+
+### Feature Flags
+
+Features let you make parts of your crate optional, activated at compile time:
+
+```toml
+[features]
+default  = ["logging"]          # enabled unless the user opts out
+logging  = ["dep:log"]          # enables the `log` dependency
+tls      = ["dep:rustls"]
+full     = ["logging", "tls"]   # convenience: enables everything
+```
+
+A user of your crate enables features in their own `Cargo.toml`:
+
+```toml
+my_lib = { version = "1.0", features = ["tls"] }
+my_lib = { version = "1.0", default-features = false }   # strip defaults
+```
+
+In your code, gate feature-specific code with `#[cfg(feature = "tls")]`:
+
+```rust
+#[cfg(feature = "tls")]
+pub mod tls_support { ... }
+```
+
+Features are additive: enabling a feature can only add code, never remove it. This is a deliberate constraint that keeps the dependency resolver simple.
+
+### Build Profiles
+
+Cargo compiles in two profiles by default. You can tune both:
+
+```toml
+[profile.dev]
+opt-level = 0      # no optimization — fast to compile, slow to run
+debug     = true   # include debug symbols
+
+[profile.release]
+opt-level = 3      # maximum optimization — slow to compile, fast to run
+lto       = true   # link-time optimization: slower link, smaller/faster binary
+strip     = true   # remove debug symbols from the output binary
+panic     = "abort" # smaller binary: no stack unwinding on panic
+```
+
+`cargo build` uses `dev`. `cargo build --release` uses `release`. You can define custom profiles for benchmarks or special builds:
+
+```toml
+[profile.bench]
+inherits  = "release"
+debug     = true    # keep symbols for profiling
+```
 
 ## Key Differences from C/C++
 ::: {.subheading}
