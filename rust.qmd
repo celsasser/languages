@@ -109,7 +109,7 @@ src/
     └── geometry.rs # submodule, accessed as math::geometry
 ```
 
-::: {.callout-warning title="Rauchen est Verbotten"}
+::: {.callout-warning title="Rauchen ist verboten"}
 For cases 2 and 3, Rust decides which to use based on which file exists. You cannot have both `src/math.rs` and `src/math/mod.rs`.
 :::
 
