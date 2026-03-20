@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-03-19">
+<meta name="dcterms.date" content="2026-03-20">
 
 <title>Rust for C/C++ Programmers – Computer Language Notebook</title>
 <style>
@@ -275,7 +275,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#the-core-design-decisions" id="toc-the-core-design-decisions" class="nav-link" data-scroll-target="#the-core-design-decisions">The Core Design Decisions</a></li>
   </ul></li>
-  <li><a href="#how-a-rust-project-is-structured" id="toc-how-a-rust-project-is-structured" class="nav-link" data-scroll-target="#how-a-rust-project-is-structured">How a Rust Project Is Structured</a>
+  <li><a href="#project-anatomy" id="toc-project-anatomy" class="nav-link" data-scroll-target="#project-anatomy">Project Anatomy</a>
   <ul>
   <li><a href="#packages-and-crates" id="toc-packages-and-crates" class="nav-link" data-scroll-target="#packages-and-crates">Packages and Crates</a></li>
   <li><a href="#modules" id="toc-modules" class="nav-link" data-scroll-target="#modules">Modules</a>
@@ -390,7 +390,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">March 19, 2026</p>
+      <p class="date">March 20, 2026</p>
     </div>
   </div>
   
@@ -428,8 +428,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 </section>
 </section>
-<section id="how-a-rust-project-is-structured" class="level2">
-<h2 class="anchored" data-anchor-id="how-a-rust-project-is-structured">How a Rust Project Is Structured</h2>
+<section id="project-anatomy" class="level2">
+<h2 class="anchored" data-anchor-id="project-anatomy">Project Anatomy</h2>
 <p>Three nested concepts organize Rust code: <strong>packages</strong>, <strong>crates</strong>, and <strong>modules</strong>. They map roughly — but not exactly — onto what you know from C and Python.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -450,7 +450,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 ├── Cargo.lock      # exact resolved dependency versions (commit this to git)
 └── src/
     └── main.rs     # root of the binary crate</code></pre>
-<p>A library package looks the same but with <code>src/</code> instead. A package can contain both a <code>main.rs</code> and a <code>lib.rs</code>, producing a binary and a library from the same source tree.</p>
+<p>A library package has the same structure, but the crate root is <code>src/lib.rs</code> instead of <code>src/main.rs</code>. A package can contain both a <code>main.rs</code> and a <code>lib.rs</code>, producing a binary and a library from the same source tree.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="`lib.rs` vs `mod.rs`?">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -509,13 +509,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 └── math/
     ├── mod.rs      # the math module root
     └── geometry.rs # submodule, accessed as math::geometry</code></pre>
-<div class="callout callout-style-default callout-warning callout-titled" title="Rauchen est Verbotten">
+<div class="callout callout-style-default callout-warning callout-titled" title="Rauchen ist verboten">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Warning</span>Rauchen est Verbotten
+<span class="screen-reader-only">Warning</span>Rauchen ist verboten
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -717,7 +717,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="the-basics" class="level2">
 <h2 class="anchored" data-anchor-id="the-basics">The Basics</h2>
-<p><a href="https://doc.rust-lang.org/book/ch03-00-common-programming-concepts.html">Common Programming Concepts</a> by <em>The Rust Programming Language</em>.</p>
 <section id="variables-and-mutability" class="level3">
 <h3 class="anchored" data-anchor-id="variables-and-mutability">Variables and Mutability</h3>
 <p>In C you declare a variable and it’s mutable by default. In Rust, variables are <strong>immutable by default</strong>. You opt into mutability with <code>mut</code>.</p>
@@ -761,7 +760,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ol>
 <section id="unit-type" class="level4">
 <h4 class="anchored" data-anchor-id="unit-type">Unit Type</h4>
-<p>In Rust, <code>()</code> is called the <strong>unit type</strong> (and also the <strong>unit value</strong>). It is essentially Rust’s version of <code>void</code> from languages like C, C++, or Java, but with a key difference: it is an actual value that occupies zero bytes of memory. You will frequently see it used in <code>Okay(...)</code> statements: <code>Okay(())</code>. Looks a little weird doesn’t it? It looks like we are calling a function without specifying the function name. Here is the breakdown of <code>Ok(())</code>:</p>
+<p>In Rust, <code>()</code> is called the <strong>unit type</strong> (and also the <strong>unit value</strong>). It is essentially Rust’s version of <code>void</code> from languages like C, C++, or Java, but with a key difference: it is an actual value that occupies zero bytes of memory. You will frequently see it used in <code>Ok(...)</code> statements: <code>Ok(())</code>. Looks a little weird doesn’t it? It looks like we are calling a function without specifying the function name. Here is the breakdown of <code>Ok(())</code>:</p>
 <ol type="1">
 <li>The inner <code>()</code>: This is the “unit value.” It represents “nothing” or “empty success.”</li>
 <li>The outer <code>Ok(...)</code>: This is the success variant of the Result enum.</li>
@@ -771,7 +770,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>Ok(42)</code> -&gt; “I succeeded, and here is the answer: 42.”</li>
 <li><code>Ok(())</code> -&gt; “I succeeded. That’s all you need to know.”</li>
 </ul>
-<p>Instead, Rust uses an enum called Option<t> which we saw up above.</t></p>
+<p>In short, <code>()</code> is Rust’s way to say “no meaningful value,” whether as a function’s return type or as the success payload in types like <code>Result&lt;(), E&gt;</code>.</p>
 </section>
 </section>
 <section id="functions" class="level3">
@@ -810,11 +809,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> n <span class="kw">in</span> <span class="op">&amp;</span>nums <span class="op">{</span></span>
 <span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">"{}"</span><span class="op">,</span> n)<span class="op">;</span></span>
 <span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>See <a href="https://doc.rust-lang.org/book/ch03-00-common-programming-concepts.html">Common Programming Concepts</a> in <em>The Rust Programming Language</em> for more information.</p>
 </section>
 </section>
 <section id="macros" class="level2">
 <h2 class="anchored" data-anchor-id="macros">Macros</h2>
-<p><a href="https://doc.rust-lang.org/book/ch20-05-macros.html">Macros</a> as per <em>The Rust Programming Language</em>.</p>
 <p>Throughout this chapter you have seen <code>println!</code>, <code>vec!</code>, <code>format!</code>, and <code>panic!</code>. The <code>!</code> signals a <strong>macro call</strong>, not a function call. Macros in Rust are code that writes code at compile time, before the compiler type-checks anything.</p>
 <p>The practical reason macros exist: some things ordinary functions cannot do. <code>println!</code> accepts a variable number of arguments of different types — impossible for a regular Rust function without significant compromise. Macros solve this by expanding at compile time into whatever code is needed.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="pp">println!</span>(<span class="st">"hello"</span>)<span class="op">;</span>                    <span class="co">// no arguments</span></span>
@@ -880,10 +879,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> p2 <span class="op">=</span> p<span class="op">.</span>clone()<span class="op">;</span>     <span class="co">// Clone</span></span>
 <span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="pp">assert_eq!</span>(p<span class="op">,</span> p2)<span class="op">;</span>      <span class="co">// PartialEq</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>You can write your own macros with <code>macro_rules!</code> (declarative macros) or procedural macro crates. For most work, the standard library macros and <a href="https://doc.rust-lang.org/book/ch20-05-macros.html#custom-derive-macros"><code>derive</code></a> cover what you need.</p>
+<p>See <a href="https://doc.rust-lang.org/book/ch20-05-macros.html">Macros</a> in <em>The Rust Programming Language</em> for more information.</p>
 </section>
 <section id="memory-management" class="level2">
 <h2 class="anchored" data-anchor-id="memory-management">Memory Management</h2>
-<p><a href="https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html">Understanding Ownership</a> in <em>The Rust Programming Language</em>.</p>
 <p>This is the heart of Rust. If you understand this section, you understand Rust.</p>
 <section id="the-stack-and-the-heap" class="level3">
 <h3 class="anchored" data-anchor-id="the-stack-and-the-heap">The Stack and the Heap</h3>
@@ -901,7 +900,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> s <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"hello"</span>)<span class="op">;</span>  <span class="co">// s owns the heap-allocated string</span></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// use s...</span></span>
 <span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span>   <span class="co">// s goes out of scope: memory freed automatically. No free(), no delete.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>When <code>s</code> goes out of scope, there are no remaining pointers to the memory that <code>s</code> held. This is an ideal point at which we may return <code>s</code>’s memory to the allocator. When a variable goes out of scope, Rust calls a special function for us: <code>drop</code>. It’s where the author of <code>String</code> <em>can</em> put the code to return the memory to the allocator. Rust calls <code>drop</code> automatically at the closing curly bracket. This is sort of analagous to what happens in C++ when <code>delete</code> is called on an pointer: its destructor[s] is called and the memory is freed. The difference here is that it seems that its up to the author to release the memory. My memory of C++ destructors is foggy; I think that by the time a destructor was called, his fate was sealed: he’s a goner.</p>
+<p>When <code>s</code> goes out of scope, Rust automatically runs <code>String</code>’s implementation of the <code>Drop</code> trait. This <code>drop</code> logic is generated and invoked by the compiler at the end of the scope; it releases the resources owned by <code>s</code>, typically by returning its heap memory to the allocator. Conceptually, <code>Drop</code> plays the same role as a C++ destructor: it is guaranteed to run exactly once when the value’s lifetime ends, and user code cannot forget to call it or call it twice.</p>
 <p><strong>Move semantics</strong> — when you assign an owned value to another variable, the original owner is invalidated. This prevents double-free:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> s1 <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"hello"</span>)<span class="op">;</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> s2 <span class="op">=</span> s1<span class="op">;</span>         <span class="co">// ownership moves to s2</span></span>
@@ -999,11 +998,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> x<span class="op">.</span>len() <span class="op">&gt;</span> y<span class="op">.</span>len() <span class="op">{</span> x <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span> y <span class="op">}</span></span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The <code>'a</code> says “the returned reference lives at least as long as both inputs.” Don’t worry about this too deeply at first — the compiler will tell you when you need an annotation and the error messages are good.</p>
+<p>See <a href="https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html">Understanding Ownership</a> in <em>The Rust Programming Language</em> for more information.</p>
 </section>
 </section>
 <section id="smart-pointers" class="level2">
 <h2 class="anchored" data-anchor-id="smart-pointers">Smart Pointers</h2>
-<p><a href="https://doc.rust-lang.org/book/ch15-00-smart-pointers.html">Smart Pointers</a> in <em>The Rust Programming Language</em>.</p>
 <p>When you need heap allocation beyond what <code>Vec</code> and <code>String</code> already handle, Rust provides smart pointer types. C++ developers will recognize the ideas.</p>
 <section id="boxt" class="level3">
 <h3 class="anchored" data-anchor-id="boxt"><code>Box&lt;T&gt;</code></h3>
@@ -1098,13 +1097,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
+<p>See <a href="https://doc.rust-lang.org/book/ch15-00-smart-pointers.html">Smart Pointers</a> in <em>The Rust Programming Language</em> for more information.</p>
 </section>
 </section>
 <section id="structs-enums-and-traits" class="level2">
 <h2 class="anchored" data-anchor-id="structs-enums-and-traits">Structs, Enums, and Traits</h2>
 <section id="structs" class="level3">
 <h3 class="anchored" data-anchor-id="structs">Structs</h3>
-<p><a href="https://doc.rust-lang.org/book/ch05-00-structs.html">Structs</a> as per <em>The Rust Programming Language</em>.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb39"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> Point <span class="op">{</span></span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span> <span class="dt">f64</span><span class="op">,</span></span>
 <span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    y<span class="op">:</span> <span class="dt">f64</span><span class="op">,</span></span>
@@ -1193,11 +1192,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb43"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="at">#[</span>derive<span class="at">(</span><span class="bu">Debug</span><span class="op">,</span> <span class="bu">Clone</span><span class="at">)]</span></span>
 <span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> Point <span class="op">{</span> x<span class="op">:</span> <span class="dt">f64</span><span class="op">,</span> y<span class="op">:</span> <span class="dt">f64</span> <span class="op">}</span></span>
 <span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="co">// Now you can: println!("{:?}", p);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>See <a href="https://doc.rust-lang.org/book/ch05-00-structs.html">Structs</a> in <em>The Rust Programming Language</em> for more information.</p>
 </section>
 </section>
 <section id="generics-and-trait-bounds" class="level2">
 <h2 class="anchored" data-anchor-id="generics-and-trait-bounds">Generics and Trait Bounds</h2>
-<p><a href="https://doc.rust-lang.org/book/ch10-00-generics.html">Generic Types, Traits, and Lifetimes</a> by <em>The Rust Programming Language</em>.</p>
 <p>Generics are Rust’s equivalent of C++ templates, but they interact with the trait system in a way that makes constraints explicit and checked at compile time. A generic function works over any type, constrained by trait bounds:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb44"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> largest<span class="op">&lt;</span>T<span class="op">:</span> <span class="bu">PartialOrd</span><span class="op">&gt;</span>(a<span class="op">:</span> T<span class="op">,</span> b<span class="op">:</span> T) <span class="op">-&gt;</span> T <span class="op">{</span></span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> a <span class="op">&gt;</span> b <span class="op">{</span> a <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span> b <span class="op">}</span></span>
@@ -1236,11 +1235,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>This is the Rust equivalent of virtual methods in C++. The analogy is direct: <code>Box&lt;dyn Trait&gt;</code> is roughly what a pointer-to-base class with a vtable is in C++. Prefer <code>impl Trait</code> when the type is known at compile time; reach for <code>dyn Trait</code> when you need runtime polymorphism or heterogeneous collections.</p>
+<p>See <a href="https://doc.rust-lang.org/book/ch10-00-generics.html">Generic Types, Traits, and Lifetimes</a> in <em>The Rust Programming Language</em> for more information.</p>
 </section>
 </section>
 <section id="pattern-matching" class="level2">
 <h2 class="anchored" data-anchor-id="pattern-matching">Pattern Matching</h2>
-<p><a href="https://doc.rust-lang.org/book/ch19-00-patterns.html">Pattern Matching</a> as per <em>The Rust Programming Language</em>.</p>
 <p>Pattern matching in Rust is deeper than a switch statement. It simultaneously <strong>tests the structure</strong> of a value and <strong>extracts</strong> data from it. Every <code>match</code> arm is a pattern, and the compiler guarantees you have handled every possible case — exhaustiveness is enforced at compile time.</p>
 <section id="the-match-expression" class="level3">
 <h3 class="anchored" data-anchor-id="the-match-expression">The <code>match</code> Expression</h3>
@@ -1401,13 +1400,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb65-8"><a href="#cb65-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">// compile error: Direction::East and Direction::West not covered</span></span>
 <span id="cb65-9"><a href="#cb65-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Adding a new variant to an enum breaks every exhaustive match in the codebase at compile time. You cannot silently miss a case. This is one of the most powerful refactoring guarantees Rust offers.</p>
+<p>See <a href="https://doc.rust-lang.org/book/ch19-00-patterns.html">Pattern Matching</a> in <em>The Rust Programming Language</em> for more information.</p>
 </section>
 </section>
 <section id="closures-and-iterators" class="level2">
 <h2 class="anchored" data-anchor-id="closures-and-iterators">Closures and Iterators</h2>
 <section id="closures" class="level3">
 <h3 class="anchored" data-anchor-id="closures">Closures</h3>
-<p>A closure is an anonymous function that can capture values from its surrounding scope. C++ programmers will recognize them as lambdas.</p>
+<div class="subheading">
+<p>“lambdas” in other worlds</p>
+</div>
+<p>A <strong>closure</strong> is an anonymous function that can capture values from its surrounding scope. C++ and Python programmers will recognize them as <em>lambdas</em>.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb66"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> add <span class="op">=</span> <span class="op">|</span>a<span class="op">,</span> b<span class="op">|</span> a <span class="op">+</span> b<span class="op">;</span></span>
 <span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a><span class="pp">println!</span>(<span class="st">"{}"</span><span class="op">,</span> add(<span class="dv">2</span><span class="op">,</span> <span class="dv">3</span>))<span class="op">;</span>   <span class="co">// 5</span></span>
 <span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1416,11 +1419,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a><span class="pp">println!</span>(<span class="st">"{}"</span><span class="op">,</span> above(<span class="dv">15</span>))<span class="op">;</span>        <span class="co">// true</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Closures infer parameter and return types from context. You can annotate explicitly if needed:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb67"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> square <span class="op">=</span> <span class="op">|</span>x<span class="op">:</span> <span class="dt">f64</span><span class="op">|</span> <span class="op">-&gt;</span> <span class="dt">f64</span> <span class="op">{</span> x <span class="op">*</span> x <span class="op">};</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>Capture modes.</strong> Rust closures capture by reference by default. If you need the closure to own its captured data — to send it to another thread, for example — use <code>move</code>:</p>
+<p>Closures are inherently flexible and will do what the functionality requires to make the closure work without annotation. This allows capturing to flexibly adapt to the use case, sometimes moving and sometimes borrowing. Closures can capture variables:</p>
+<ul>
+<li>by reference: <code>&amp;T</code></li>
+<li>by mutable reference: <code>&amp;mut T</code></li>
+<li>by value: <code>T</code></li>
+</ul>
+<p>By default closures capture variables by <em>reference</em> and only go lower when required.</p>
+<p>If you need the closure to own its captured data (to send it to another thread, for example) use <code>move</code>. <code>move</code> before vertical pipes forces closure to take ownership of captured variables:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb68"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> name <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"world"</span>)<span class="op">;</span></span>
 <span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> greet <span class="op">=</span> <span class="kw">move</span> <span class="op">||</span> <span class="pp">println!</span>(<span class="st">"hello, {}"</span><span class="op">,</span> name)<span class="op">;</span>   <span class="co">// name is moved in</span></span>
 <span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>greet()<span class="op">;</span></span>
 <span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a><span class="co">// name is no longer accessible here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>See <a href="https://doc.rust-lang.org/book/ch13-01-closures.html">Closures</a> in <em>The Rust Programming Language</em> for more information.</p>
 </section>
 <section id="iterators" class="level3">
 <h3 class="anchored" data-anchor-id="iterators">Iterators</h3>
@@ -1525,6 +1536,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb71-5"><a href="#cb71-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
 <span id="cb71-6"><a href="#cb71-6" aria-hidden="true" tabindex="-1"></a><span class="pp">println!</span>(<span class="st">"{:?}"</span><span class="op">,</span> v)<span class="op">;</span>   <span class="co">// [2, 4, 6]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The compiler optimizes iterator chains aggressively. A chain of <code>.filter().map().collect()</code> typically compiles to the same machine code as an equivalent hand-written loop.</p>
+<p>See <a href="https://doc.rust-lang.org/book/ch13-02-iterators.html">Iterators</a> in <em>The Rust Programming Language</em> for more information.</p>
 </section>
 </section>
 <section id="error-handling" class="level2">
@@ -1692,9 +1704,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="quick-reference-1">Quick Reference</h4>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
+<col style="width: 26%">
+<col style="width: 32%">
+<col style="width: 41%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -1720,7 +1732,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Literal fallback is cheap and obvious</td>
 </tr>
 <tr class="even">
-<td><code>.unwrap_or_else(\|\| ...)</code></td>
+<td><code>.unwrap_or_else(|| ...)</code></td>
 <td>Call closure, return result</td>
 <td>Fallback requires computation</td>
 </tr>
@@ -1754,6 +1766,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><code>.unwrap()</code> and <code>.expect()</code> are appropriate in tests and prototypes. In production code, a panic is a crash with no recovery. Prefer <code>?</code>, <code>match</code>, <code>if let</code>, or the <code>unwrap_or</code> variants, which give callers a chance to handle the failure.</p>
 </div>
 </div>
+<p>See <a href="https://doc.rust-lang.org/book/ch09-00-error-handling.html">Error Handling</a> in <em>The Rust Programming Language</em> for more information.</p>
 </section>
 </section>
 </section>
@@ -1777,13 +1790,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb85-16"><a href="#cb85-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (k<span class="op">,</span> v) <span class="kw">in</span> <span class="op">&amp;</span>map <span class="op">{</span></span>
 <span id="cb85-17"><a href="#cb85-17" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">"{}: {}"</span><span class="op">,</span> k<span class="op">,</span> v)<span class="op">;</span></span>
 <span id="cb85-18"><a href="#cb85-18" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>See <a href="https://doc.rust-lang.org/book/ch08-00-common-collections.html">Common Collections</a> in <em>The Rust Programming Language</em> for more information.</p>
 </section>
 <section id="cargo" class="level2">
 <h2 class="anchored" data-anchor-id="cargo">Cargo</h2>
 <div class="subheading">
 <p>The Build System</p>
 </div>
-<p><a href="https://doc.rust-lang.org/book/ch07-00-managing-growing-projects-with-packages-crates-and-modules.html">Packages, Crates, and Modules</a> as per <em>The Rust Programming Language</em>.</p>
 <p>Cargo is Rust’s build tool, package manager, and test runner. You’ll use it for everything.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb86"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="ex">cargo</span> new my_project    <span class="co"># create new project</span></span>
 <span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a><span class="ex">cargo</span> build             <span class="co"># debug build</span></span>
@@ -1843,8 +1856,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>What changes between editions is <strong>language syntax and a small number of semantic rules</strong>, not the standard library. The standard library API is versioned by the Rust release channel separately. An example: in edition 2015 you had to write <code>extern crate serde;</code> at the top of <code>main.rs</code> to bring an external crate into scope. In 2018 that was removed entirely. Both editions call the same <code>serde</code> functions at runtime.</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
+<col style="width: 5%">
+<col style="width: 94%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -1890,6 +1903,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="dependency-version-constraints">Dependency Version Constraints</h3>
 <p>Cargo uses <a href="https://semver.org">semantic versioning</a>. The version string in <code>Cargo.toml</code> is a <em>requirement</em>, not an exact pin. Cargo selects the newest version that satisfies all constraints in the dependency graph:</p>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 32%">
+<col style="width: 41%">
+<col style="width: 25%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>Requirement</th>
@@ -1975,6 +1993,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb94"><pre class="sourceCode toml code-with-copy"><code class="sourceCode toml"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[profile.bench]</span></span>
 <span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a><span class="dt">inherits</span>  <span class="op">=</span> <span class="st">"release"</span></span>
 <span id="cb94-3"><a href="#cb94-3" aria-hidden="true" tabindex="-1"></a><span class="dt">debug</span>     <span class="op">=</span> <span class="cn">true</span>    <span class="co"># keep symbols for profiling</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>See <a href="https://doc.rust-lang.org/book/ch07-00-managing-growing-projects-with-packages-crates-and-modules.html">Packages, Crates, and Modules</a> in <em>The Rust Programming Language</em> for more information.</p>
 </section>
 </section>
 <section id="key-differences-from-cc" class="level2">
@@ -2053,6 +2072,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="where-to-go-next">Where to Go Next</h2>
 <ul>
 <li>The <a href="https://doc.rust-lang.org/book/">Rust Book</a> is free online and excellent.</li>
+<li><a href="https://doc.rust-lang.org/rust-by-example/">Rust by Example</a> is terse.</li>
+<li><a href="https://doc.rust-lang.org/cargo/">The Cargo Book</a> Cargo inside out.</li>
 <li><a href="https://github.com/rust-lang/rustlings">Rustlings</a> is a set of small exercises that build muscle memory quickly.</li>
 <li><a href="https://docs.rs">docs.rs</a> is the standard library and crate documentation hub — well worth bookmarking.</li>
 </ul>

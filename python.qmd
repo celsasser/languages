@@ -389,10 +389,10 @@ Generator expressions look like list comprehensions but use parentheses. They ar
 
 ```python
 # list comprehension: entire list built in memory immediately
-squares_list = [x ** 2 for x in range(1_000_000)]   # ~8 MB
+squares_list = [x ** 2 for x in range(1_000_000)]
 
 # generator expression: one value computed at a time
-squares_gen = (x ** 2 for x in range(1_000_000))    # negligible memory
+squares_gen = (x ** 2 for x in range(1_000_000))
 ```
 
 Use a generator expression when you only need to iterate once, or when you are passing the result directly to a function that consumes it:

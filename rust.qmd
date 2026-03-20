@@ -25,7 +25,7 @@ Rust's high-level features (iterators, generics, traits) compile down to the sam
 ###### 5. Explicit over implicit.
 Rust rarely does things behind your back. Integer overflow is checked in debug builds and wraps in release (with explicit opt-in). Type coercions are almost never automatic. Mutability must be declared. This is intentionally more verbose than C++ in places, in exchange for fewer surprises.
 
-## How a Rust Project Is Structured
+## Project Anatomy
 Three nested concepts organize Rust code: **packages**, **crates**, and **modules**. They map roughly — but not exactly — onto what you know from C and Python.
 
 [![](images/rust-01.jpg){fig-align="center" width=9in}](https://iota-for-flutter.github.io/tutorial/fundamentals/rust/project-structure.html)
@@ -48,7 +48,7 @@ my_project/
     └── main.rs     # root of the binary crate
 ```
 
-A library package looks the same but with `src/` instead. A package can contain both a `main.rs` and a `lib.rs`, producing a binary and a library from the same source tree.
+A library package has the same structure, but the crate root is `src/lib.rs` instead of `src/main.rs`. A package can contain both a `main.rs` and a `lib.rs`, producing a binary and a library from the same source tree.
 
 ::: {.callout-note title="`lib.rs` vs `mod.rs`?"}
 They are the same in that they are both "roots" that define how code is organized, but they differ in scope:
@@ -277,8 +277,6 @@ This is the `pip install` + `import` of Rust, collapsed into one tool that also 
 | Package manager       | (none built in)          | pip                 | cargo             |
 
 ## The Basics
-[Common Programming Concepts](https://doc.rust-lang.org/book/ch03-00-common-programming-concepts.html) by *The Rust Programming Language*.
-
 ### Variables and Mutability
 In C you declare a variable and it's mutable by default. In Rust, variables are **immutable by default**. You opt into mutability with `mut`.
 
@@ -341,11 +339,10 @@ In Rust, `()` is called the **unit type** (and also the **unit value**). It is e
 1. The inner `()`: This is the "unit value." It represents "nothing" or "empty success."
 2. The outer `Ok(...)`: This is the success variant of the Result enum.
 
-
 **Why do we use it?** Most of our command functions (like execute) return a `Result<(), Box<dyn Error>>`. Since the Result type must contain something in the Ok case, we use () to say: "The operation finished successfully, but there isn't a specific piece of data (like an integer or a string) to return to the caller." Gemini told me to think of it like this:
 
-* `Ok(42)` -> "I succeeded, and here is the answer: 42."
-* `Ok(())` -> "I succeeded. That's all you need to know."
+- `Ok(42)` -> "I succeeded, and here is the answer: 42."
+- `Ok(())` -> "I succeeded. That's all you need to know."
 
 In short, `()` is Rust's way to say "no meaningful value," whether as a function's return type or as the success payload in types like `Result<(), E>`.
 
@@ -389,9 +386,9 @@ for n in &nums {
 }
 ```
 
-## Macros
-[Macros](https://doc.rust-lang.org/book/ch20-05-macros.html) as per *The Rust Programming Language*.
+See [Common Programming Concepts](https://doc.rust-lang.org/book/ch03-00-common-programming-concepts.html) in *The Rust Programming Language* for more information.
 
+## Macros
 Throughout this chapter you have seen `println!`, `vec!`, `format!`, and `panic!`. The `!` signals a **macro call**, not a function call. Macros in Rust are code that writes code at compile time, before the compiler type-checks anything.
 
 The practical reason macros exist: some things ordinary functions cannot do. `println!` accepts a variable number of arguments of different types — impossible for a regular Rust function without significant compromise. Macros solve this by expanding at compile time into whatever code is needed.
@@ -430,9 +427,9 @@ assert_eq!(p, p2);      // PartialEq
 
 You can write your own macros with `macro_rules!` (declarative macros) or procedural macro crates. For most work, the standard library macros and [`derive`](https://doc.rust-lang.org/book/ch20-05-macros.html#custom-derive-macros) cover what you need.
 
-## Memory Management
-[Understanding Ownership](https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html) in *The Rust Programming Language*.
+See [Macros](https://doc.rust-lang.org/book/ch20-05-macros.html) in *The Rust Programming Language* for more information.
 
+## Memory Management
 This is the heart of Rust. If you understand this section, you understand Rust.
 
 ### The Stack and the Heap
@@ -552,9 +549,9 @@ fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
 
 The `'a` says "the returned reference lives at least as long as both inputs." Don't worry about this too deeply at first — the compiler will tell you when you need an annotation and the error messages are good.
 
-## Smart Pointers
-[Smart Pointers](https://doc.rust-lang.org/book/ch15-00-smart-pointers.html) in *The Rust Programming Language*.
+See [Understanding Ownership](https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html) in *The Rust Programming Language* for more information.
 
+## Smart Pointers
 When you need heap allocation beyond what `Vec` and `String` already handle, Rust provides smart pointer types. C++ developers will recognize the ideas.
 
 ### `Box<T>`
@@ -639,10 +636,10 @@ let counter = Arc::new(Mutex::new(0));
 | `Rc<T>`  | Shared    | No          | `shared_ptr<T>` (single-threaded)     |
 | `Arc<T>` | Shared    | Yes         | `shared_ptr<T>` with atomic ref count |
 
+See [Smart Pointers](https://doc.rust-lang.org/book/ch15-00-smart-pointers.html) in *The Rust Programming Language* for more information.
+
 ## Structs, Enums, and Traits
 ### Structs
-[Structs](https://doc.rust-lang.org/book/ch05-00-structs.html) as per *The Rust Programming Language*.
-
 ```rust
 struct Point {
     x: f64,
@@ -748,9 +745,9 @@ struct Point { x: f64, y: f64 }
 // Now you can: println!("{:?}", p);
 ```
 
-## Generics and Trait Bounds
-[Generic Types, Traits, and Lifetimes](https://doc.rust-lang.org/book/ch10-00-generics.html) by *The Rust Programming Language*.
+See [Structs](https://doc.rust-lang.org/book/ch05-00-structs.html) in *The Rust Programming Language* for more information.
 
+## Generics and Trait Bounds
 Generics are Rust's equivalent of C++ templates, but they interact with the trait system in a way that makes constraints explicit and checked at compile time. A generic function works over any type, constrained by trait bounds:
 
 ```rust
@@ -811,9 +808,9 @@ fn make_sounds(animals: &[Box<dyn Animal>]) {
 
 This is the Rust equivalent of virtual methods in C++. The analogy is direct: `Box<dyn Trait>` is roughly what a pointer-to-base class with a vtable is in C++. Prefer `impl Trait` when the type is known at compile time; reach for `dyn Trait` when you need runtime polymorphism or heterogeneous collections.
 
-## Pattern Matching
-[Pattern Matching](https://doc.rust-lang.org/book/ch19-00-patterns.html) as per *The Rust Programming Language*.
+See [Generic Types, Traits, and Lifetimes](https://doc.rust-lang.org/book/ch10-00-generics.html) in *The Rust Programming Language* for more information.
 
+## Pattern Matching
 Pattern matching in Rust is deeper than a switch statement. It simultaneously **tests the structure** of a value and **extracts** data from it. Every `match` arm is a pattern, and the compiler guarantees you have handled every possible case — exhaustiveness is enforced at compile time.
 
 ### The `match` Expression
@@ -1030,9 +1027,15 @@ match dir {
 
 Adding a new variant to an enum breaks every exhaustive match in the codebase at compile time. You cannot silently miss a case. This is one of the most powerful refactoring guarantees Rust offers.
 
+See [Pattern Matching](https://doc.rust-lang.org/book/ch19-00-patterns.html) in *The Rust Programming Language* for more information.
+
 ## Closures and Iterators
 ### Closures
-A closure is an anonymous function that can capture values from its surrounding scope. C++ programmers will recognize them as lambdas.
+::: {.subheading}
+"lambdas" in other worlds
+:::
+
+A **closure** is an anonymous function that can capture values from its surrounding scope. C++ and Python programmers will recognize them as *lambdas*.
 
 ```rust
 let add = |a, b| a + b;
@@ -1049,7 +1052,15 @@ Closures infer parameter and return types from context. You can annotate explici
 let square = |x: f64| -> f64 { x * x };
 ```
 
-**Capture modes.** Rust closures capture by reference by default. If you need the closure to own its captured data — to send it to another thread, for example — use `move`:
+Closures are inherently flexible and will do what the functionality requires to make the closure work without annotation. This allows capturing to flexibly adapt to the use case, sometimes moving and sometimes borrowing. Closures can capture variables:
+
+- by reference: `&T`
+- by mutable reference: `&mut T`
+- by value: `T`
+
+By default closures capture variables by *reference* and only go lower when required.
+
+If you need the closure to own its captured data (to send it to another thread, for example) use `move`. `move` before vertical pipes forces closure to take ownership of captured variables:
 
 ```rust
 let name = String::from("world");
@@ -1057,6 +1068,8 @@ let greet = move || println!("hello, {}", name);   // name is moved in
 greet();
 // name is no longer accessible here
 ```
+
+See [Closures](https://doc.rust-lang.org/book/ch13-01-closures.html) in *The Rust Programming Language* for more information.
 
 ### Iterators
 The `Iterator` trait powers a functional-style pipeline over any collection. The adapters are *lazy* — nothing is computed until you drive the iterator with a terminal operation.
@@ -1116,6 +1129,8 @@ println!("{:?}", v);   // [2, 4, 6]
 ```
 
 The compiler optimizes iterator chains aggressively. A chain of `.filter().map().collect()` typically compiles to the same machine code as an equivalent hand-written loop.
+
+See [Iterators](https://doc.rust-lang.org/book/ch13-02-iterators.html) in *The Rust Programming Language* for more information.
 
 ## Error Handling
 Rust has no exceptions. Errors are values, returned via `Result<T, E>`.
@@ -1237,7 +1252,6 @@ Both `Option<T>` and `Result<T, E>` are enum wrappers around a value. At some po
 The name "unwrap" is literal: remove the enum wrapper and return the inner value. It has nothing to do with `Box` or heap allocation.
 
 #### `.unwrap()` and `.expect()`
-
 `.unwrap()` returns the inner value if it is present, and **panics** if it is not:
 
 ```rust
@@ -1265,7 +1279,6 @@ n.unwrap();   // panic: "called `Result::unwrap()` on an `Err` value: \"overflow
 Prefer `.expect()` over `.unwrap()` whenever you use either one. The message costs nothing at runtime and is invaluable when debugging a crash.
 
 #### Fallback Variants
-
 When you have a sensible default, these avoid the panic entirely:
 
 ```rust
@@ -1283,7 +1296,6 @@ let name: String = maybe_name.unwrap_or_default();  // "" if None
 `unwrap_or_else` takes a closure, which means the fallback value is only computed when the `None` or `Err` branch is actually reached. Prefer it over `unwrap_or` when the default is expensive to produce.
 
 #### Testing the Error Side
-
 `unwrap_err()` and `expect_err()` are the mirror image: they extract the error value and panic if the result was actually `Ok`. These are almost exclusively used in tests where you want to assert that an operation failed:
 
 ```rust
@@ -1296,20 +1308,21 @@ fn rejects_negative_input() {
 ```
 
 #### Quick Reference
-
-| Method | Absent/error case | Typical use |
-|---|---|---|
-| `.unwrap()` | Panic with generic message | Prototyping; values that cannot be absent |
-| `.expect("msg")` | Panic with your message | Same, but with a useful crash message |
-| `.unwrap_or(val)` | Return `val` | Literal fallback is cheap and obvious |
-| `.unwrap_or_else(\|\| ...)` | Call closure, return result | Fallback requires computation |
-| `.unwrap_or_default()` | Return `T::default()` | Zero/empty is a sensible fallback |
-| `.unwrap_err()` | Panic if it was `Ok` | Tests asserting failure |
-| `.expect_err("msg")` | Panic with your message if `Ok` | Same, with a useful message |
+| Method                    | Absent/error case               | Typical use                               |
+|---------------------------|---------------------------------|-------------------------------------------|
+| `.unwrap()`               | Panic with generic message      | Prototyping; values that cannot be absent |
+| `.expect("msg")`          | Panic with your message         | Same, but with a useful crash message     |
+| `.unwrap_or(val)`         | Return `val`                    | Literal fallback is cheap and obvious     |
+| `.unwrap_or_else(|| ...)` | Call closure, return result     | Fallback requires computation             |
+| `.unwrap_or_default()`    | Return `T::default()`           | Zero/empty is a sensible fallback         |
+| `.unwrap_err()`           | Panic if it was `Ok`            | Tests asserting failure                   |
+| `.expect_err("msg")`      | Panic with your message if `Ok` | Same, with a useful message               |
 
 ::: {.callout-warning title="Panics in production code"}
 `.unwrap()` and `.expect()` are appropriate in tests and prototypes. In production code, a panic is a crash with no recovery. Prefer `?`, `match`, `if let`, or the `unwrap_or` variants, which give callers a chance to handle the failure.
 :::
+
+See [Error Handling](https://doc.rust-lang.org/book/ch09-00-error-handling.html) in *The Rust Programming Language* for more information.
 
 ## Common Collections
 ```rust
@@ -1333,12 +1346,12 @@ for (k, v) in &map {
 }
 ```
 
+See [Common Collections](https://doc.rust-lang.org/book/ch08-00-common-collections.html) in *The Rust Programming Language* for more information.
+
 ## Cargo
 ::: {.subheading}
 The Build System
 :::
-
-[Packages, Crates, and Modules](https://doc.rust-lang.org/book/ch07-00-managing-growing-projects-with-packages-crates-and-modules.html) as per *The Rust Programming Language*.
 
 Cargo is Rust's build tool, package manager, and test runner. You'll use it for everything.
 
@@ -1364,7 +1377,6 @@ regex = "1.10"
 `cargo add serde` adds a dependency from the command line. The ecosystem (crates.io) is large and high quality.
 
 ### `Cargo.toml` in Full
-
 A complete manifest with all common fields looks like this:
 
 ```toml
@@ -1412,12 +1424,12 @@ The key insight is that **editions are per-crate, and all editions can link toge
 
 What changes between editions is **language syntax and a small number of semantic rules**, not the standard library. The standard library API is versioned by the Rust release channel separately. An example: in edition 2015 you had to write `extern crate serde;` at the top of `main.rs` to bring an external crate into scope. In 2018 that was removed entirely. Both editions call the same `serde` functions at runtime.
 
-| Edition | Notable changes |
-|---|---|
-| 2015 | Original Rust. `extern crate` required. Old module path rules. |
-| 2018 | `extern crate` no longer needed. Clearer `use` paths (`crate::`, `super::`). `async`/`await` syntax. `?` usable in `main`. Non-lexical lifetimes. |
-| 2021 | More precise closure captures (captures only what it uses, not the whole struct). `IntoIterator` implemented for arrays. Cargo feature resolver v2. |
-| 2024 | `gen` blocks and coroutines. `impl Trait` lifetime improvements. Stricter `unsafe` requirements. |
+| Edition | Notable changes                                                                                                                                     |
+|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| 2015    | Original Rust. `extern crate` required. Old module path rules.                                                                                      |
+| 2018    | `extern crate` no longer needed. Clearer `use` paths (`crate::`, `super::`). `async`/`await` syntax. `?` usable in `main`. Non-lexical lifetimes.   |
+| 2021    | More precise closure captures (captures only what it uses, not the whole struct). `IntoIterator` implemented for arrays. Cargo feature resolver v2. |
+| 2024    | `gen` blocks and coroutines. `impl Trait` lifetime improvements. Stricter `unsafe` requirements.                                                    |
 
 Migrating is low-friction. Running `cargo fix --edition` rewrites the parts of your code that need updating automatically, then you change the `edition` field in `Cargo.toml`. Most migrations take a few minutes.
 
@@ -1426,23 +1438,21 @@ Start new projects with the latest edition (`2021` at minimum, `2024` if your to
 :::
 
 ### Dependency Version Constraints
-
 Cargo uses [semantic versioning](https://semver.org). The version string in `Cargo.toml` is a *requirement*, not an exact pin. Cargo selects the newest version that satisfies all constraints in the dependency graph:
 
-| Requirement | Meaning | Resolves to (e.g.) |
-|---|---|---|
-| `"1.0"` or `"^1.0"` | `>=1.0.0, <2.0.0` (default) | `1.9.4` |
-| `"1.2.3"` or `"^1.2.3"` | `>=1.2.3, <2.0.0` | `1.9.4` |
-| `"~1.2.3"` | `>=1.2.3, <1.3.0` (patch only) | `1.2.9` |
-| `"=1.2.3"` | Exactly `1.2.3` | `1.2.3` |
-| `"*"` | Any version | latest |
+| Requirement             | Meaning                        | Resolves to (e.g.) |
+|-------------------------|--------------------------------|--------------------|
+| `"1.0"` or `"^1.0"`     | `>=1.0.0, <2.0.0` (default)    | `1.9.4`            |
+| `"1.2.3"` or `"^1.2.3"` | `>=1.2.3, <2.0.0`              | `1.9.4`            |
+| `"~1.2.3"`              | `>=1.2.3, <1.3.0` (patch only) | `1.2.9`            |
+| `"=1.2.3"`              | Exactly `1.2.3`                | `1.2.3`            |
+| `"*"`                   | Any version                    | latest             |
 
 The caret rule (`^`) is the default and the most common. It reflects semver's promise: a library increment its major version when it makes breaking changes, so `>=1.0, <2.0` is safe to let Cargo update freely within.
 
 `Cargo.lock` records the exact resolved versions. Commit `Cargo.lock` for binaries (so builds are reproducible) and typically do not commit it for libraries (so downstream users get the benefit of patch updates).
 
 ### Dependency Scopes
-
 Not every dependency is needed in every context:
 
 ```toml
@@ -1462,7 +1472,6 @@ cc = "1.0"
 `build-dependencies` are for `build.rs`, a special script Cargo runs before compiling your crate. Common uses: compiling C code, generating Rust source from a schema, or probing the build environment.
 
 ### Feature Flags
-
 Features let you make parts of your crate optional, activated at compile time:
 
 ```toml
@@ -1490,7 +1499,6 @@ pub mod tls_support { ... }
 Features are additive: enabling a feature can only add code, never remove it. This is a deliberate constraint that keeps the dependency resolver simple.
 
 ### Build Profiles
-
 Cargo compiles in two profiles by default. You can tune both:
 
 ```toml
@@ -1512,6 +1520,8 @@ panic     = "abort" # smaller binary: no stack unwinding on panic
 inherits  = "release"
 debug     = true    # keep symbols for profiling
 ```
+
+See [Packages, Crates, and Modules](https://doc.rust-lang.org/book/ch07-00-managing-growing-projects-with-packages-crates-and-modules.html) in *The Rust Programming Language* for more information.
 
 ## Key Differences from C/C++
 ::: {.subheading}
@@ -1536,6 +1546,8 @@ Quick Reference
 
 ## Where to Go Next
 - The [Rust Book](https://doc.rust-lang.org/book/) is free online and excellent.
+- [Rust by Example](https://doc.rust-lang.org/rust-by-example/) is terse.
+- [The Cargo Book](https://doc.rust-lang.org/cargo/) Cargo inside out.
 - [Rustlings](https://github.com/rust-lang/rustlings) is a set of small exercises that build muscle memory quickly.
 - [docs.rs](https://docs.rs) is the standard library and crate documentation hub — well worth bookmarking.
 
