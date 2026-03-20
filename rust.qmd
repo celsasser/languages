@@ -453,7 +453,7 @@ Every value in Rust has exactly one **owner**. When the owner goes out of scope,
 }   // s goes out of scope: memory freed automatically. No free(), no delete.
 ```
 
-When `s` goes out of scope, there are no remaining pointers to the memory that `s` held. This is an ideal point at which we may return `s`'s memory to the allocator. When a variable goes out of scope, Rust calls a special function for us: `drop`. It’s where the author of `String` *can* put the code to return the memory to the allocator. Rust calls `drop` automatically at the closing curly bracket. This is sort of analagous to what happens in C++ when `delete` is called on an pointer: its destructor[s] is called and the memory is freed. The difference here is that it seems that its up to the author to release the memory. My memory of C++ destructors is foggy; I think that by the time a destructor was called, his fate was sealed: he's a goner.
+When `s` goes out of scope, Rust automatically runs `String`’s implementation of the `Drop` trait. This `drop` logic is generated and invoked by the compiler at the end of the scope; it releases the resources owned by `s`, typically by returning its heap memory to the allocator. Conceptually, `Drop` plays the same role as a C++ destructor: it is guaranteed to run exactly once when the value’s lifetime ends, and user code cannot forget to call it or call it twice.
 
 **Move semantics** — when you assign an owned value to another variable, the original owner is invalidated. This prevents double-free:
 
