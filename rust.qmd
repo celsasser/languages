@@ -336,7 +336,7 @@ Why this is better:
 3. **Efficiency**: Rust uses a "null-pointer optimization." For types like references or Box, an `Option<T>` takes up the same amount of memory as a regular `T`. The None case is represented by a literal null pointer under the hood, but the language makes it impossible for you to interact with that pointer unsafely.
 
 #### Unit Type
-In Rust, `()` is called the **unit type** (and also the **unit value**). It is essentially Rust's version of `void` from languages like C, C++, or Java, but with a key difference: it is an actual value that occupies zero bytes of memory. You will frequently see it used in `Okay(...)` statements: `Okay(())`. Looks a little weird doesn't it? It looks like we are calling a function without specifying the function name. Here is the breakdown of `Ok(())`:
+In Rust, `()` is called the **unit type** (and also the **unit value**). It is essentially Rust's version of `void` from languages like C, C++, or Java, but with a key difference: it is an actual value that occupies zero bytes of memory. You will frequently see it used in `Ok(...)` statements: `Ok(())`. Looks a little weird doesn't it? It looks like we are calling a function without specifying the function name. Here is the breakdown of `Ok(())`:
 
 1. The inner `()`: This is the "unit value." It represents "nothing" or "empty success."
 2. The outer `Ok(...)`: This is the success variant of the Result enum.
