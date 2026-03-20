@@ -347,7 +347,7 @@ In Rust, `()` is called the **unit type** (and also the **unit value**). It is e
 * `Ok(42)` -> "I succeeded, and here is the answer: 42."
 * `Ok(())` -> "I succeeded. That's all you need to know."
 
-Instead, Rust uses an enum called Option<T> which we saw up above.
+In short, `()` is Rust's way to say "no meaningful value," whether as a function's return type or as the success payload in types like `Result<(), E>`.
 
 ### Functions
 ```rust
