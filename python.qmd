@@ -30,19 +30,24 @@ Python's syntax enforces structure through indentation rather than braces. The l
 The [standard library](https://docs.python.org/3/library/index.html) is enormous. Networking, file I/O, JSON, regular expressions, HTTP, CSV, database access, unit testing: most of what you need for a typical program is already there.
 
 ::: {.callout-note title="The Zen of Python"}
-Tim Peters wrote nineteen aphorisms that capture Python's design philosophy. You can read them any time:
+Tim Peters wrote nineteen aphorisms that capture Python's design philosophy. You can read them any time with `import this`.
 
-```python
+```{python}
+#| code-fold: true
+
+# The following is a little more involved because once `this` is loaded into
+# sys.modules cache, it won't render upon import. To make sure it renders
+# every time we remove it from sys's module cache.
+import sys
+
+try:
+    del sys.modules["this"]
+except:
+    pass
+
 import this
 ```
 
-The most relevant ones for programmers coming from C or Rust:
-
-- *Explicit is better than implicit.*
-- *Simple is better than complex.*
-- *Readability counts.*
-- *There should be one — and preferably only one — obvious way to do it.*
-- *Errors should never pass silently.*
 :::
 
 ## How a Python Project Is Structured
