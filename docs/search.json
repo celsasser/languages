@@ -136,7 +136,7 @@
     "href": "rust.html#common-collections",
     "title": "Rust for C/C++ Programmers",
     "section": "Common Collections",
-    "text": "Common Collections\n// Vec&lt;T&gt; — growable array (like std::vector)\nlet mut v: Vec&lt;i32&gt; = Vec::new();\nv.push(1);\nv.push(2);\nv.push(3);\nlet third = v[2];           // 3 — panics if index is out of bounds\nlet safe = v.get(10);       // None — returns Option&lt;&i32&gt; instead of panicking\n\n// HashMap&lt;K, V&gt;\nuse std::collections::HashMap;\nlet mut map = HashMap::new();\nmap.insert(\"key\", 42);\nlet val = map.get(\"key\");   // Option&lt;&i32&gt;\n\n// Iterate\nfor (k, v) in &map {\n    println!(\"{}: {}\", k, v);\n}\nSee Common Collections in The Rust Programming Language for more information.",
+    "text": "Common Collections\n\n\n\n\n\n// Vec&lt;T&gt; — growable array (like std::vector)\nlet mut v: Vec&lt;i32&gt; = Vec::new();\nv.push(1);\nv.push(2);\nv.push(3);\nlet third = v[2];           // 3 — panics if index is out of bounds\nlet safe = v.get(10);       // None — returns Option&lt;&i32&gt; instead of panicking\n\n// HashMap&lt;K, V&gt;\nuse std::collections::HashMap;\nlet mut map = HashMap::new();\nmap.insert(\"key\", 42);\nlet val = map.get(\"key\");   // Option&lt;&i32&gt;\n\n// Iterate\nfor (k, v) in &map {\n    println!(\"{}: {}\", k, v);\n}\nSee Common Collections in The Rust Programming Language for more information.",
     "crumbs": [
       "Languages",
       "The Rust Language"

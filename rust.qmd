@@ -1393,6 +1393,9 @@ fn rejects_negative_input() {
 See [Error Handling](https://doc.rust-lang.org/book/ch09-00-error-handling.html) in *The Rust Programming Language* for more information.
 
 ## Common Collections
+
+![](images/rust-ccs.png){fig-align="center" width=12in}
+
 ```rust
 // Vec<T> — growable array (like std::vector)
 let mut v: Vec<i32> = Vec::new();
