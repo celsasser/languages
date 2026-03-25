@@ -30,14 +30,15 @@ Three nested concepts organize Rust code: **packages**, **crates**, and **module
 
 [![](images/rust-01.jpg){fig-align="center" width=9in}](https://iota-for-flutter.github.io/tutorial/fundamentals/rust/project-structure.html)
 
-### Packages and Crates
-A **crate** is the fundamental unit of compilation. The Rust compiler takes a crate and produces either an executable or a library. Think of it as the equivalent of a compiled C library (`.a`, `.so`) or a Python package on PyPI — the distributable unit that other projects depend on.
+### Crates
+A **crate** is the fundamental unit of compilation, meaning it is the smallest unit of code that Rust will compile. The Rust compiler takes a crate and produces either an executable or a library. Think of it as the equivalent of a compiled C library (`.a`, `.so`) or a Python package on PyPI — the distributable unit that other projects depend on.
 
 Two kinds of crates:
 
 - **Binary crate** — has a `main()` entry point, produces an executable. Root file is `src/main.rs`.
 - **Library crate** — no `main()`, produces a library for other code to use. Root file is `src/lib.rs`.
 
+### Packages
 A **package** is what Cargo manages: a directory with a `Cargo.toml` manifest. A package contains at least one crate. Most projects you will work on are a single package with a single binary crate:
 
 ```
@@ -58,6 +59,73 @@ They are the same in that they are both "roots" that define how code is organize
 
 In modern Rust (since 2018), `mod.rs` is often replaced by a file with the same name as the folder (e.g., `src/commands.rs` instead of
 `src/commands/mod.rs`) to keep the file tree flatter, but their purpose remains identical.
+:::
+
+The following came from *The Rust Programming Language* in which it is called the ["Modules Cheat Sheet"](https://doc.rust-lang.org/book/ch07-02-defining-modules-to-control-scope-and-privacy.html). I like it and is just what I was looking for; so here it is word for word:
+
+::: {.exploration data-label="The Ghost of Modules yet to Come"}
+### Modules Cheat Sheet
+Before we get to the details of modules and paths, here we provide a quick reference on how modules, paths, the use keyword, and the pub keyword work in the compiler, and how most developers organize their code. We’ll be going through examples of each of these rules throughout this chapter, but this is a great place to refer to as a reminder of how modules work.
+
+**Start from the crate root:** When compiling a crate, the compiler first looks in the crate root file (usually src/lib.rs for a library crate or src/main.rs for a binary crate) for code to compile.
+
+**Declaring modules:** In the crate root file, you can declare new modules; say you declare a “garden” module with mod garden;. The compiler will look for the module’s code in these places:
+
+- Inline, within curly brackets that replace the semicolon following mod garden
+- In the file src/garden.rs
+- In the file src/garden/mod.rs
+
+**Declaring submodules:** In any file other than the crate root, you can declare submodules. For example, you might declare mod vegetables; in src/garden.rs. The compiler will look for the submodule’s code within the directory named for the parent module in these places:
+
+- Inline, directly following mod vegetables, within curly brackets instead of the semicolon
+- In the file src/garden/vegetables.rs
+- In the file src/garden/vegetables/mod.rs
+
+**Paths to code in modules:** Once a module is part of your crate, you can refer to code in that module from anywhere else in that same crate, as long as the privacy rules allow, using the path to the code. For example, an Asparagus type in the garden vegetables module would be found at `crate::garden::vegetables::Asparagus`.
+
+**Private vs. public:** Code within a module is private from its parent modules by default. To make a module public, declare it with pub mod instead of mod. To make items within a public module public as well, use pub before their declarations.
+
+**The use `keyword`** Within a scope, the use keyword creates shortcuts to items to reduce repetition of long paths. In any scope that can refer to crate::garden:: vegetables::Asparagus, you can create a shortcut with use crate::garden:: vegetables::Asparagus; and from then on you only need to write Asparagus to make use of that type in the scope.
+
+Here, we create a binary crate named backyard that illustrates these rules. The crate’s directory, also named backyard, contains these files and directories:
+
+```
+backyard
+├── Cargo.lock
+├── Cargo.toml
+└── src
+   ├── garden
+   │ └── vegetables.rs
+   ├── garden.rs
+   └── main.rs
+```
+
+The crate root file in this case is `src/main.rs`, and it contains:
+
+```rust
+use crate::garden::vegetables::Asparagus;
+pub mod garden;
+
+fn main() {
+    let plant = Asparagus {};
+    println!("I'm growing {:?}!", plant);
+}
+```
+
+The pub mod garden; line tells the compiler to include the code it finds in `src/garden.rs`, which is:
+
+```rust
+pub mod vegetables;
+```
+
+Here, `pub` mod `vegetables` means the code in `src/garden/vegetables.rs` is included too. That code is:
+
+```rust
+ #[derive(Debug)]
+pub struct Asparagus {}
+```
+
+Now let’s get into the details of these rules and demonstrate them in action!
 :::
 
 ### Modules
