@@ -20,7 +20,7 @@ Instead of passing pointers around freely, Rust has a formal concept of *borrowi
 Data races are a compile error. The same ownership rules that prevent memory bugs also make entire classes of concurrency bugs impossible.
 
 ###### 4. Zero-cost abstractions.
-Rust's high-level features (iterators, generics, traits) compile down to the same machine code you'd write by hand. You don't pay for what you don't use — the same guarantee C++ makes, but delivered more consistently.
+Rust's high-level features ([iterators](#iterators), [generics](#generics-and-trait-bounds), [traits](#traits)) compile down to the same machine code you'd write by hand. You don't pay for what you don't use — the same guarantee C++ makes, but delivered more consistently.
 
 ###### 5. Explicit over implicit.
 Rust rarely does things behind your back. Integer overflow is checked in debug builds and wraps in release (with explicit opt-in). Type coercions are almost never automatic. Mutability must be declared. This is intentionally more verbose than C++ in places, in exchange for fewer surprises.
@@ -61,21 +61,21 @@ In modern Rust (since 2018), `mod.rs` is often replaced by a file with the same 
 `src/commands/mod.rs`) to keep the file tree flatter, but their purpose remains identical.
 :::
 
-The following came from *The Rust Programming Language* in which it is called the ["Modules Cheat Sheet"](https://doc.rust-lang.org/book/ch07-02-defining-modules-to-control-scope-and-privacy.html). I like it and is just what I was looking for; so here it is word for word:
+### Modules
+A **module** is a namespace within a crate — the closest equivalent to a Python module. Modules organize code into logical units and control what is visible outside (`pub`) versus private. Items are **private by default** — you opt into visibility explicitly. Before we dive deep on our own, we are to share *The Rust Programming Language*'s  ["Modules Cheat Sheet"](https://doc.rust-lang.org/book/ch07-02-defining-modules-to-control-scope-and-privacy.html). It was just what I was looking for when learning about modules; so, here it is word for word:
 
-::: {.exploration data-label="The Ghost of Modules yet to Come"}
-### Modules Cheat Sheet
+::: {.exploration data-label="Modules Cheat Sheet"}
 Before we get to the details of modules and paths, here we provide a quick reference on how modules, paths, the use keyword, and the pub keyword work in the compiler, and how most developers organize their code. We’ll be going through examples of each of these rules throughout this chapter, but this is a great place to refer to as a reminder of how modules work.
 
 **Start from the crate root:** When compiling a crate, the compiler first looks in the crate root file (usually src/lib.rs for a library crate or src/main.rs for a binary crate) for code to compile.
 
-**Declaring modules:** In the crate root file, you can declare new modules; say you declare a “garden” module with mod garden;. The compiler will look for the module’s code in these places:
+**Declaring modules:** In the crate root file, you can declare new modules; say you declare a “garden” module with `mod garden`;. The compiler will look for the module’s code in these places:
 
-- Inline, within curly brackets that replace the semicolon following mod garden
+- Inline, within curly brackets that replace the semicolon following `mod garden`
 - In the file src/garden.rs
 - In the file src/garden/mod.rs
 
-**Declaring submodules:** In any file other than the crate root, you can declare submodules. For example, you might declare mod vegetables; in src/garden.rs. The compiler will look for the submodule’s code within the directory named for the parent module in these places:
+**Declaring submodules:** In any file other than the crate root, you can declare submodules. For example, you might declare `mod vegetables`; in src/garden.rs. The compiler will look for the submodule’s code within the directory named for the parent module in these places:
 
 - Inline, directly following mod vegetables, within curly brackets instead of the semicolon
 - In the file src/garden/vegetables.rs
@@ -83,7 +83,7 @@ Before we get to the details of modules and paths, here we provide a quick refer
 
 **Paths to code in modules:** Once a module is part of your crate, you can refer to code in that module from anywhere else in that same crate, as long as the privacy rules allow, using the path to the code. For example, an Asparagus type in the garden vegetables module would be found at `crate::garden::vegetables::Asparagus`.
 
-**Private vs. public:** Code within a module is private from its parent modules by default. To make a module public, declare it with pub mod instead of mod. To make items within a public module public as well, use pub before their declarations.
+**Private vs. public:** Code within a module is private from its parent modules by default. To make a module public, declare it with `pub mod` instead of `mod`. To make items within a public module public as well, use pub before their declarations.
 
 **The use `keyword`** Within a scope, the use keyword creates shortcuts to items to reduce repetition of long paths. In any scope that can refer to crate::garden:: vegetables::Asparagus, you can create a shortcut with use crate::garden:: vegetables::Asparagus; and from then on you only need to write Asparagus to make use of that type in the scope.
 
@@ -127,9 +127,6 @@ pub struct Asparagus {}
 
 Now let’s get into the details of these rules and demonstrate them in action!
 :::
-
-### Modules
-A **module** is a namespace within a crate — the closest equivalent to a Python module. Modules organize code into logical units and control what is visible outside (`pub`) versus private. Items are **private by default** — you opt into visibility explicitly.
 
 ##### 1. Inline
 ::: {.subheading}
@@ -481,7 +478,7 @@ Common macros you will use regularly:
 | `todo!()`          | Placeholder that compiles but panics at runtime                     |
 | `dbg!(expr)`       | Print the file, line, and value of an expression; returns the value |
 
-`#[derive(...)]` is a different kind of macro — a *procedural macro* — that generates trait implementations automatically:
+`#[derive(...)]` is a different kind of macro — a *procedural macro* — that generates [trait](#traits) implementations automatically:
 
 ```rust
 #[derive(Debug, Clone, PartialEq)]
@@ -518,7 +515,7 @@ Every value in Rust has exactly one **owner**. When the owner goes out of scope,
 }   // s goes out of scope: memory freed automatically. No free(), no delete.
 ```
 
-When `s` goes out of scope, Rust automatically runs `String`’s implementation of the `Drop` trait. This `drop` logic is generated and invoked by the compiler at the end of the scope; it releases the resources owned by `s`, typically by returning its heap memory to the allocator. Conceptually, `Drop` plays the same role as a C++ destructor: it is guaranteed to run exactly once when the value’s lifetime ends, and user code cannot forget to call it or call it twice.
+When `s` goes out of scope, Rust automatically runs `String`’s implementation of the `Drop` [trait](#traits). This `drop` logic is generated and invoked by the compiler at the end of the scope; it releases the resources owned by `s`, typically by returning its heap memory to the allocator. Conceptually, `Drop` plays the same role as a C++ destructor: it is guaranteed to run exactly once when the value’s lifetime ends, and user code cannot forget to call it or call it twice.
 
 **Move semantics** — when you assign an owned value to another variable, the original owner is invalidated. This prevents double-free:
 
@@ -531,7 +528,7 @@ println!("{}", s2);  // fine
 
 This is like C++ move semantics, but the compiler *forces* you to use them correctly. You can't accidentally use a moved-from value.
 
-**Copy types** — primitives like integers implement the `Copy` trait, so assignment copies the value rather than moving it (same as C):
+**Copy types** — primitives like integers implement the `Copy` [trait](#traits), so assignment copies the value rather than moving it (same as C):
 
 ```rust
 let x = 5;
@@ -854,7 +851,7 @@ fn print_debug<T: Debug + Clone>(item: T) {
 ```
 
 ### `impl Trait` vs `dyn Trait`
-There are two ways to accept a trait in a function signature, and the choice matters for performance.
+There are two ways to accept a [trait](#traits) in a function signature, and the choice matters for performance.
 
 **`impl Trait` — static dispatch.** The compiler generates a separate, specialized function for each concrete type at compile time. No runtime overhead, but the type must be known at compile time.
 
@@ -1140,7 +1137,7 @@ greet();
 See [Closures](https://doc.rust-lang.org/book/ch13-01-closures.html) in *The Rust Programming Language* for more information.
 
 ### Iterators
-The `Iterator` trait powers a functional-style pipeline over any collection. The adapters are *lazy* — nothing is computed until you drive the iterator with a terminal operation.
+The `Iterator` [trait](#traits) powers a functional-style pipeline over any collection. The adapters are *lazy* — nothing is computed until you drive the iterator with a terminal operation.
 
 ```rust
 let nums = vec![1, 2, 3, 4, 5, 6];
@@ -1594,6 +1591,385 @@ debug     = true    # keep symbols for profiling
 
 See [Packages, Crates, and Modules](https://doc.rust-lang.org/book/ch07-00-managing-growing-projects-with-packages-crates-and-modules.html) in *The Rust Programming Language* for more information.
 
+## Common Crates
+A few fellas that I find indispensable.
+
+### clap
+::: {.subheading}
+Command-line argument parsing, the civilized way
+:::
+
+[clap](https://docs.rs/clap/latest/clap/) (Command Line Argument Parser) turns a Rust struct into a fully-featured CLI: `--help`, `--version`, validation, subcommands, and shell completions all come for free. You describe what your program accepts; clap handles the rest.
+
+Add it to `Cargo.toml` with the `derive` feature, which enables the attribute-based API used throughout this section:
+
+```toml
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+```
+
+#### The Derive API
+
+The derive API lets you describe your CLI as a struct. Clap reads the struct and its attributes at compile time and generates the parser automatically. This is the approach you will use in almost all real projects.
+
+```rust
+use clap::Parser;
+
+#[derive(Parser)]
+#[command(name = "greet", version = "1.0", about = "Greet someone")]
+struct Cli {
+    /// The name to greet
+    name: String,
+
+    /// How many times to repeat the greeting
+    #[arg(short, long, default_value_t = 1)]
+    count: u32,
+}
+
+fn main() {
+    let cli = Cli::parse();
+
+    for _ in 0..cli.count {
+        println!("Hello, {}!", cli.name);
+    }
+}
+```
+
+Running `./greet --help` produces:
+
+```
+Greet someone
+
+Usage: greet [OPTIONS] <NAME>
+
+Arguments:
+  <NAME>  The name to greet
+
+Options:
+  -c, --count <COUNT>  How many times to repeat the greeting [default: 1]
+  -h, --help           Print help
+  -V, --version        Print version
+```
+
+`Cli::parse()` reads `std::env::args()`, validates the input, and returns a populated `Cli`. If parsing fails, it prints an error and exits — no `Result` to unwrap.
+
+#### `#[derive(Parser)]`
+
+`Parser` is the [trait](#traits) that drives everything. Applying `#[derive(Parser)]` to a struct generates an implementation of that [trait](#traits), including the `parse()` and `try_parse()` associated functions. Without it, none of the other clap attributes do anything.
+
+```rust
+#[derive(Parser)]          // generates Cli::parse(), Cli::try_parse(), etc.
+struct Cli { ... }
+```
+
+`try_parse()` is available when you want to handle errors yourself instead of letting clap exit:
+
+```rust
+let cli = Cli::try_parse()?;   // returns Result<Cli, clap::Error>
+```
+
+#### `#[command(...)]` Attributes
+
+`#[command(...)]` applies to the struct as a whole and controls top-level metadata about your program.
+
+```rust
+#[derive(Parser)]
+#[command(
+    name    = "pexs24",
+    version = env!("CARGO_PKG_VERSION"),
+    author  = "Curtis",
+    about   = "Process expression files for the 2024 dataset",
+)]
+struct Cli { ... }
+```
+
+| Attribute                            | Effect                                                  |
+|--------------------------------------|---------------------------------------------------------|
+| `name = "pexs24"`                    | Sets the program name shown in usage and help text      |
+| `version = "1.2.3"`                  | Sets the version shown by `--version`                   |
+| `version = env!("CARGO_PKG_VERSION")`| Reads the version from `Cargo.toml` at compile time     |
+| `author = "..."`                     | Sets the author shown in `--help`                       |
+| `about = "..."`                      | One-line description shown at the top of `--help`       |
+| `long_about = "..."`                 | Longer description shown in `--help` (multiline)        |
+
+**`name = "pexs24"`** matters because clap uses the binary file name by default. If your binary is named `target/debug/pexs24_dev`, that ugly name shows up in every usage example. Setting `name` pins it to a clean, version-independent string.
+
+**`version = env!("CARGO_PKG_VERSION")`** is worth pausing on. `env!` is a built-in Rust macro that reads an [environment variable](https://doc.rust-lang.org/cargo/reference/environment-variables.html) at *compile time*. Cargo sets `CARGO_PKG_VERSION` to the `version` field in your `Cargo.toml` before invoking the compiler. The result is that your `--version` output always matches your `Cargo.toml` with zero manual synchronization.
+
+```toml
+# Cargo.toml
+[package]
+version = "0.3.1"
+```
+
+```
+$ pexs24 --version
+pexs24 0.3.1
+```
+
+Change the version in one place; the binary reflects it automatically.
+
+#### `#[arg(...)]` Attributes
+
+`#[arg(...)]` applies to individual fields and controls how each argument is parsed.
+
+##### Positional Arguments
+
+A field with no `short` or `long` attribute is positional — the user supplies it by position, not by name.
+
+```rust
+#[derive(Parser)]
+struct Cli {
+    #[arg(name = "FILE", num_args = 1)]
+    input: String,
+}
+```
+
+```
+Usage: prog <FILE>
+```
+
+**What does `name = "FILE"` mean?**
+
+The `name` attribute in `#[arg(...)]` sets the argument's internal **ID** and, for positional arguments, its **metavar** — the placeholder text shown in usage and help output. The uppercase `FILE` in `<FILE>` is a Unix convention: metavars are written in ALL_CAPS to visually distinguish the placeholder from the flags around it, and to make the type of input obvious at a glance.
+
+```
+Usage: prog [OPTIONS] <FILE>              # FILE is the metavar
+           ^^^^^^^^   ^^^^^^
+           flags      positional argument
+```
+
+"FILE" is not arbitrary. It communicates meaning to the user: *this argument expects a file path*. By convention:
+
+| Metavar     | Communicates                        |
+|-------------|-------------------------------------|
+| `<FILE>`    | Expects a file path                 |
+| `<DIR>`     | Expects a directory path            |
+| `<HOST>`    | Expects a hostname or IP address    |
+| `<N>`       | Expects a number                    |
+| `<PATTERN>` | Expects a regular expression        |
+| `<KEY>`     | Expects a key string                |
+
+Clap will use the field name (uppercased) as the metavar if you omit `name`. So a field named `input` would display as `<INPUT>`. Setting `name = "FILE"` gives you a more informative, idiomatic label without renaming the Rust field.
+
+If you want to control the metavar display independently of the ID, use `value_name` instead:
+
+```rust
+#[arg(value_name = "FILE")]
+input: String,
+```
+
+`value_name` only affects the display; it does not change the ID. This is the preferred approach in clap 4.
+
+**`num_args = 1`** tells clap how many values this argument consumes. For a single value it is the default, so you typically omit it. More useful forms:
+
+| `num_args`    | Meaning                                         |
+|---------------|-------------------------------------------------|
+| `1`           | Exactly one value (the default)                 |
+| `0..=1`       | Zero or one value (use `Option<T>` for the field) |
+| `1..`         | One or more values (use `Vec<T>` for the field) |
+| `0..`         | Zero or more values                             |
+| `3`           | Exactly three values                            |
+
+##### Flags and Options
+
+Adding `short` and/or `long` turns a field into a named argument rather than a positional one.
+
+```rust
+#[derive(Parser)]
+struct Cli {
+    /// Enable verbose output
+    #[arg(short, long)]
+    verbose: bool,          // --verbose / -v
+
+    /// Output file path
+    #[arg(short, long, value_name = "FILE")]
+    output: Option<String>, // --output <FILE> / -o <FILE>, optional
+
+    /// Number of threads
+    #[arg(short = 'j', long = "jobs", default_value_t = 4)]
+    jobs: u32,              // --jobs <JOBS> / -j <JOBS>
+}
+```
+
+`short` and `long` without values derive from the field name: `verbose` becomes `-v` and `--verbose`. Assign explicit characters or strings when the default conflicts or is not what you want.
+
+`bool` fields paired with `short`/`long` become **flags** — they are `false` by default and become `true` when passed. No value is consumed.
+
+`Option<T>` fields are **optional arguments** — omitting them produces `None`; passing them produces `Some(value)`.
+
+##### Common `#[arg(...)]` Attributes
+
+| Attribute                  | Effect                                                      |
+|----------------------------|-------------------------------------------------------------|
+| `short`                    | Add a short flag derived from the field name (`-v`)         |
+| `short = 'x'`              | Add a specific short flag (`-x`)                            |
+| `long`                     | Add a long flag derived from the field name (`--verbose`)   |
+| `long = "my-flag"`         | Add a specific long flag                                    |
+| `value_name = "FILE"`      | Set the metavar shown in help text                          |
+| `name = "FILE"`            | Set the argument's internal ID (and metavar for positionals)|
+| `default_value = "8080"`   | String default, parsed into the field's type                |
+| `default_value_t = 8080`   | Typed default — no parsing, must match the field type       |
+| `required = true`          | Force the argument to be provided (overrides `Option<T>`)   |
+| `num_args = 1..`           | Accept multiple values into a `Vec<T>`                      |
+| `env = "MY_VAR"`           | Fall back to an [environment variable](https://doc.rust-lang.org/cargo/reference/environment-variables.html) if the flag is absent  |
+| `hide = true`              | Omit the argument from help output                          |
+
+Doc comments (`/// ...`) above a field become the help text for that argument. Clap reads them directly — no separate `help = "..."` attribute needed.
+
+#### Multiple Values
+
+When a flag should accept a list of values, use `Vec<T>` and `num_args`:
+
+```rust
+#[derive(Parser)]
+struct Cli {
+    /// Input files to process
+    #[arg(value_name = "FILE", num_args = 1..)]
+    inputs: Vec<String>,
+
+    /// Tags to apply
+    #[arg(short, long, value_name = "TAG")]
+    tags: Vec<String>,         // --tag foo --tag bar
+}
+```
+
+Positional `Vec<T>` with `num_args = 1..` collects all remaining positional arguments. Named `Vec<T>` fields (with `short`/`long`) allow the flag to be repeated: `--tag foo --tag bar`.
+
+#### Subcommands
+
+Subcommands model tools like `git commit` or `cargo build` where the first argument selects a mode of operation. Define an enum with `#[derive(Subcommand)]` and embed it in your top-level struct:
+
+```rust
+use clap::{Parser, Subcommand};
+
+#[derive(Parser)]
+#[command(name = "tool")]
+struct Cli {
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    /// Compress a file
+    Compress {
+        #[arg(value_name = "FILE")]
+        input: String,
+
+        #[arg(short, long, value_name = "FILE")]
+        output: Option<String>,
+    },
+    /// List available formats
+    Formats,
+}
+
+fn main() {
+    let cli = Cli::parse();
+
+    match cli.command {
+        Commands::Compress { input, output } => {
+            let dest = output.unwrap_or_else(|| format!("{}.gz", input));
+            println!("Compressing {} -> {}", input, dest);
+        }
+        Commands::Formats => {
+            println!("Supported: gz, zst, xz");
+        }
+    }
+}
+```
+
+```
+$ tool --help
+Usage: tool <COMMAND>
+
+Commands:
+  compress  Compress a file
+  formats   List available formats
+  help      Print this message or the help of a subcommand
+
+$ tool compress --help
+Compress a file
+
+Usage: tool compress [OPTIONS] <FILE>
+
+Arguments:
+  <FILE>
+
+Options:
+  -o, --output <FILE>
+  -h, --help           Print help
+```
+
+Each subcommand gets its own `--help` page automatically.
+
+#### A Complete Example
+
+Putting it all together: a realistic CLI for a file processing tool.
+
+```rust
+use clap::Parser;
+
+#[derive(Parser)]
+#[command(
+    name    = "pexs24",
+    version = env!("CARGO_PKG_VERSION"),
+    about   = "Process expression files for the 2024 dataset",
+)]
+struct Cli {
+    /// Input file to process
+    #[arg(value_name = "FILE", num_args = 1)]
+    input: String,
+
+    /// Write output to FILE instead of stdout
+    #[arg(short, long, value_name = "FILE")]
+    output: Option<String>,
+
+    /// Number of worker threads
+    #[arg(short = 'j', long = "jobs", default_value_t = 4, value_name = "N")]
+    jobs: u32,
+
+    /// Enable verbose logging
+    #[arg(short, long)]
+    verbose: bool,
+}
+
+fn main() {
+    let cli = Cli::parse();
+
+    if cli.verbose {
+        eprintln!("Processing {} with {} threads", cli.input, cli.jobs);
+    }
+
+    match cli.output {
+        Some(path) => println!("Writing to {}", path),
+        None       => println!("Writing to stdout"),
+    }
+}
+```
+
+```
+$ pexs24 --help
+Process expression files for the 2024 dataset
+
+Usage: pexs24 [OPTIONS] <FILE>
+
+Arguments:
+  <FILE>  Input file to process
+
+Options:
+  -o, --output <FILE>  Write output to FILE instead of stdout
+  -j, --jobs <N>       Number of worker threads [default: 4]
+  -v, --verbose        Enable verbose logging
+  -h, --help           Print help
+  -V, --version        Print version
+
+$ pexs24 --version
+pexs24 0.3.1
+```
+
+See [clap documentation](https://docs.rs/clap/latest/clap/) and the [clap derive reference](https://docs.rs/clap/latest/clap/_derive/index.html) for the full attribute catalog.
+
 ## Key Differences from C/C++
 ::: {.subheading}
 Quick Reference
@@ -1619,7 +1995,9 @@ Quick Reference
 - The [Rust Book](https://doc.rust-lang.org/book/) is free online and excellent.
 - [Rust by Example](https://doc.rust-lang.org/rust-by-example/) is terse.
 - [The Cargo Book](https://doc.rust-lang.org/cargo/) Cargo inside out.
+    - [Environment Variables](https://doc.rust-lang.org/cargo/reference/environment-variables.html)
 - [Rustlings](https://github.com/rust-lang/rustlings) is a set of small exercises that build muscle memory quickly.
 - [docs.rs](https://docs.rs) is the standard library and crate documentation hub — well worth bookmarking.
+
 
 The compiler error messages are unusually good. Read them carefully — they usually tell you exactly what's wrong and often suggest the fix.
