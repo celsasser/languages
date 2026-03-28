@@ -1197,27 +1197,36 @@ The compiler optimizes iterator chains aggressively. A chain of `.filter().map()
 
 See [Iterators](https://doc.rust-lang.org/book/ch13-02-iterators.html) in *The Rust Programming Language* for more information.
 
-## Error Handling
-Rust has no exceptions. Errors are values, returned via `Result<T, E>`.
+## Errors as Values
+::: {.subheading}
+Understanding what an error is before learning how to handle it
+:::
+
+Rust does not have exceptions. There is no `try`, no `catch`, no `throw`. An error in Rust is not a control-flow mechanism that unwinds the stack — it is an ordinary value returned from a function, like any other return value. This is the single most important thing to understand about Rust error handling.
+
+### The Philosophy: Errors Are Just Data
+In languages with exceptions, errors live in a parallel universe. Normal values flow through `return`, but errors use a separate channel (`throw`) and require separate syntax to intercept (`try`/`catch`). The type signature of a function does not tell you what errors it might produce. You find out at runtime.
+
+Rust collapses this duality. An error is a value of a particular type, carried inside a `Result<T, E>` enum. The function signature tells you exactly what can go wrong.
+
+Compare these signatures:
 
 ```rust
-use std::fs;
-use std::io;
+// C++
+std::string read_file(const std::string& path);  // might throw, might not — signature doesn't say
 
-fn read_file(path: &str) -> Result<String, io::Error> {
-    let content = fs::read_to_string(path)?;  // ? propagates error
-    Ok(content)
-}
-
-// Caller handles the result
-match read_file("data.txt") {
-    Ok(content) => println!("{}", content),
-    Err(e)      => eprintln!("Failed: {}", e),
-}
+// Rust
+fn read_file(path: &str) -> Result<String, io::Error>;  // returns String *or* io::Error
 ```
 
-### `Result` Is Just an Enum
-It is worth pausing on this. `Result<T, E>` is not a special language construct. It is an ordinary enum defined in the standard library:
+The Rust signature is a contract. The function returns either:
+- `Ok(String)` — success, here's the file content
+- `Err(io::Error)` — failure, here's what went wrong
+
+No hidden control flow. No silent failures. The type system forces you to acknowledge that failure is possible.
+
+### `Result<T, E>` Is Just an Enum
+Here is the complete definition of `Result`, copied directly from the standard library:
 
 ```rust
 enum Result<T, E> {
@@ -1226,7 +1235,239 @@ enum Result<T, E> {
 }
 ```
 
-That's it. Everything you have learned about matching enums applies directly. `Ok` and `Err` are variants that carry data, exactly like `Shape::Circle(f64)` or `Message::Write(String)`. The compiler treats them no differently. What makes `Result` powerful is the combination of that simple structure with the pattern matching tools built into the language.
+That's it. `Result` is not a language keyword or compiler magic. It is an ordinary enum with two variants that carry data, exactly like the `Shape` and `Message` enums you saw in the [Structs, Enums, and Traits](#structs-enums-and-traits) section. Everything you already know about enums applies:
+
+- `Ok` and `Err` are enum variants
+- They carry values: `Ok(T)` wraps a success value, `Err(E)` wraps an error value
+- You extract those values with pattern matching: `match`, `if let`, or `while let`
+
+The power comes not from `Result` being special, but from the compiler enforcing exhaustive pattern matching. You cannot access the success value without also handling the error case. The compiler will not let you forget.
+
+### Reading Result Type Signatures
+When you see:
+
+```rust
+fn parse_config(path: &str) -> Result<Config, io::Error>
+```
+
+Read it as: "This function returns `Config` on success, or `io::Error` on failure."
+
+The generic parameters `<T, E>` make this explicit:
+- `T` (the first parameter) is the **success type** — what you get when everything works
+- `E` (the second parameter) is the **error type** — what you get when it fails
+
+Common examples:
+
+```rust
+Result<String, io::Error>       // returns String or io::Error
+Result<i32, ParseIntError>      // returns i32 or ParseIntError  
+Result<(), Box<dyn Error>>      // returns nothing (unit type) or any error type
+```
+
+The unit type `()` as the success value means "this function either succeeds with no meaningful return value, or fails with an error." You'll see this in functions that perform side effects (write a file, send a network packet) where success means "it worked" and nothing more.
+
+### Matching on Result
+Because `Result` is an enum, you destructure it the same way you destructure any other enum:
+
+```rust
+use std::fs;
+
+let result = fs::read_to_string("config.toml");
+
+match result {
+    Ok(content) => {
+        println!("File contents:");
+        println!("{}", content);
+    }
+    Err(e) => {
+        eprintln!("Failed to read file: {}", e);
+    }
+}
+```
+
+The pattern `Ok(content)` does two things simultaneously:
+1. Tests whether the result is the `Ok` variant (not `Err`)
+2. Binds the inner `String` to the name `content`
+
+The pattern `Err(e)` extracts the error value. The name `e` is conventional (short for "error"), but you can use any name. Inside that arm, `e` has type `io::Error` — the `E` in `Result<String, E>`.
+
+If you only care about one outcome, use `if let`:
+
+```rust
+if let Ok(content) = fs::read_to_string("config.toml") {
+    println!("{}", content);
+}
+// silently ignore errors
+```
+
+Or handle only the error:
+
+```rust
+if let Err(e) = fs::read_to_string("config.toml") {
+    eprintln!("Error: {}", e);
+    std::process::exit(1);
+}
+```
+
+This is identical to the `Option<T>` matching you saw in [Pattern Matching](#pattern-matching) — same syntax, same semantics, because `Result` and `Option` are both just enums.
+
+### The `Error` Trait
+Any type can be used as `E` in `Result<T, E>`, but by convention error types implement the `std::error::Error` trait. This trait is simple:
+
+```rust
+pub trait Error: Debug + Display {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        None
+    }
+}
+```
+
+Breaking this down:
+
+**1. Trait bounds: `Debug + Display`**
+
+Every error type must implement both:
+- **`Debug`** — for developer-facing output with `{:?}`. Shows the full internal structure.
+- **`Display`** — for user-facing output with `{}`. Shows a human-readable message.
+
+This separation lets you choose the right representation for the context. In production logs you might want `Debug` to see all the details. When showing an error to a user, you want `Display` to give them a clear message without internal noise.
+
+**2. The `source()` method**
+
+Errors can be chained. If parsing a config file fails because of an I/O error, the parse error can *wrap* the I/O error. `source()` returns the underlying cause, letting you walk the error chain:
+
+```rust
+let mut cause = &error;
+while let Some(source) = cause.source() {
+    eprintln!("  caused by: {}", source);
+    cause = source;
+}
+```
+
+Most errors return `None` (they are root causes). Higher-level errors that wrap other errors override this method.
+
+### Error Formatting: Display vs Debug
+The distinction between `Display` and `Debug` is not just convention — it changes how you present errors to different audiences.
+
+**`Display` (`{}`)** — user-facing error messages
+
+- Should be lowercase with no trailing period
+- Should be specific and actionable
+- Should not expose internal implementation details
+
+Good examples:
+```rust
+"file not found"
+"invalid UTF-8 sequence at byte 42"
+"connection timeout after 30s"
+```
+
+Bad examples:
+```
+"Error."                          // too vague
+"FILE_NOT_FOUND"                  // shouting
+"IoError(Os { code: 2 })"         // internal structure leaked
+```
+
+**`Debug` (`{:?}`)** — developer-facing output
+
+- Shows internal structure
+- Used in panic messages and debugging tools
+- Typically derived automatically with `#[derive(Debug)]`
+
+```rust
+#[derive(Debug)]
+struct ParseError {
+    line: usize,
+    column: usize,
+    message: String,
+}
+```
+
+When you print with `{:?}`, you get the full structure:
+```
+ParseError { line: 14, column: 8, message: "unexpected token" }
+```
+
+When you print with `{}`, you implement `Display` to format it for humans:
+```rust
+impl fmt::Display for ParseError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "parse error at {}:{}: {}", self.line, self.column, self.message)
+    }
+}
+```
+
+### Formatting Errors in Practice
+When you catch an error, you typically format it with `Display`:
+
+```rust
+match load_config() {
+    Ok(cfg) => run_app(cfg),
+    Err(e) => {
+        eprintln!("Error: {}", e);    // Display formatting
+        std::process::exit(1);
+    }
+}
+```
+
+The `{}` placeholder calls the error's `Display` implementation, giving you a clean user-facing message. If you need diagnostic details (say, in a crash report or log), use `Debug`:
+
+```rust
+eprintln!("Error: {:?}", e);   // Debug formatting
+```
+
+Or even better, use the alternate `Debug` format (`{:#?}`) for pretty-printed output:
+
+```rust
+eprintln!("Error: {:#?}", e);
+```
+
+### Common Error Types in std
+The standard library provides error types for its own operations:
+
+**`std::io::Error`** — I/O operations (file, network, etc.)
+
+```rust
+use std::fs::File;
+
+let file = File::open("data.txt")?;  // returns io::Error on failure
+```
+
+**`std::fmt::Error`** — formatting operations (rarely used directly)
+
+Returned by formatting macros (`write!`, `format!`) when writing to a buffer fails.
+
+**`std::num::ParseIntError`, `ParseFloatError`** — parsing strings to numbers
+
+```rust
+let n: i32 = "42".parse()?;       // returns ParseIntError if not a valid number
+```
+
+**`std::str::Utf8Error`** — invalid UTF-8 byte sequences
+
+```rust
+let s = std::str::from_utf8(&bytes)?;  // returns Utf8Error if bytes aren't valid UTF-8
+```
+
+Each of these implements `Error`, `Display`, and `Debug`, so they work uniformly in `Result<T, E>` and can be formatted for users or developers as needed.
+
+### Why This Matters
+Treating errors as values means:
+- **No hidden control flow** — the function signature tells you what errors to expect
+- **No silent failures** — the type system forces you to handle or propagate every error
+- **Composable error handling** — errors are just data, so you can transform, wrap, and combine them like any other value
+
+This is the foundation. The [Error Handling](#error-handling) section that follows shows you the *tools* for working with these error values: the `?` operator, `if let` for selective handling, `.unwrap()` and `.expect()` for prototyping, and the extraction family for getting the value out when you know it's there.
+
+But those are techniques. What you've learned here is the model: errors are enum values, `Result<T, E>` is the container, and the `Error` trait defines the contract for how to display and chain them.
+
+## Error Handling
+::: {.subheading}
+Tools for working with error values
+:::
+
+Now that you understand what errors *are* in Rust — enum values wrapped in `Result<T, E>` — this section covers the practical tools for *handling* them.
 
 ### `if let` for Error Handling
 Because `Result` is an enum, `if let` works on it naturally. The most common form you will see in real code handles only the error case and ignores success:
