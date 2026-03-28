@@ -2048,6 +2048,382 @@ for (k, v) in &map {
 
 See [Common Collections](https://doc.rust-lang.org/book/ch08-00-common-collections.html) in *The Rust Programming Language* for more information.
 
+## File I/O
+::: {.subheading}
+Reading and writing files: unbuffered, buffered, and binary
+:::
+
+File I/O in Rust is built around the `std::fs` and `std::io` modules. The landscape includes basic file operations, buffered I/O for performance, line-oriented reading, and binary I/O with byte order control.
+
+### Basic File Operations
+
+**Opening and creating files:**
+
+```rust
+use std::fs::File;
+use std::io::{self, Read, Write};
+
+// Open existing file (read-only)
+let file = File::open("input.txt")?;
+
+// Create new file (truncates if exists)
+let file = File::create("output.txt")?;
+
+// Open with specific options
+use std::fs::OpenOptions;
+let file = OpenOptions::new()
+    .read(true)
+    .write(true)
+    .create(true)
+    .append(true)
+    .open("data.txt")?;
+```
+
+The `?` operator propagates `io::Error` to the caller. All file operations return `Result<T, io::Error>`.
+
+### Unbuffered I/O
+
+**Reading directly from `File`:**
+
+```rust
+use std::fs::File;
+use std::io::Read;
+
+let mut file = File::open("data.bin")?;
+
+// Read entire file into Vec<u8>
+let mut buffer = Vec::new();
+file.read_to_end(&mut buffer)?;
+
+// Read into fixed-size array
+let mut buf = [0u8; 1024];
+let n = file.read(&mut buf)?;  // returns bytes read
+println!("Read {} bytes", n);
+
+// Read exact amount (fails if not enough data)
+let mut exact = [0u8; 16];
+file.read_exact(&mut exact)?;
+```
+
+**Writing directly to `File`:**
+
+```rust
+use std::fs::File;
+use std::io::Write;
+
+let mut file = File::create("output.bin")?;
+
+let data = vec![0x01, 0x02, 0x03, 0x04];
+file.write_all(&data)?;  // writes entire slice
+
+// Ensure data is flushed to disk
+file.flush()?;
+```
+
+Unbuffered I/O makes a system call for every read/write operation. This is fine for large transfers, but inefficient for many small operations.
+
+### Buffered I/O
+
+**Buffered reading with `BufReader`:**
+
+```rust
+use std::fs::File;
+use std::io::{BufReader, BufRead};
+
+let file = File::open("input.txt")?;
+let reader = BufReader::new(file);
+
+// Read line by line (most common pattern)
+for line in reader.lines() {
+    let line = line?;  // line is a Result<String, io::Error>
+    println!("{}", line);
+}
+
+// Or manually read lines
+let file = File::open("input.txt")?;
+let mut reader = BufReader::new(file);
+let mut line = String::new();
+while reader.read_line(&mut line)? > 0 {
+    print!("{}", line);  // line includes \n
+    line.clear();
+}
+
+// Read entire file into String
+let file = File::open("input.txt")?;
+let mut reader = BufReader::new(file);
+let mut content = String::new();
+reader.read_to_string(&mut content)?;
+```
+
+**Buffered writing with `BufWriter`:**
+
+```rust
+use std::fs::File;
+use std::io::{BufWriter, Write};
+
+let file = File::create("output.txt")?;
+let mut writer = BufWriter::new(file);
+
+for i in 0..1000 {
+    writeln!(writer, "Line {}", i)?;  // buffered in memory
+}
+
+writer.flush()?;  // ensure buffer is written to disk
+// BufWriter also flushes on drop, but explicit flush lets you handle errors
+```
+
+`BufReader` and `BufWriter` reduce system calls by buffering data in memory. Use them for text files or when doing many small reads/writes.
+
+### Convenience Functions
+
+For simple cases, `std::fs` provides one-shot functions:
+
+```rust
+use std::fs;
+
+// Read entire file to String
+let text = fs::read_to_string("input.txt")?;
+
+// Read entire file to Vec<u8>
+let bytes = fs::read("data.bin")?;
+
+// Write entire String to file
+fs::write("output.txt", "Hello, world!")?;
+
+// Write entire Vec<u8> to file
+fs::write("data.bin", vec![0x01, 0x02, 0x03])?;
+```
+
+These are buffered internally and handle open/close automatically. Perfect for small files.
+
+### Binary I/O and Byte Order
+
+When reading binary formats, you often need to handle multi-byte integers with specific endianness.
+
+**Reading primitives with byte order:**
+
+Rust provides methods on primitive types to read/write with explicit endianness:
+
+```rust
+use std::fs::File;
+use std::io::{Read, Write};
+
+let mut file = File::open("binary.dat")?;
+
+// Read u32 in little-endian
+let mut buf = [0u8; 4];
+file.read_exact(&mut buf)?;
+let value = u32::from_le_bytes(buf);
+
+// Read u32 in big-endian
+file.read_exact(&mut buf)?;
+let value = u32::from_be_bytes(buf);
+
+// Read in native byte order (matches platform)
+file.read_exact(&mut buf)?;
+let value = u32::from_ne_bytes(buf);
+```
+
+**Writing primitives with byte order:**
+
+```rust
+let mut file = File::create("output.dat")?;
+
+let value: u32 = 0x12345678;
+
+// Write as little-endian
+file.write_all(&value.to_le_bytes())?;
+
+// Write as big-endian  
+file.write_all(&value.to_be_bytes())?;
+
+// Write in native byte order
+file.write_all(&value.to_ne_bytes())?;
+```
+
+**Reading/writing multiple values:**
+
+```rust
+use std::io::{BufReader, BufWriter, Read, Write};
+
+// Reading a binary file with known structure
+let file = File::open("data.bin")?;
+let mut reader = BufReader::new(file);
+
+let mut header = [0u8; 4];
+reader.read_exact(&mut header)?;
+let magic = u32::from_le_bytes(header);
+
+let mut buf = [0u8; 2];
+reader.read_exact(&mut buf)?;
+let width = u16::from_le_bytes(buf);
+
+reader.read_exact(&mut buf)?;
+let height = u16::from_le_bytes(buf);
+
+// Writing binary data
+let file = File::create("output.bin")?;
+let mut writer = BufWriter::new(file);
+
+writer.write_all(&0xCAFEBABEu32.to_be_bytes())?;  // magic number
+writer.write_all(&1920u16.to_le_bytes())?;         // width
+writer.write_all(&1080u16.to_le_bytes())?;         // height
+writer.flush()?;
+```
+
+**All primitive integer types** (`u8`, `i8`, `u16`, `i16`, `u32`, `i32`, `u64`, `i64`, `u128`, `i128`, `usize`, `isize`) and **floats** (`f32`, `f64`) have these methods:
+- `to_le_bytes()` / `from_le_bytes()` — little-endian
+- `to_be_bytes()` / `from_be_bytes()` — big-endian  
+- `to_ne_bytes()` / `from_ne_bytes()` — native endian
+
+### The `byteorder` Crate
+
+For more convenient binary I/O, the `byteorder` crate provides traits that extend readers/writers:
+
+```toml
+# Cargo.toml
+[dependencies]
+byteorder = "1.5"
+```
+
+```rust
+use std::fs::File;
+use std::io::{BufReader, BufWriter};
+use byteorder::{LittleEndian, BigEndian, ReadBytesExt, WriteBytesExt};
+
+// Reading with byteorder
+let file = File::open("data.bin")?;
+let mut reader = BufReader::new(file);
+
+let value1 = reader.read_u32::<LittleEndian>()?;
+let value2 = reader.read_u16::<BigEndian>()?;
+let float = reader.read_f64::<LittleEndian>()?;
+
+// Writing with byteorder
+let file = File::create("output.bin")?;
+let mut writer = BufWriter::new(file);
+
+writer.write_u32::<LittleEndian>(0x12345678)?;
+writer.write_u16::<BigEndian>(42)?;
+writer.write_f64::<LittleEndian>(3.14159)?;
+writer.flush()?;
+```
+
+This is more ergonomic than manually managing byte arrays.
+
+### Error Handling
+
+All I/O operations return `Result<T, io::Error>`. Common patterns:
+
+```rust
+use std::fs::File;
+use std::io::{self, ErrorKind};
+
+// Propagate with ?
+fn read_config() -> io::Result<String> {
+    std::fs::read_to_string("config.txt")  // io::Result is alias for Result<T, io::Error>
+}
+
+// Match on error kind
+match File::open("data.txt") {
+    Ok(file) => { /* use file */ },
+    Err(e) => match e.kind() {
+        ErrorKind::NotFound => eprintln!("File not found"),
+        ErrorKind::PermissionDenied => eprintln!("Permission denied"),
+        _ => eprintln!("I/O error: {}", e),
+    }
+}
+
+// Provide context with custom error types or anyhow crate
+use anyhow::Context;
+let file = File::open("data.txt")
+    .context("Failed to open data.txt")?;
+```
+
+### Quick Reference
+
+| Task | Approach |
+|------|----------|
+| Read entire file to String | `fs::read_to_string("file.txt")?` |
+| Read entire file to Vec<u8> | `fs::read("file.bin")?` |
+| Write String/bytes to file | `fs::write("file.txt", data)?` |
+| Read file line by line | `BufReader::new(file).lines()` |
+| Read binary file | `File::open()` + `read_exact()` + `from_le_bytes()` |
+| Write binary file | `File::create()` + `write_all()` + `to_le_bytes()` |
+| Buffered text reading | `BufReader::new(File::open()?)` |
+| Buffered text writing | `BufWriter::new(File::create()?)` |
+| Binary I/O with endianness | `byteorder` crate or `to_le_bytes()`/`from_be_bytes()` |
+
+### Common Patterns
+
+**Reading a binary header:**
+
+```rust
+use std::fs::File;
+use std::io::Read;
+
+struct Header {
+    magic: u32,
+    version: u16,
+    count: u16,
+}
+
+fn read_header(path: &str) -> io::Result<Header> {
+    let mut file = File::open(path)?;
+    
+    let mut buf = [0u8; 8];
+    file.read_exact(&mut buf)?;
+    
+    Ok(Header {
+        magic: u32::from_le_bytes([buf[0], buf[1], buf[2], buf[3]]),
+        version: u16::from_le_bytes([buf[4], buf[5]]),
+        count: u16::from_le_bytes([buf[6], buf[7]]),
+    })
+}
+```
+
+**Processing a large file line by line:**
+
+```rust
+use std::fs::File;
+use std::io::{BufReader, BufRead};
+
+fn process_log_file(path: &str) -> io::Result<()> {
+    let file = File::open(path)?;
+    let reader = BufReader::new(file);
+    
+    for line in reader.lines() {
+        let line = line?;
+        if line.contains("ERROR") {
+            eprintln!("Found error: {}", line);
+        }
+    }
+    Ok(())
+}
+```
+
+**Writing CSV-like data:**
+
+```rust
+use std::fs::File;
+use std::io::{BufWriter, Write};
+
+fn write_csv(path: &str, data: &[(u32, f64)]) -> io::Result<()> {
+    let file = File::create(path)?;
+    let mut writer = BufWriter::new(file);
+    
+    writeln!(writer, "id,value")?;
+    for (id, value) in data {
+        writeln!(writer, "{},{:.2}", id, value)?;
+    }
+    
+    writer.flush()?;
+    Ok(())
+}
+```
+
+See [Reading a File](https://doc.rust-lang.org/book/ch12-02-reading-a-file.html) and the [`std::io` module documentation](https://doc.rust-lang.org/std/io/index.html) for more information.
+
 ## Cargo
 ::: {.subheading}
 The Build System
