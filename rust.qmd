@@ -378,6 +378,48 @@ let x: i32 = 42;
 let y: f64 = x as f64;
 ```
 
+#### Fixed-Length Arrays
+Arrays in Rust are fixed-size collections of elements of the same type, allocated on the stack. The syntax is `[T; N]` where `T` is the element type and `N` is the length, which must be known at compile time.
+
+```rust
+// Array of 5 integers
+let arr: [i32; 5] = [1, 2, 3, 4, 5];
+
+// Initialize all elements to the same value
+let zeros = [0; 100];        // 100 zeros
+let buffer = [0u8; 1024];    // 1024-byte buffer
+
+// Access elements (zero-indexed, bounds-checked at runtime)
+let first = arr[0];          // 1
+let last = arr[4];           // 5
+
+// Length is part of the type
+println!("Length: {}", arr.len());  // 5
+```
+
+**Key characteristics:**
+
+- **Stack-allocated** — arrays live on the stack, not the heap
+- **Fixed size** — length cannot change after creation
+- **Type includes length** — `[i32; 3]` and `[i32; 5]` are different, incompatible types
+- **Bounds-checked** — indexing out of bounds causes a runtime panic
+
+Arrays are useful when you know the exact size at compile time (RGB colors, matrix dimensions, fixed buffers). For dynamic sizing, use `Vec<T>` instead ([covered later](#common-collections)).
+
+```rust
+// Iterating over arrays
+let colors = [[255, 0, 0], [0, 255, 0], [0, 0, 255]];
+
+for color in &colors {
+    println!("RGB: {:?}", color);
+}
+
+// Arrays can be passed to functions by reference
+fn sum(arr: &[i32; 5]) -> i32 {
+    arr.iter().sum()
+}
+```
+
 ### Values
 ::: {.subheading}
 The "Null Problem"
@@ -601,20 +643,204 @@ Functions that just need to read a string should accept `&str` — it works with
 
 ### Lifetimes
 ::: {.subheading}
-Brief Introduction
+Ensuring references don't outlive their data
 :::
 
-Lifetimes are Rust's way of ensuring references don't outlive the data they point to. In most code the compiler infers them. You only write lifetime annotations when the compiler can't figure it out — usually in function signatures that return references:
+Lifetimes are Rust's way of ensuring references are always valid — that they don't outlive the data they point to. In most code the compiler infers them. You only write lifetime annotations when the compiler can't figure out the relationship between input and output references.
+
+The lifetime syntax looks unusual at first (it is the `'a` in `&'a str`), but it's just a way to name the scope during which a reference must remain valid.
+
+#### Basic Lifetime Syntax
 
 ```rust
+// Function that returns a reference: which input does it come from?
 fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
     if x.len() > y.len() { x } else { y }
 }
 ```
 
-The `'a` says "the returned reference lives at least as long as both inputs." Don't worry about this too deeply at first — the compiler will tell you when you need an annotation and the error messages are good.
+The `<'a>` declares a lifetime parameter (like a generic type parameter). The `&'a str` annotations say:
+- Both inputs must live at least as long as `'a`
+- The output reference lives at most as long as `'a`
 
-See [Understanding Ownership](https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html) in *The Rust Programming Language* for more information.
+This tells the compiler: "The returned reference is valid for as long as both inputs are valid."
+
+**Why it matters:**
+
+```rust
+let result;
+{
+    let s1 = String::from("long string");
+    let s2 = String::from("short");
+    result = longest(&s1, &s2);
+}
+// println!("{}", result);  // compile error: s1 and s2 are out of scope
+```
+
+The compiler prevents the dangling reference at compile time, not runtime.
+
+#### Comprehensive Lifetime Syntax Reference
+
+**Single lifetime parameter**
+```rust
+fn first_word<'a>(s: &'a str) -> &'a str {
+    s.split_whitespace().next().unwrap_or("")
+}
+```
+
+**Multiple independent lifetimes**
+```rust
+fn announce<'a, 'b>(x: &'a str, y: &'b str) -> &'a str {
+    println!("Announcement: {}", y);  // y can have a different lifetime
+    x  // returned reference tied only to x's lifetime
+}
+```
+
+**Lifetime bounds: `'b: 'a` means `'b` outlives `'a`**
+```rust
+fn choose<'a, 'b: 'a>(x: &'a str, y: &'b str) -> &'a str {
+    if x.len() > y.len() { x } else { y }
+    // y must live at least as long as 'a to be returned
+}
+```
+
+**Structs with lifetimes**
+```rust
+struct Excerpt<'a> {
+    text: &'a str,  // this struct holds a reference that lives 'a
+}
+
+impl<'a> Excerpt<'a> {
+    fn announce(&self) -> &str {
+        self.text  // lifetime elided — compiler knows it's 'a
+    }
+}
+```
+
+**Multiple lifetimes in structs**
+```rust
+struct Context<'a, 'b> {
+    config: &'a str,
+    buffer: &'b mut [u8],
+}
+```
+
+**Static lifetime: `'static` lives for entire program**
+```rust
+let s: &'static str = "string literal";  // lives in the binary
+
+fn leak_value() -> &'static str {
+    Box::leak(Box::new(String::from("leaked")))  // deliberately leak to get 'static
+}
+```
+
+**Lifetime elision: when the compiler infers lifetimes**
+
+These three rules let you omit lifetime annotations in many cases:
+
+1. Each elided input lifetime gets a distinct parameter
+2. If there's exactly one input lifetime, it's assigned to all outputs
+3. If there's a `&self` or `&mut self`, its lifetime is assigned to all outputs
+
+```rust
+// Written:
+fn first(s: &str) -> &str { s }
+
+// Compiler sees:
+fn first<'a>(s: &'a str) -> &'a str { s }
+```
+
+**Trait bounds with lifetimes**
+```rust
+fn print_ref<'a, T>(value: &'a T)
+where
+    T: std::fmt::Display + 'a  // T must live at least 'a
+{
+    println!("{}", value);
+}
+```
+
+**Higher-Rank Trait Bounds (HRTB): `for<'a>`**
+
+Used when a closure or trait must work for *any* lifetime:
+
+```rust
+fn apply<F>(f: F)
+where
+    F: for<'a> Fn(&'a str) -> &'a str  // F must work for all lifetimes 'a
+{
+    let s = String::from("test");
+    println!("{}", f(&s));
+}
+```
+
+#### Common Lifetime Patterns
+
+**Returning references from methods**
+```rust
+impl<'a> MyStruct<'a> {
+    fn get_field(&self) -> &'a str {
+        self.field  // tied to struct's lifetime, not method's &self
+    }
+}
+```
+
+**Mutable and immutable references with different lifetimes**
+```rust
+fn split_at<'a>(s: &'a mut str, mid: usize) -> (&'a mut str, &'a mut str) {
+    // ... splits s into two mutable references
+}
+```
+
+**Anonymous lifetime: `'_`**
+
+Explicitly acknowledge a lifetime without naming it:
+
+```rust
+impl<'a> Excerpt<'a> {
+    fn level(&self) -> &'_ str {  // same as &str here due to elision
+        self.text
+    }
+}
+
+// Useful in type position to be explicit:
+let x: &'_ str = "hello";
+```
+
+#### When You Need Lifetime Annotations
+
+The compiler will tell you. Common situations:
+
+1. **Function returns a reference** and has multiple reference inputs
+2. **Struct holds references** — you must name how long those references live
+3. **Impl blocks for structs with lifetimes** — repeat the lifetime parameter
+4. **Closures that capture references** (usually inferred, but not always)
+
+#### Quick Reference Table
+
+| Syntax | Meaning |
+|--------|---------|
+| `'a` | A lifetime parameter named `'a` |
+| `&'a T` | Reference to `T` that lives at least `'a` |
+| `&'a mut T` | Mutable reference to `T` that lives at least `'a` |
+| `<'a, 'b>` | Function/struct has two independent lifetimes |
+| `'b: 'a` | Lifetime `'b` outlives lifetime `'a` |
+| `T: 'a` | All references in `T` must outlive `'a` |
+| `'static` | Lives for the entire program (string literals, leaked values) |
+| `'_` | Anonymous lifetime (placeholder, let compiler infer) |
+| `for<'a>` | Higher-rank trait bound — works for *any* lifetime |
+
+::: {.callout-tip}
+**Don't worry if this feels overwhelming.** In practice:
+- The compiler infers lifetimes in most code
+- Error messages tell you exactly where annotations are needed
+- Most functions only need one lifetime parameter
+- You rarely write complex lifetime bounds until you're building advanced libraries
+
+Start simple, let the compiler guide you, and the syntax will become natural over time.
+:::
+
+See [Validating References with Lifetimes](https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html) in *The Rust Programming Language* for more information.
 
 ## Smart Pointers
 When you need heap allocation beyond what `Vec` and `String` already handle, Rust provides smart pointer types. C++ developers will recognize the ideas.
@@ -730,15 +956,83 @@ println!("{}", p.distance_from_origin()); // 5.0
 No inheritance. Composition over inheritance is idiomatic Rust.
 
 ### Enums
-[Enums and Pattern Matching](https://doc.rust-lang.org/book/ch06-00-enums.html) as per *The Rust Programming Language*.
+::: {.subheading}
+From C-style constants to algebraic data types
+:::
 
-Rust enums are algebraic data types — each variant can carry different data. This is far more powerful than C enums.
+Enums in Rust serve the same purpose as in C/C++ — defining a type with a fixed set of named variants — but they're far more powerful. Let's start with what you know, then expand.
+
+#### C-Style Enums: Named Constants
+
+Yes, you can use Rust enums exactly like C enums:
+
+```rust
+// Simple enum, like C
+enum Status {
+    Ready,
+    Running,
+    Stopped,
+}
+
+let state = Status::Running;
+
+match state {
+    Status::Ready   => println!("ready"),
+    Status::Running => println!("running"),
+    Status::Stopped => println!("stopped"),
+}
+```
+
+Unlike C, you don't get implicit integer values. Variants are not integers — they're type-safe values. You can't compare `Status::Ready == 0` unless you explicitly derive traits or assign discriminants.
+
+**Explicit discriminants (like C enum values):**
+
+```rust
+enum HttpStatus {
+    Ok = 200,
+    NotFound = 404,
+    InternalError = 500,
+}
+
+let code = HttpStatus::NotFound as i32;  // 404
+```
+
+Use `as i32` to get the integer value. The reverse (integer to enum) requires manual implementation or a crate like `num_enum`.
+
+#### Rust Enums: Algebraic Data Types
+
+Here's where Rust diverges from C/C++: **each variant can carry data**. This makes enums a tagged union — a type that can be one of several variants, each with its own payload.
+
+```rust
+enum Message {
+    Quit,                       // no data
+    Move { x: i32, y: i32 },   // named fields (like a struct)
+    Write(String),              // single unnamed field
+    Color(u8, u8, u8),         // tuple-like (RGB)
+}
+
+let msg = Message::Write(String::from("hello"));
+
+match msg {
+    Message::Quit => println!("quit"),
+    Message::Move { x, y } => println!("move to {}, {}", x, y),
+    Message::Write(text) => println!("write: {}", text),
+    Message::Color(r, g, b) => println!("color: {}, {}, {}", r, g, b),
+}
+```
+
+This is more powerful than C unions because:
+1. The tag (which variant it is) is stored automatically
+2. The compiler ensures you can't access the wrong variant's data
+3. Each variant can have completely different types
+
+**Real-world example:**
 
 ```rust
 enum Shape {
-    Circle(f64),               // radius
-    Rectangle(f64, f64),       // width, height
-    Triangle { base: f64, height: f64 },  // named fields
+    Circle(f64),                              // radius
+    Rectangle(f64, f64),                      // width, height
+    Triangle { base: f64, height: f64 },     // named fields
 }
 
 impl Shape {
@@ -750,23 +1044,120 @@ impl Shape {
         }
     }
 }
+
+let circle = Shape::Circle(5.0);
+println!("Area: {}", circle.area());  // 78.54
 ```
+
+#### Standard Library Enums
 
 Two enums you'll use constantly:
 
+**`Option<T>` — replaces null pointers**
+
 ```rust
-// Option<T> replaces null
 enum Option<T> {
-    Some(T),
-    None,
+    Some(T),  // value is present
+    None,     // value is absent
 }
 
-// Result<T, E> replaces error codes and exceptions
-enum Result<T, E> {
-    Ok(T),
-    Err(E),
+let maybe: Option<i32> = Some(42);
+let nothing: Option<i32> = None;
+
+// Must handle both cases
+match maybe {
+    Some(n) => println!("got {}", n),
+    None    => println!("nothing"),
 }
 ```
+
+**`Result<T, E>` — replaces error codes and exceptions**
+
+```rust
+enum Result<T, E> {
+    Ok(T),   // success value
+    Err(E),  // error value
+}
+
+fn divide(a: i32, b: i32) -> Result<i32, String> {
+    if b == 0 {
+        Err(String::from("division by zero"))
+    } else {
+        Ok(a / b)
+    }
+}
+```
+
+See the [Errors as Values](#errors-as-values) section for comprehensive coverage of `Result`.
+
+#### Methods on Enums
+
+Enums can have methods, just like structs:
+
+```rust
+enum TrafficLight {
+    Red,
+    Yellow,
+    Green,
+}
+
+impl TrafficLight {
+    fn duration(&self) -> u32 {
+        match self {
+            TrafficLight::Red    => 60,
+            TrafficLight::Yellow => 10,
+            TrafficLight::Green  => 90,
+        }
+    }
+    
+    fn can_go(&self) -> bool {
+        matches!(self, TrafficLight::Green)
+    }
+}
+
+let light = TrafficLight::Red;
+println!("Duration: {}s", light.duration());  // 60s
+```
+
+#### Why Rust Enums Are Not Quite Generics
+
+You mentioned enums seem like generics — there's a connection, but they're different:
+
+- **Generics** (`Vec<T>`, `Result<T, E>`) are about parameterizing types — the same code works for many types
+- **Enums** are about *choice* — a value is exactly one of several variants
+
+`Option<T>` and `Result<T, E>` are enums *with* generic parameters. The enum defines the structure (`Some` or `None`), and the generic `T` lets you wrap any type:
+
+```rust
+let num: Option<i32> = Some(42);        // Option is the enum, i32 is the generic param
+let text: Option<String> = Some(s);     // Same enum, different T
+```
+
+#### Quick Comparison
+
+| Feature | C/C++ enum | Rust enum |
+|---------|------------|-----------|
+| Named constants | ✓ | ✓ |
+| Implicit integer values | ✓ | ✗ (must use discriminants) |
+| Variants carry data | ✗ | ✓ (each variant can hold different types) |
+| Type safety | Weak (converts to int) | Strong (cannot misuse variants) |
+| Pattern matching required | ✗ | ✓ (compiler enforces exhaustiveness) |
+| Methods | ✗ | ✓ |
+
+#### When to Use Each Style
+
+**C-style (no data):**
+- State machines (Ready, Running, Stopped)
+- Status codes with explicit discriminants
+- Simple categorization
+
+**Algebraic data types (with data):**
+- Representing different kinds of data (shapes, messages)
+- Optional values (`Option<T>`)
+- Results with success/error variants (`Result<T, E>`)
+- Abstract syntax trees, parsers, state with payloads
+
+See [Enums and Pattern Matching](https://doc.rust-lang.org/book/ch06-00-enums.html) in *The Rust Programming Language* for more information.
 
 ### Traits
 Traits are Rust's answer to interfaces. A trait defines behaviour; structs implement it.
