@@ -27,22 +27,27 @@ CPython (the reference implementation) uses reference counting as its primary ga
 Python's syntax enforces structure through indentation rather than braces. The language includes exactly one obvious way to do most things, by design. This is not a limitation: it is a feature that makes code written by others readable.
 
 ###### 6. Batteries included.
-The [standard library](https://docs.python.org/3/library/index.html) is enormous. Networking, file I/O, JSON, regular expressions, HTTP, CSV, database access, unit testing: most of what you need for a typical program is already there.
+The [standard library](https://docs.python.org/3/library/index.html){target=_blank} is enormous. Networking, file I/O, JSON, regular expressions, HTTP, CSV, database access, unit testing: most of what you need for a typical program is already there.
 
 ::: {.callout-note title="The Zen of Python"}
-Tim Peters wrote nineteen aphorisms that capture Python's design philosophy. You can read them any time:
+Tim Peters wrote nineteen aphorisms that capture Python's design philosophy. You can read them any time with `import this`.
 
-```python
+```{python}
+#| code-fold: true
+
+# The following is a little more involved because once `this` is loaded into
+# sys.modules cache, it won't render upon import. To make sure it renders
+# every time we remove it from sys's module cache.
+import sys
+
+try:
+    del sys.modules["this"]
+except:
+    pass
+
 import this
 ```
 
-The most relevant ones for programmers coming from C or Rust:
-
-- *Explicit is better than implicit.*
-- *Simple is better than complex.*
-- *Readability counts.*
-- *There should be one — and preferably only one — obvious way to do it.*
-- *Errors should never pass silently.*
 :::
 
 ## How a Python Project Is Structured
@@ -910,7 +915,7 @@ def add(a, b):
 add(2, 3)   # prints "calling add", returns 5
 ```
 
-Decorators are used throughout web frameworks, testing libraries, and the [standard library](https://docs.python.org/3/library/index.html) (`@staticmethod`, `@classmethod`, `@property`).
+Decorators are used throughout web frameworks, testing libraries, and the [standard library](https://docs.python.org/3/library/index.html){target=_blank} (`@staticmethod`, `@classmethod`, `@property`).
 
 ## Classes and Objects
 ```python
@@ -1455,7 +1460,7 @@ finally:
     print("always runs")        # cleanup: always executes, exception or not
 ```
 
-Exceptions are classes. The [standard library](https://docs.python.org/3/library/index.html) defines a hierarchy; catching a base class catches all its subclasses:
+Exceptions are classes. The [standard library](https://docs.python.org/3/library/index.html){target=_blank} defines a hierarchy; catching a base class catches all its subclasses:
 
 ```python
 try:
@@ -1477,7 +1482,7 @@ with open("input.txt") as src, open("output.txt", "w") as dst:
     dst.write(src.read())
 ```
 
-Any object implementing `__enter__` and `__exit__` can be used as a context manager. The [standard library](https://docs.python.org/3/library/index.html) provides them for files, locks, database connections, and more.
+Any object implementing `__enter__` and `__exit__` can be used as a context manager. The [standard library](https://docs.python.org/3/library/index.html){target=_blank} provides them for files, locks, database connections, and more.
 
 ## Concurrency
 ::: {.subheading}
@@ -1678,7 +1683,7 @@ You can write modules in C using the **Python C API**. This gives you full contr
 FFI (Foreign Function Interface)
 :::
 
-Libraries like `ctypes` ([standard library](https://docs.python.org/3/library/index.html)) and `cffi` allow you to load shared libraries (`.so`, `.dll`, `.dylib`) and call functions within them directly from Python. This is ideal for wrapping existing C libraries.
+Libraries like `ctypes` ([standard library](https://docs.python.org/3/library/index.html){target=_blank}) and `cffi` allow you to load shared libraries (`.so`, `.dll`, `.dylib`) and call functions within them directly from Python. This is ideal for wrapping existing C libraries.
 
 ::: {.subheading}
 The Rust Bridge
@@ -2124,4 +2129,4 @@ Python's package index (PyPI) hosts hundreds of thousands of packages. A represe
 - [Real Python](https://realpython.com){target=_blank} has well-written tutorials on almost every Python topic imaginable.
 - `python -m pdb` is the built-in debugger. `breakpoint()` drops you into it from code, at any line.
 
-The most important habit: use a virtual environment for every project, read the error tracebacks carefully (they are good), and reach for the [standard library](https://docs.python.org/3/library/index.html) before reaching for a third-party package.
+The most important habit: use a virtual environment for every project, read the error tracebacks carefully (they are good), and reach for the [standard library](https://docs.python.org/3/library/index.html){target=_blank} before reaching for a third-party package.

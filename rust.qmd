@@ -20,7 +20,7 @@ Instead of passing pointers around freely, Rust has a formal concept of *borrowi
 Data races are a compile error. The same ownership rules that prevent memory bugs also make entire classes of concurrency bugs impossible.
 
 ###### 4. Zero-cost abstractions.
-Rust's high-level features (iterators, generics, traits) compile down to the same machine code you'd write by hand. You don't pay for what you don't use — the same guarantee C++ makes, but delivered more consistently.
+Rust's high-level features ([iterators](#iterators), [generics](#generics-and-trait-bounds), [traits](#traits)) compile down to the same machine code you'd write by hand. You don't pay for what you don't use — the same guarantee C++ makes, but delivered more consistently.
 
 ###### 5. Explicit over implicit.
 Rust rarely does things behind your back. Integer overflow is checked in debug builds and wraps in release (with explicit opt-in). Type coercions are almost never automatic. Mutability must be declared. This is intentionally more verbose than C++ in places, in exchange for fewer surprises.
@@ -28,16 +28,17 @@ Rust rarely does things behind your back. Integer overflow is checked in debug b
 ## Project Anatomy
 Three nested concepts organize Rust code: **packages**, **crates**, and **modules**. They map roughly — but not exactly — onto what you know from C and Python.
 
-[![](images/rust-01.jpg){fig-align="center" width=9in}](https://iota-for-flutter.github.io/tutorial/fundamentals/rust/project-structure.html)
+[![](images/rust-01.jpg){fig-align="center" width=9in}](https://iota-for-flutter.github.io/tutorial/fundamentals/rust/project-structure.html){target=_blank}
 
-### Packages and Crates
-A **crate** is the fundamental unit of compilation. The Rust compiler takes a crate and produces either an executable or a library. Think of it as the equivalent of a compiled C library (`.a`, `.so`) or a Python package on PyPI — the distributable unit that other projects depend on.
+### Crates
+A **crate** is the fundamental unit of compilation, meaning it is the smallest unit of code that Rust will compile. The Rust compiler takes a crate and produces either an executable or a library. Think of it as the equivalent of a compiled C library (`.a`, `.so`) or a Python package on PyPI — the distributable unit that other projects depend on.
 
 Two kinds of crates:
 
 - **Binary crate** — has a `main()` entry point, produces an executable. Root file is `src/main.rs`.
 - **Library crate** — no `main()`, produces a library for other code to use. Root file is `src/lib.rs`.
 
+### Packages
 A **package** is what Cargo manages: a directory with a `Cargo.toml` manifest. A package contains at least one crate. Most projects you will work on are a single package with a single binary crate:
 
 ```
@@ -61,7 +62,71 @@ In modern Rust (since 2018), `mod.rs` is often replaced by a file with the same 
 :::
 
 ### Modules
-A **module** is a namespace within a crate — the closest equivalent to a Python module. Modules organize code into logical units and control what is visible outside (`pub`) versus private. Items are **private by default** — you opt into visibility explicitly.
+A **module** is a namespace within a crate — the closest equivalent to a Python module. Modules organize code into logical units and control what is visible outside (`pub`) versus private. Items are **private by default** — you opt into visibility explicitly. Before we dive deep on our own, we are to share *The Rust Programming Language*'s  ["Modules Cheat Sheet"](https://doc.rust-lang.org/book/ch07-02-defining-modules-to-control-scope-and-privacy.html). It was just what I was looking for when learning about modules; so, here it is word for word:
+
+::: {.exploration data-label="Modules Cheat Sheet"}
+Before we get to the details of modules and paths, here we provide a quick reference on how modules, paths, the use keyword, and the pub keyword work in the compiler, and how most developers organize their code. We’ll be going through examples of each of these rules throughout this chapter, but this is a great place to refer to as a reminder of how modules work.
+
+**Start from the crate root:** When compiling a crate, the compiler first looks in the crate root file (usually src/lib.rs for a library crate or src/main.rs for a binary crate) for code to compile.
+
+**Declaring modules:** In the crate root file, you can declare new modules; say you declare a “garden” module with `mod garden`;. The compiler will look for the module’s code in these places:
+
+- Inline, within curly brackets that replace the semicolon following `mod garden`
+- In the file src/garden.rs
+- In the file src/garden/mod.rs
+
+**Declaring submodules:** In any file other than the crate root, you can declare submodules. For example, you might declare `mod vegetables`; in src/garden.rs. The compiler will look for the submodule’s code within the directory named for the parent module in these places:
+
+- Inline, directly following mod vegetables, within curly brackets instead of the semicolon
+- In the file src/garden/vegetables.rs
+- In the file src/garden/vegetables/mod.rs
+
+**Paths to code in modules:** Once a module is part of your crate, you can refer to code in that module from anywhere else in that same crate, as long as the privacy rules allow, using the path to the code. For example, an Asparagus type in the garden vegetables module would be found at `crate::garden::vegetables::Asparagus`.
+
+**Private vs. public:** Code within a module is private from its parent modules by default. To make a module public, declare it with `pub mod` instead of `mod`. To make items within a public module public as well, use pub before their declarations.
+
+**The use `keyword`** Within a scope, the use keyword creates shortcuts to items to reduce repetition of long paths. In any scope that can refer to crate::garden:: vegetables::Asparagus, you can create a shortcut with use crate::garden:: vegetables::Asparagus; and from then on you only need to write Asparagus to make use of that type in the scope.
+
+Here, we create a binary crate named backyard that illustrates these rules. The crate’s directory, also named backyard, contains these files and directories:
+
+```
+backyard
+├── Cargo.lock
+├── Cargo.toml
+└── src
+   ├── garden
+   │ └── vegetables.rs
+   ├── garden.rs
+   └── main.rs
+```
+
+The crate root file in this case is `src/main.rs`, and it contains:
+
+```rust
+use crate::garden::vegetables::Asparagus;
+pub mod garden;
+
+fn main() {
+    let plant = Asparagus {};
+    println!("I'm growing {:?}!", plant);
+}
+```
+
+The pub mod garden; line tells the compiler to include the code it finds in `src/garden.rs`, which is:
+
+```rust
+pub mod vegetables;
+```
+
+Here, `pub` mod `vegetables` means the code in `src/garden/vegetables.rs` is included too. That code is:
+
+```rust
+ #[derive(Debug)]
+pub struct Asparagus {}
+```
+
+Now let’s get into the details of these rules and demonstrate them in action!
+:::
 
 ##### 1. Inline
 ::: {.subheading}
@@ -313,6 +378,48 @@ let x: i32 = 42;
 let y: f64 = x as f64;
 ```
 
+#### Fixed-Length Arrays
+Arrays in Rust are fixed-size collections of elements of the same type, allocated on the stack. The syntax is `[T; N]` where `T` is the element type and `N` is the length, which must be known at compile time.
+
+```rust
+// Array of 5 integers
+let arr: [i32; 5] = [1, 2, 3, 4, 5];
+
+// Initialize all elements to the same value
+let zeros = [0; 100];        // 100 zeros
+let buffer = [0u8; 1024];    // 1024-byte buffer
+
+// Access elements (zero-indexed, bounds-checked at runtime)
+let first = arr[0];          // 1
+let last = arr[4];           // 5
+
+// Length is part of the type
+println!("Length: {}", arr.len());  // 5
+```
+
+**Key characteristics:**
+
+- **Stack-allocated** — arrays live on the stack, not the heap
+- **Fixed size** — length cannot change after creation
+- **Type includes length** — `[i32; 3]` and `[i32; 5]` are different, incompatible types
+- **Bounds-checked** — indexing out of bounds causes a runtime panic
+
+Arrays are useful when you know the exact size at compile time (RGB colors, matrix dimensions, fixed buffers). For dynamic sizing, use `Vec<T>` instead ([covered later](#common-collections)).
+
+```rust
+// Iterating over arrays
+let colors = [[255, 0, 0], [0, 255, 0], [0, 0, 255]];
+
+for color in &colors {
+    println!("RGB: {:?}", color);
+}
+
+// Arrays can be passed to functions by reference
+fn sum(arr: &[i32; 5]) -> i32 {
+    arr.iter().sum()
+}
+```
+
 ### Values
 ::: {.subheading}
 The "Null Problem"
@@ -386,7 +493,7 @@ for n in &nums {
 }
 ```
 
-See [Common Programming Concepts](https://doc.rust-lang.org/book/ch03-00-common-programming-concepts.html) in *The Rust Programming Language* for more information.
+See [Common Programming Concepts](https://doc.rust-lang.org/book/ch03-00-common-programming-concepts.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ## Macros
 Throughout this chapter you have seen `println!`, `vec!`, `format!`, and `panic!`. The `!` signals a **macro call**, not a function call. Macros in Rust are code that writes code at compile time, before the compiler type-checks anything.
@@ -413,7 +520,7 @@ Common macros you will use regularly:
 | `todo!()`          | Placeholder that compiles but panics at runtime                     |
 | `dbg!(expr)`       | Print the file, line, and value of an expression; returns the value |
 
-`#[derive(...)]` is a different kind of macro — a *procedural macro* — that generates trait implementations automatically:
+`#[derive(...)]` is a different kind of macro — a *procedural macro* — that generates [trait](#traits) implementations automatically:
 
 ```rust
 #[derive(Debug, Clone, PartialEq)]
@@ -425,9 +532,9 @@ let p2 = p.clone();     // Clone
 assert_eq!(p, p2);      // PartialEq
 ```
 
-You can write your own macros with `macro_rules!` (declarative macros) or procedural macro crates. For most work, the standard library macros and [`derive`](https://doc.rust-lang.org/book/ch20-05-macros.html#custom-derive-macros) cover what you need.
+You can write your own macros with `macro_rules!` (declarative macros) or procedural macro crates. For most work, the standard library macros and [`derive`](https://doc.rust-lang.org/book/ch20-05-macros.html#custom-derive-macros){target=_blank} cover what you need.
 
-See [Macros](https://doc.rust-lang.org/book/ch20-05-macros.html) in *The Rust Programming Language* for more information.
+See [Macros](https://doc.rust-lang.org/book/ch20-05-macros.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ## Memory Management
 This is the heart of Rust. If you understand this section, you understand Rust.
@@ -450,7 +557,7 @@ Every value in Rust has exactly one **owner**. When the owner goes out of scope,
 }   // s goes out of scope: memory freed automatically. No free(), no delete.
 ```
 
-When `s` goes out of scope, Rust automatically runs `String`’s implementation of the `Drop` trait. This `drop` logic is generated and invoked by the compiler at the end of the scope; it releases the resources owned by `s`, typically by returning its heap memory to the allocator. Conceptually, `Drop` plays the same role as a C++ destructor: it is guaranteed to run exactly once when the value’s lifetime ends, and user code cannot forget to call it or call it twice.
+When `s` goes out of scope, Rust automatically runs `String`’s implementation of the `Drop` [trait](#traits). This `drop` logic is generated and invoked by the compiler at the end of the scope; it releases the resources owned by `s`, typically by returning its heap memory to the allocator. Conceptually, `Drop` plays the same role as a C++ destructor: it is guaranteed to run exactly once when the value’s lifetime ends, and user code cannot forget to call it or call it twice.
 
 **Move semantics** — when you assign an owned value to another variable, the original owner is invalidated. This prevents double-free:
 
@@ -463,7 +570,7 @@ println!("{}", s2);  // fine
 
 This is like C++ move semantics, but the compiler *forces* you to use them correctly. You can't accidentally use a moved-from value.
 
-**Copy types** — primitives like integers implement the `Copy` trait, so assignment copies the value rather than moving it (same as C):
+**Copy types** — primitives like integers implement the `Copy` [trait](#traits), so assignment copies the value rather than moving it (same as C):
 
 ```rust
 let x = 5;
@@ -536,20 +643,204 @@ Functions that just need to read a string should accept `&str` — it works with
 
 ### Lifetimes
 ::: {.subheading}
-Brief Introduction
+Ensuring references don't outlive their data
 :::
 
-Lifetimes are Rust's way of ensuring references don't outlive the data they point to. In most code the compiler infers them. You only write lifetime annotations when the compiler can't figure it out — usually in function signatures that return references:
+Lifetimes are Rust's way of ensuring references are always valid — that they don't outlive the data they point to. In most code the compiler infers them. You only write lifetime annotations when the compiler can't figure out the relationship between input and output references.
+
+The lifetime syntax looks unusual at first (it is the `'a` in `&'a str`), but it's just a way to name the scope during which a reference must remain valid.
+
+#### Basic Lifetime Syntax
 
 ```rust
+// Function that returns a reference: which input does it come from?
 fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
     if x.len() > y.len() { x } else { y }
 }
 ```
 
-The `'a` says "the returned reference lives at least as long as both inputs." Don't worry about this too deeply at first — the compiler will tell you when you need an annotation and the error messages are good.
+The `<'a>` declares a lifetime parameter (like a generic type parameter). The `&'a str` annotations say:
+- Both inputs must live at least as long as `'a`
+- The output reference lives at most as long as `'a`
 
-See [Understanding Ownership](https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html) in *The Rust Programming Language* for more information.
+This tells the compiler: "The returned reference is valid for as long as both inputs are valid."
+
+**Why it matters:**
+
+```rust
+let result;
+{
+    let s1 = String::from("long string");
+    let s2 = String::from("short");
+    result = longest(&s1, &s2);
+}
+// println!("{}", result);  // compile error: s1 and s2 are out of scope
+```
+
+The compiler prevents the dangling reference at compile time, not runtime.
+
+#### Comprehensive Lifetime Syntax Reference
+
+**Single lifetime parameter**
+```rust
+fn first_word<'a>(s: &'a str) -> &'a str {
+    s.split_whitespace().next().unwrap_or("")
+}
+```
+
+**Multiple independent lifetimes**
+```rust
+fn announce<'a, 'b>(x: &'a str, y: &'b str) -> &'a str {
+    println!("Announcement: {}", y);  // y can have a different lifetime
+    x  // returned reference tied only to x's lifetime
+}
+```
+
+**Lifetime bounds: `'b: 'a` means `'b` outlives `'a`**
+```rust
+fn choose<'a, 'b: 'a>(x: &'a str, y: &'b str) -> &'a str {
+    if x.len() > y.len() { x } else { y }
+    // y must live at least as long as 'a to be returned
+}
+```
+
+**Structs with lifetimes**
+```rust
+struct Excerpt<'a> {
+    text: &'a str,  // this struct holds a reference that lives 'a
+}
+
+impl<'a> Excerpt<'a> {
+    fn announce(&self) -> &str {
+        self.text  // lifetime elided — compiler knows it's 'a
+    }
+}
+```
+
+**Multiple lifetimes in structs**
+```rust
+struct Context<'a, 'b> {
+    config: &'a str,
+    buffer: &'b mut [u8],
+}
+```
+
+**Static lifetime: `'static` lives for entire program**
+```rust
+let s: &'static str = "string literal";  // lives in the binary
+
+fn leak_value() -> &'static str {
+    Box::leak(Box::new(String::from("leaked")))  // deliberately leak to get 'static
+}
+```
+
+**Lifetime elision: when the compiler infers lifetimes**
+
+These three rules let you omit lifetime annotations in many cases:
+
+1. Each elided input lifetime gets a distinct parameter
+2. If there's exactly one input lifetime, it's assigned to all outputs
+3. If there's a `&self` or `&mut self`, its lifetime is assigned to all outputs
+
+```rust
+// Written:
+fn first(s: &str) -> &str { s }
+
+// Compiler sees:
+fn first<'a>(s: &'a str) -> &'a str { s }
+```
+
+**Trait bounds with lifetimes**
+```rust
+fn print_ref<'a, T>(value: &'a T)
+where
+    T: std::fmt::Display + 'a  // T must live at least 'a
+{
+    println!("{}", value);
+}
+```
+
+**Higher-Rank Trait Bounds (HRTB): `for<'a>`**
+
+Used when a closure or trait must work for *any* lifetime:
+
+```rust
+fn apply<F>(f: F)
+where
+    F: for<'a> Fn(&'a str) -> &'a str  // F must work for all lifetimes 'a
+{
+    let s = String::from("test");
+    println!("{}", f(&s));
+}
+```
+
+#### Common Lifetime Patterns
+
+**Returning references from methods**
+```rust
+impl<'a> MyStruct<'a> {
+    fn get_field(&self) -> &'a str {
+        self.field  // tied to struct's lifetime, not method's &self
+    }
+}
+```
+
+**Mutable and immutable references with different lifetimes**
+```rust
+fn split_at<'a>(s: &'a mut str, mid: usize) -> (&'a mut str, &'a mut str) {
+    // ... splits s into two mutable references
+}
+```
+
+**Anonymous lifetime: `'_`**
+
+Explicitly acknowledge a lifetime without naming it:
+
+```rust
+impl<'a> Excerpt<'a> {
+    fn level(&self) -> &'_ str {  // same as &str here due to elision
+        self.text
+    }
+}
+
+// Useful in type position to be explicit:
+let x: &'_ str = "hello";
+```
+
+#### When You Need Lifetime Annotations
+
+The compiler will tell you. Common situations:
+
+1. **Function returns a reference** and has multiple reference inputs
+2. **Struct holds references** — you must name how long those references live
+3. **Impl blocks for structs with lifetimes** — repeat the lifetime parameter
+4. **Closures that capture references** (usually inferred, but not always)
+
+#### Quick Reference Table
+
+| Syntax | Meaning |
+|--------|---------|
+| `'a` | A lifetime parameter named `'a` |
+| `&'a T` | Reference to `T` that lives at least `'a` |
+| `&'a mut T` | Mutable reference to `T` that lives at least `'a` |
+| `<'a, 'b>` | Function/struct has two independent lifetimes |
+| `'b: 'a` | Lifetime `'b` outlives lifetime `'a` |
+| `T: 'a` | All references in `T` must outlive `'a` |
+| `'static` | Lives for the entire program (string literals, leaked values) |
+| `'_` | Anonymous lifetime (placeholder, let compiler infer) |
+| `for<'a>` | Higher-rank trait bound — works for *any* lifetime |
+
+::: {.callout-tip}
+**Don't worry if this feels overwhelming.** In practice:
+- The compiler infers lifetimes in most code
+- Error messages tell you exactly where annotations are needed
+- Most functions only need one lifetime parameter
+- You rarely write complex lifetime bounds until you're building advanced libraries
+
+Start simple, let the compiler guide you, and the syntax will become natural over time.
+:::
+
+See [Validating References with Lifetimes](https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ## Smart Pointers
 When you need heap allocation beyond what `Vec` and `String` already handle, Rust provides smart pointer types. C++ developers will recognize the ideas.
@@ -636,7 +927,7 @@ let counter = Arc::new(Mutex::new(0));
 | `Rc<T>`  | Shared    | No          | `shared_ptr<T>` (single-threaded)     |
 | `Arc<T>` | Shared    | Yes         | `shared_ptr<T>` with atomic ref count |
 
-See [Smart Pointers](https://doc.rust-lang.org/book/ch15-00-smart-pointers.html) in *The Rust Programming Language* for more information.
+See [Smart Pointers](https://doc.rust-lang.org/book/ch15-00-smart-pointers.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ## Structs, Enums, and Traits
 ### Structs
@@ -665,15 +956,83 @@ println!("{}", p.distance_from_origin()); // 5.0
 No inheritance. Composition over inheritance is idiomatic Rust.
 
 ### Enums
-[Enums and Pattern Matching](https://doc.rust-lang.org/book/ch06-00-enums.html) as per *The Rust Programming Language*.
+::: {.subheading}
+From C-style constants to algebraic data types
+:::
 
-Rust enums are algebraic data types — each variant can carry different data. This is far more powerful than C enums.
+Enums in Rust serve the same purpose as in C/C++ — defining a type with a fixed set of named variants — but they're far more powerful. Let's start with what you know, then expand.
+
+#### C-Style Enums: Named Constants
+
+Yes, you can use Rust enums exactly like C enums:
+
+```rust
+// Simple enum, like C
+enum Status {
+    Ready,
+    Running,
+    Stopped,
+}
+
+let state = Status::Running;
+
+match state {
+    Status::Ready   => println!("ready"),
+    Status::Running => println!("running"),
+    Status::Stopped => println!("stopped"),
+}
+```
+
+Unlike C, you don't get implicit integer values. Variants are not integers — they're type-safe values. You can't compare `Status::Ready == 0` unless you explicitly derive traits or assign discriminants.
+
+**Explicit discriminants (like C enum values):**
+
+```rust
+enum HttpStatus {
+    Ok = 200,
+    NotFound = 404,
+    InternalError = 500,
+}
+
+let code = HttpStatus::NotFound as i32;  // 404
+```
+
+Use `as i32` to get the integer value. The reverse (integer to enum) requires manual implementation or a crate like `num_enum`.
+
+#### Rust Enums: Algebraic Data Types
+
+Here's where Rust diverges from C/C++: **each variant can carry data**. This makes enums a tagged union — a type that can be one of several variants, each with its own payload.
+
+```rust
+enum Message {
+    Quit,                       // no data
+    Move { x: i32, y: i32 },   // named fields (like a struct)
+    Write(String),              // single unnamed field
+    Color(u8, u8, u8),         // tuple-like (RGB)
+}
+
+let msg = Message::Write(String::from("hello"));
+
+match msg {
+    Message::Quit => println!("quit"),
+    Message::Move { x, y } => println!("move to {}, {}", x, y),
+    Message::Write(text) => println!("write: {}", text),
+    Message::Color(r, g, b) => println!("color: {}, {}, {}", r, g, b),
+}
+```
+
+This is more powerful than C unions because:
+1. The tag (which variant it is) is stored automatically
+2. The compiler ensures you can't access the wrong variant's data
+3. Each variant can have completely different types
+
+**Real-world example:**
 
 ```rust
 enum Shape {
-    Circle(f64),               // radius
-    Rectangle(f64, f64),       // width, height
-    Triangle { base: f64, height: f64 },  // named fields
+    Circle(f64),                              // radius
+    Rectangle(f64, f64),                      // width, height
+    Triangle { base: f64, height: f64 },     // named fields
 }
 
 impl Shape {
@@ -685,23 +1044,120 @@ impl Shape {
         }
     }
 }
+
+let circle = Shape::Circle(5.0);
+println!("Area: {}", circle.area());  // 78.54
 ```
+
+#### Standard Library Enums
 
 Two enums you'll use constantly:
 
+**`Option<T>` — replaces null pointers**
+
 ```rust
-// Option<T> replaces null
 enum Option<T> {
-    Some(T),
-    None,
+    Some(T),  // value is present
+    None,     // value is absent
 }
 
-// Result<T, E> replaces error codes and exceptions
-enum Result<T, E> {
-    Ok(T),
-    Err(E),
+let maybe: Option<i32> = Some(42);
+let nothing: Option<i32> = None;
+
+// Must handle both cases
+match maybe {
+    Some(n) => println!("got {}", n),
+    None    => println!("nothing"),
 }
 ```
+
+**`Result<T, E>` — replaces error codes and exceptions**
+
+```rust
+enum Result<T, E> {
+    Ok(T),   // success value
+    Err(E),  // error value
+}
+
+fn divide(a: i32, b: i32) -> Result<i32, String> {
+    if b == 0 {
+        Err(String::from("division by zero"))
+    } else {
+        Ok(a / b)
+    }
+}
+```
+
+See the [Errors as Values](#errors-as-values) section for comprehensive coverage of `Result`.
+
+#### Methods on Enums
+
+Enums can have methods, just like structs:
+
+```rust
+enum TrafficLight {
+    Red,
+    Yellow,
+    Green,
+}
+
+impl TrafficLight {
+    fn duration(&self) -> u32 {
+        match self {
+            TrafficLight::Red    => 60,
+            TrafficLight::Yellow => 10,
+            TrafficLight::Green  => 90,
+        }
+    }
+
+    fn can_go(&self) -> bool {
+        matches!(self, TrafficLight::Green)
+    }
+}
+
+let light = TrafficLight::Red;
+println!("Duration: {}s", light.duration());  // 60s
+```
+
+#### Why Rust Enums Are Not Quite Generics
+
+You mentioned enums seem like generics — there's a connection, but they're different:
+
+- **Generics** (`Vec<T>`, `Result<T, E>`) are about parameterizing types — the same code works for many types
+- **Enums** are about *choice* — a value is exactly one of several variants
+
+`Option<T>` and `Result<T, E>` are enums *with* generic parameters. The enum defines the structure (`Some` or `None`), and the generic `T` lets you wrap any type:
+
+```rust
+let num: Option<i32> = Some(42);        // Option is the enum, i32 is the generic param
+let text: Option<String> = Some(s);     // Same enum, different T
+```
+
+#### Quick Comparison
+
+| Feature | C/C++ enum | Rust enum |
+|---------|------------|-----------|
+| Named constants | ✓ | ✓ |
+| Implicit integer values | ✓ | ✗ (must use discriminants) |
+| Variants carry data | ✗ | ✓ (each variant can hold different types) |
+| Type safety | Weak (converts to int) | Strong (cannot misuse variants) |
+| Pattern matching required | ✗ | ✓ (compiler enforces exhaustiveness) |
+| Methods | ✗ | ✓ |
+
+#### When to Use Each Style
+
+**C-style (no data):**
+- State machines (Ready, Running, Stopped)
+- Status codes with explicit discriminants
+- Simple categorization
+
+**Algebraic data types (with data):**
+- Representing different kinds of data (shapes, messages)
+- Optional values (`Option<T>`)
+- Results with success/error variants (`Result<T, E>`)
+- Abstract syntax trees, parsers, state with payloads
+
+See [Enums and Pattern Matching](https://doc.rust-lang.org/book/ch06-00-enums.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ### Traits
 Traits are Rust's answer to interfaces. A trait defines behaviour; structs implement it.
@@ -745,7 +1201,7 @@ struct Point { x: f64, y: f64 }
 // Now you can: println!("{:?}", p);
 ```
 
-See [Structs](https://doc.rust-lang.org/book/ch05-00-structs.html) in *The Rust Programming Language* for more information.
+See [Structs](https://doc.rust-lang.org/book/ch05-00-structs.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ## Generics and Trait Bounds
 Generics are Rust's equivalent of C++ templates, but they interact with the trait system in a way that makes constraints explicit and checked at compile time. A generic function works over any type, constrained by trait bounds:
@@ -786,7 +1242,7 @@ fn print_debug<T: Debug + Clone>(item: T) {
 ```
 
 ### `impl Trait` vs `dyn Trait`
-There are two ways to accept a trait in a function signature, and the choice matters for performance.
+There are two ways to accept a [trait](#traits) in a function signature, and the choice matters for performance.
 
 **`impl Trait` — static dispatch.** The compiler generates a separate, specialized function for each concrete type at compile time. No runtime overhead, but the type must be known at compile time.
 
@@ -808,13 +1264,13 @@ fn make_sounds(animals: &[Box<dyn Animal>]) {
 
 This is the Rust equivalent of virtual methods in C++. The analogy is direct: `Box<dyn Trait>` is roughly what a pointer-to-base class with a vtable is in C++. Prefer `impl Trait` when the type is known at compile time; reach for `dyn Trait` when you need runtime polymorphism or heterogeneous collections.
 
-See [Generic Types, Traits, and Lifetimes](https://doc.rust-lang.org/book/ch10-00-generics.html) in *The Rust Programming Language* for more information.
+See [Generic Types, Traits, and Lifetimes](https://doc.rust-lang.org/book/ch10-00-generics.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ## Pattern Matching
 Pattern matching in Rust is deeper than a switch statement. It simultaneously **tests the structure** of a value and **extracts** data from it. Every `match` arm is a pattern, and the compiler guarantees you have handled every possible case — exhaustiveness is enforced at compile time.
 
 ### The `match` Expression
-[`match`](https://doc.rust-lang.org/book/ch19-01-all-the-places-for-patterns.html#match-arms) as per *The Rust Programming Language*.
+[`match`](https://doc.rust-lang.org/book/ch19-01-all-the-places-for-patterns.html#match-arms){target=_blank} as per *The Rust Programming Language*.
 
 ```rust
 let n = 7;
@@ -1027,7 +1483,7 @@ match dir {
 
 Adding a new variant to an enum breaks every exhaustive match in the codebase at compile time. You cannot silently miss a case. This is one of the most powerful refactoring guarantees Rust offers.
 
-See [Pattern Matching](https://doc.rust-lang.org/book/ch19-00-patterns.html) in *The Rust Programming Language* for more information.
+See [Pattern Matching](https://doc.rust-lang.org/book/ch19-00-patterns.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ## Closures and Iterators
 ### Closures
@@ -1069,10 +1525,10 @@ greet();
 // name is no longer accessible here
 ```
 
-See [Closures](https://doc.rust-lang.org/book/ch13-01-closures.html) in *The Rust Programming Language* for more information.
+See [Closures](https://doc.rust-lang.org/book/ch13-01-closures.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ### Iterators
-The `Iterator` trait powers a functional-style pipeline over any collection. The adapters are *lazy* — nothing is computed until you drive the iterator with a terminal operation.
+The `Iterator` [trait](#traits) powers a functional-style pipeline over any collection. The adapters are *lazy* — nothing is computed until you drive the iterator with a terminal operation.
 
 ```rust
 let nums = vec![1, 2, 3, 4, 5, 6];
@@ -1130,29 +1586,38 @@ println!("{:?}", v);   // [2, 4, 6]
 
 The compiler optimizes iterator chains aggressively. A chain of `.filter().map().collect()` typically compiles to the same machine code as an equivalent hand-written loop.
 
-See [Iterators](https://doc.rust-lang.org/book/ch13-02-iterators.html) in *The Rust Programming Language* for more information.
+See [Iterators](https://doc.rust-lang.org/book/ch13-02-iterators.html){target=_blank} in *The Rust Programming Language* for more information.
 
-## Error Handling
-Rust has no exceptions. Errors are values, returned via `Result<T, E>`.
+## Errors as Values
+::: {.subheading}
+Understanding what an error is before learning how to handle it
+:::
+
+Rust does not have exceptions. There is no `try`, no `catch`, no `throw`. An error in Rust is not a control-flow mechanism that unwinds the stack — it is an ordinary value returned from a function, like any other return value. This is the single most important thing to understand about Rust error handling.
+
+### The Philosophy: Errors Are Just Data
+In languages with exceptions, errors live in a parallel universe. Normal values flow through `return`, but errors use a separate channel (`throw`) and require separate syntax to intercept (`try`/`catch`). The type signature of a function does not tell you what errors it might produce. You find out at runtime.
+
+Rust collapses this duality. An error is a value of a particular type, carried inside a `Result<T, E>` enum. The function signature tells you exactly what can go wrong.
+
+Compare these signatures:
 
 ```rust
-use std::fs;
-use std::io;
+// C++
+std::string read_file(const std::string& path);  // might throw, might not — signature doesn't say
 
-fn read_file(path: &str) -> Result<String, io::Error> {
-    let content = fs::read_to_string(path)?;  // ? propagates error
-    Ok(content)
-}
-
-// Caller handles the result
-match read_file("data.txt") {
-    Ok(content) => println!("{}", content),
-    Err(e)      => eprintln!("Failed: {}", e),
-}
+// Rust
+fn read_file(path: &str) -> Result<String, io::Error>;  // returns String *or* io::Error
 ```
 
-### `Result` Is Just an Enum
-It is worth pausing on this. `Result<T, E>` is not a special language construct. It is an ordinary enum defined in the standard library:
+The Rust signature is a contract. The function returns either:
+- `Ok(String)` — success, here's the file content
+- `Err(io::Error)` — failure, here's what went wrong
+
+No hidden control flow. No silent failures. The type system forces you to acknowledge that failure is possible.
+
+### `Result<T, E>` Is Just an Enum
+Here is the complete definition of `Result`, copied directly from the standard library:
 
 ```rust
 enum Result<T, E> {
@@ -1161,7 +1626,239 @@ enum Result<T, E> {
 }
 ```
 
-That's it. Everything you have learned about matching enums applies directly. `Ok` and `Err` are variants that carry data, exactly like `Shape::Circle(f64)` or `Message::Write(String)`. The compiler treats them no differently. What makes `Result` powerful is the combination of that simple structure with the pattern matching tools built into the language.
+That's it. `Result` is not a language keyword or compiler magic. It is an ordinary enum with two variants that carry data, exactly like the `Shape` and `Message` enums you saw in the [Structs, Enums, and Traits](#structs-enums-and-traits) section. Everything you already know about enums applies:
+
+- `Ok` and `Err` are enum variants
+- They carry values: `Ok(T)` wraps a success value, `Err(E)` wraps an error value
+- You extract those values with pattern matching: `match`, `if let`, or `while let`
+
+The power comes not from `Result` being special, but from the compiler enforcing exhaustive pattern matching. You cannot access the success value without also handling the error case. The compiler will not let you forget.
+
+### Reading Result Type Signatures
+When you see:
+
+```rust
+fn parse_config(path: &str) -> Result<Config, io::Error>
+```
+
+Read it as: "This function returns `Config` on success, or `io::Error` on failure."
+
+The generic parameters `<T, E>` make this explicit:
+- `T` (the first parameter) is the **success type** — what you get when everything works
+- `E` (the second parameter) is the **error type** — what you get when it fails
+
+Common examples:
+
+```rust
+Result<String, io::Error>       // returns String or io::Error
+Result<i32, ParseIntError>      // returns i32 or ParseIntError
+Result<(), Box<dyn Error>>      // returns nothing (unit type) or any error type
+```
+
+The unit type `()` as the success value means "this function either succeeds with no meaningful return value, or fails with an error." You'll see this in functions that perform side effects (write a file, send a network packet) where success means "it worked" and nothing more.
+
+### Matching on Result
+Because `Result` is an enum, you destructure it the same way you destructure any other enum:
+
+```rust
+use std::fs;
+
+let result = fs::read_to_string("config.toml");
+
+match result {
+    Ok(content) => {
+        println!("File contents:");
+        println!("{}", content);
+    }
+    Err(e) => {
+        eprintln!("Failed to read file: {}", e);
+    }
+}
+```
+
+The pattern `Ok(content)` does two things simultaneously:
+1. Tests whether the result is the `Ok` variant (not `Err`)
+2. Binds the inner `String` to the name `content`
+
+The pattern `Err(e)` extracts the error value. The name `e` is conventional (short for "error"), but you can use any name. Inside that arm, `e` has type `io::Error` — the `E` in `Result<String, E>`.
+
+If you only care about one outcome, use `if let`:
+
+```rust
+if let Ok(content) = fs::read_to_string("config.toml") {
+    println!("{}", content);
+}
+// silently ignore errors
+```
+
+Or handle only the error:
+
+```rust
+if let Err(e) = fs::read_to_string("config.toml") {
+    eprintln!("Error: {}", e);
+    std::process::exit(1);
+}
+```
+
+This is identical to the `Option<T>` matching you saw in [Pattern Matching](#pattern-matching) — same syntax, same semantics, because `Result` and `Option` are both just enums.
+
+### The `Error` Trait
+Any type can be used as `E` in `Result<T, E>`, but by convention error types implement the `std::error::Error` trait. This trait is simple:
+
+```rust
+pub trait Error: Debug + Display {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        None
+    }
+}
+```
+
+Breaking this down:
+
+**1. Trait bounds: `Debug + Display`**
+
+Every error type must implement both:
+- **`Debug`** — for developer-facing output with `{:?}`. Shows the full internal structure.
+- **`Display`** — for user-facing output with `{}`. Shows a human-readable message.
+
+This separation lets you choose the right representation for the context. In production logs you might want `Debug` to see all the details. When showing an error to a user, you want `Display` to give them a clear message without internal noise.
+
+**2. The `source()` method**
+
+Errors can be chained. If parsing a config file fails because of an I/O error, the parse error can *wrap* the I/O error. `source()` returns the underlying cause, letting you walk the error chain:
+
+```rust
+let mut cause = &error;
+while let Some(source) = cause.source() {
+    eprintln!("  caused by: {}", source);
+    cause = source;
+}
+```
+
+Most errors return `None` (they are root causes). Higher-level errors that wrap other errors override this method.
+
+### Error Formatting: Display vs Debug
+The distinction between `Display` and `Debug` is not just convention — it changes how you present errors to different audiences.
+
+**`Display` (`{}`)** — user-facing error messages
+
+- Should be lowercase with no trailing period
+- Should be specific and actionable
+- Should not expose internal implementation details
+
+Good examples:
+```rust
+"file not found"
+"invalid UTF-8 sequence at byte 42"
+"connection timeout after 30s"
+```
+
+Bad examples:
+```
+"Error."                          // too vague
+"FILE_NOT_FOUND"                  // shouting
+"IoError(Os { code: 2 })"         // internal structure leaked
+```
+
+**`Debug` (`{:?}`)** — developer-facing output
+
+- Shows internal structure
+- Used in panic messages and debugging tools
+- Typically derived automatically with `#[derive(Debug)]`
+
+```rust
+#[derive(Debug)]
+struct ParseError {
+    line: usize,
+    column: usize,
+    message: String,
+}
+```
+
+When you print with `{:?}`, you get the full structure:
+```
+ParseError { line: 14, column: 8, message: "unexpected token" }
+```
+
+When you print with `{}`, you implement `Display` to format it for humans:
+```rust
+impl fmt::Display for ParseError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "parse error at {}:{}: {}", self.line, self.column, self.message)
+    }
+}
+```
+
+### Formatting Errors in Practice
+When you catch an error, you typically format it with `Display`:
+
+```rust
+match load_config() {
+    Ok(cfg) => run_app(cfg),
+    Err(e) => {
+        eprintln!("Error: {}", e);    // Display formatting
+        std::process::exit(1);
+    }
+}
+```
+
+The `{}` placeholder calls the error's `Display` implementation, giving you a clean user-facing message. If you need diagnostic details (say, in a crash report or log), use `Debug`:
+
+```rust
+eprintln!("Error: {:?}", e);   // Debug formatting
+```
+
+Or even better, use the alternate `Debug` format (`{:#?}`) for pretty-printed output:
+
+```rust
+eprintln!("Error: {:#?}", e);
+```
+
+### Common Error Types in std
+The standard library provides error types for its own operations:
+
+**`std::io::Error`** — I/O operations (file, network, etc.)
+
+```rust
+use std::fs::File;
+
+let file = File::open("data.txt")?;  // returns io::Error on failure
+```
+
+**`std::fmt::Error`** — formatting operations (rarely used directly)
+
+Returned by formatting macros (`write!`, `format!`) when writing to a buffer fails.
+
+**`std::num::ParseIntError`, `ParseFloatError`** — parsing strings to numbers
+
+```rust
+let n: i32 = "42".parse()?;       // returns ParseIntError if not a valid number
+```
+
+**`std::str::Utf8Error`** — invalid UTF-8 byte sequences
+
+```rust
+let s = std::str::from_utf8(&bytes)?;  // returns Utf8Error if bytes aren't valid UTF-8
+```
+
+Each of these implements `Error`, `Display`, and `Debug`, so they work uniformly in `Result<T, E>` and can be formatted for users or developers as needed.
+
+### Why This Matters
+Treating errors as values means:
+- **No hidden control flow** — the function signature tells you what errors to expect
+- **No silent failures** — the type system forces you to handle or propagate every error
+- **Composable error handling** — errors are just data, so you can transform, wrap, and combine them like any other value
+
+This is the foundation. The [Error Handling](#error-handling) section that follows shows you the *tools* for working with these error values: the `?` operator, `if let` for selective handling, `.unwrap()` and `.expect()` for prototyping, and the extraction family for getting the value out when you know it's there.
+
+But those are techniques. What you've learned here is the model: errors are enum values, `Result<T, E>` is the container, and the `Error` trait defines the contract for how to display and chain them.
+
+## Error Handling
+::: {.subheading}
+Tools for working with error values
+:::
+
+Now that you understand what errors *are* in Rust — enum values wrapped in `Result<T, E>` — this section covers the practical tools for *handling* them.
 
 ### `if let` for Error Handling
 Because `Result` is an enum, `if let` works on it naturally. The most common form you will see in real code handles only the error case and ignores success:
@@ -1322,9 +2019,12 @@ fn rejects_negative_input() {
 `.unwrap()` and `.expect()` are appropriate in tests and prototypes. In production code, a panic is a crash with no recovery. Prefer `?`, `match`, `if let`, or the `unwrap_or` variants, which give callers a chance to handle the failure.
 :::
 
-See [Error Handling](https://doc.rust-lang.org/book/ch09-00-error-handling.html) in *The Rust Programming Language* for more information.
+See [Error Handling](https://doc.rust-lang.org/book/ch09-00-error-handling.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ## Common Collections
+
+![](images/rust-ccs.png){fig-align="center" width=12in}
+
 ```rust
 // Vec<T> — growable array (like std::vector)
 let mut v: Vec<i32> = Vec::new();
@@ -1346,7 +2046,383 @@ for (k, v) in &map {
 }
 ```
 
-See [Common Collections](https://doc.rust-lang.org/book/ch08-00-common-collections.html) in *The Rust Programming Language* for more information.
+See [Common Collections](https://doc.rust-lang.org/book/ch08-00-common-collections.html){target=_blank} in *The Rust Programming Language* for more information.
+
+## File I/O
+::: {.subheading}
+Reading and writing files: unbuffered, buffered, and binary
+:::
+
+File I/O in Rust is built around the `std::fs` and `std::io` modules. The landscape includes basic file operations, buffered I/O for performance, line-oriented reading, and binary I/O with byte order control.
+
+### Basic File Operations
+
+**Opening and creating files:**
+
+```rust
+use std::fs::File;
+use std::io::{self, Read, Write};
+
+// Open existing file (read-only)
+let file = File::open("input.txt")?;
+
+// Create new file (truncates if exists)
+let file = File::create("output.txt")?;
+
+// Open with specific options
+use std::fs::OpenOptions;
+let file = OpenOptions::new()
+    .read(true)
+    .write(true)
+    .create(true)
+    .append(true)
+    .open("data.txt")?;
+```
+
+The `?` operator propagates `io::Error` to the caller. All file operations return `Result<T, io::Error>`.
+
+### Unbuffered I/O
+
+**Reading directly from `File`:**
+
+```rust
+use std::fs::File;
+use std::io::Read;
+
+let mut file = File::open("data.bin")?;
+
+// Read entire file into Vec<u8>
+let mut buffer = Vec::new();
+file.read_to_end(&mut buffer)?;
+
+// Read into fixed-size array
+let mut buf = [0u8; 1024];
+let n = file.read(&mut buf)?;  // returns bytes read
+println!("Read {} bytes", n);
+
+// Read exact amount (fails if not enough data)
+let mut exact = [0u8; 16];
+file.read_exact(&mut exact)?;
+```
+
+**Writing directly to `File`:**
+
+```rust
+use std::fs::File;
+use std::io::Write;
+
+let mut file = File::create("output.bin")?;
+
+let data = vec![0x01, 0x02, 0x03, 0x04];
+file.write_all(&data)?;  // writes entire slice
+
+// Ensure data is flushed to disk
+file.flush()?;
+```
+
+Unbuffered I/O makes a system call for every read/write operation. This is fine for large transfers, but inefficient for many small operations.
+
+### Buffered I/O
+
+**Buffered reading with `BufReader`:**
+
+```rust
+use std::fs::File;
+use std::io::{BufReader, BufRead};
+
+let file = File::open("input.txt")?;
+let reader = BufReader::new(file);
+
+// Read line by line (most common pattern)
+for line in reader.lines() {
+    let line = line?;  // line is a Result<String, io::Error>
+    println!("{}", line);
+}
+
+// Or manually read lines
+let file = File::open("input.txt")?;
+let mut reader = BufReader::new(file);
+let mut line = String::new();
+while reader.read_line(&mut line)? > 0 {
+    print!("{}", line);  // line includes \n
+    line.clear();
+}
+
+// Read entire file into String
+let file = File::open("input.txt")?;
+let mut reader = BufReader::new(file);
+let mut content = String::new();
+reader.read_to_string(&mut content)?;
+```
+
+**Buffered writing with `BufWriter`:**
+
+```rust
+use std::fs::File;
+use std::io::{BufWriter, Write};
+
+let file = File::create("output.txt")?;
+let mut writer = BufWriter::new(file);
+
+for i in 0..1000 {
+    writeln!(writer, "Line {}", i)?;  // buffered in memory
+}
+
+writer.flush()?;  // ensure buffer is written to disk
+// BufWriter also flushes on drop, but explicit flush lets you handle errors
+```
+
+`BufReader` and `BufWriter` reduce system calls by buffering data in memory. Use them for text files or when doing many small reads/writes.
+
+### Convenience Functions
+
+For simple cases, `std::fs` provides one-shot functions:
+
+```rust
+use std::fs;
+
+// Read entire file to String
+let text = fs::read_to_string("input.txt")?;
+
+// Read entire file to Vec<u8>
+let bytes = fs::read("data.bin")?;
+
+// Write entire String to file
+fs::write("output.txt", "Hello, world!")?;
+
+// Write entire Vec<u8> to file
+fs::write("data.bin", vec![0x01, 0x02, 0x03])?;
+```
+
+These are buffered internally and handle open/close automatically. Perfect for small files.
+
+### Binary I/O and Byte Order
+
+When reading binary formats, you often need to handle multi-byte integers with specific endianness.
+
+**Reading primitives with byte order:**
+
+Rust provides methods on primitive types to read/write with explicit endianness:
+
+```rust
+use std::fs::File;
+use std::io::{Read, Write};
+
+let mut file = File::open("binary.dat")?;
+
+// Read u32 in little-endian
+let mut buf = [0u8; 4];
+file.read_exact(&mut buf)?;
+let value = u32::from_le_bytes(buf);
+
+// Read u32 in big-endian
+file.read_exact(&mut buf)?;
+let value = u32::from_be_bytes(buf);
+
+// Read in native byte order (matches platform)
+file.read_exact(&mut buf)?;
+let value = u32::from_ne_bytes(buf);
+```
+
+**Writing primitives with byte order:**
+
+```rust
+let mut file = File::create("output.dat")?;
+
+let value: u32 = 0x12345678;
+
+// Write as little-endian
+file.write_all(&value.to_le_bytes())?;
+
+// Write as big-endian
+file.write_all(&value.to_be_bytes())?;
+
+// Write in native byte order
+file.write_all(&value.to_ne_bytes())?;
+```
+
+**Reading/writing multiple values:**
+
+```rust
+use std::io::{BufReader, BufWriter, Read, Write};
+
+// Reading a binary file with known structure
+let file = File::open("data.bin")?;
+let mut reader = BufReader::new(file);
+
+let mut header = [0u8; 4];
+reader.read_exact(&mut header)?;
+let magic = u32::from_le_bytes(header);
+
+let mut buf = [0u8; 2];
+reader.read_exact(&mut buf)?;
+let width = u16::from_le_bytes(buf);
+
+reader.read_exact(&mut buf)?;
+let height = u16::from_le_bytes(buf);
+
+// Writing binary data
+let file = File::create("output.bin")?;
+let mut writer = BufWriter::new(file);
+
+writer.write_all(&0xCAFEBABEu32.to_be_bytes())?;  // magic number
+writer.write_all(&1920u16.to_le_bytes())?;         // width
+writer.write_all(&1080u16.to_le_bytes())?;         // height
+writer.flush()?;
+```
+
+**All primitive integer types** (`u8`, `i8`, `u16`, `i16`, `u32`, `i32`, `u64`, `i64`, `u128`, `i128`, `usize`, `isize`) and **floats** (`f32`, `f64`) have these methods:
+- `to_le_bytes()` / `from_le_bytes()` — little-endian
+- `to_be_bytes()` / `from_be_bytes()` — big-endian
+- `to_ne_bytes()` / `from_ne_bytes()` — native endian
+
+### The `byteorder` Crate
+
+For more convenient binary I/O, the `byteorder` crate provides traits that extend readers/writers:
+
+```toml
+# Cargo.toml
+[dependencies]
+byteorder = "1.5"
+```
+
+```rust
+use std::fs::File;
+use std::io::{BufReader, BufWriter};
+use byteorder::{LittleEndian, BigEndian, ReadBytesExt, WriteBytesExt};
+
+// Reading with byteorder
+let file = File::open("data.bin")?;
+let mut reader = BufReader::new(file);
+
+let value1 = reader.read_u32::<LittleEndian>()?;
+let value2 = reader.read_u16::<BigEndian>()?;
+let float = reader.read_f64::<LittleEndian>()?;
+
+// Writing with byteorder
+let file = File::create("output.bin")?;
+let mut writer = BufWriter::new(file);
+
+writer.write_u32::<LittleEndian>(0x12345678)?;
+writer.write_u16::<BigEndian>(42)?;
+writer.write_f64::<LittleEndian>(3.14159)?;
+writer.flush()?;
+```
+
+This is more ergonomic than manually managing byte arrays.
+
+### Error Handling
+
+All I/O operations return `Result<T, io::Error>`. Common patterns:
+
+```rust
+use std::fs::File;
+use std::io::{self, ErrorKind};
+
+// Propagate with ?
+fn read_config() -> io::Result<String> {
+    std::fs::read_to_string("config.txt")  // io::Result is alias for Result<T, io::Error>
+}
+
+// Match on error kind
+match File::open("data.txt") {
+    Ok(file) => { /* use file */ },
+    Err(e) => match e.kind() {
+        ErrorKind::NotFound => eprintln!("File not found"),
+        ErrorKind::PermissionDenied => eprintln!("Permission denied"),
+        _ => eprintln!("I/O error: {}", e),
+    }
+}
+
+// Provide context with custom error types or anyhow crate
+use anyhow::Context;
+let file = File::open("data.txt")
+    .context("Failed to open data.txt")?;
+```
+
+### Quick Reference
+
+| Task | Approach |
+|------|----------|
+| Read entire file to String | `fs::read_to_string("file.txt")?` |
+| Read entire file to Vec<u8> | `fs::read("file.bin")?` |
+| Write String/bytes to file | `fs::write("file.txt", data)?` |
+| Read file line by line | `BufReader::new(file).lines()` |
+| Read binary file | `File::open()` + `read_exact()` + `from_le_bytes()` |
+| Write binary file | `File::create()` + `write_all()` + `to_le_bytes()` |
+| Buffered text reading | `BufReader::new(File::open()?)` |
+| Buffered text writing | `BufWriter::new(File::create()?)` |
+| Binary I/O with endianness | `byteorder` crate or `to_le_bytes()`/`from_be_bytes()` |
+
+### Common Patterns
+
+**Reading a binary header:**
+
+```rust
+use std::fs::File;
+use std::io::Read;
+
+struct Header {
+    magic: u32,
+    version: u16,
+    count: u16,
+}
+
+fn read_header(path: &str) -> io::Result<Header> {
+    let mut file = File::open(path)?;
+
+    let mut buf = [0u8; 8];
+    file.read_exact(&mut buf)?;
+
+    Ok(Header {
+        magic: u32::from_le_bytes([buf[0], buf[1], buf[2], buf[3]]),
+        version: u16::from_le_bytes([buf[4], buf[5]]),
+        count: u16::from_le_bytes([buf[6], buf[7]]),
+    })
+}
+```
+
+**Processing a large file line by line:**
+
+```rust
+use std::fs::File;
+use std::io::{BufReader, BufRead};
+
+fn process_log_file(path: &str) -> io::Result<()> {
+    let file = File::open(path)?;
+    let reader = BufReader::new(file);
+
+    for line in reader.lines() {
+        let line = line?;
+        if line.contains("ERROR") {
+            eprintln!("Found error: {}", line);
+        }
+    }
+    Ok(())
+}
+```
+
+**Writing CSV-like data:**
+
+```rust
+use std::fs::File;
+use std::io::{BufWriter, Write};
+
+fn write_csv(path: &str, data: &[(u32, f64)]) -> io::Result<()> {
+    let file = File::create(path)?;
+    let mut writer = BufWriter::new(file);
+
+    writeln!(writer, "id,value")?;
+    for (id, value) in data {
+        writeln!(writer, "{},{:.2}", id, value)?;
+    }
+
+    writer.flush()?;
+    Ok(())
+}
+```
+
+See [Reading a File](https://doc.rust-lang.org/book/ch12-02-reading-a-file.html){target=_blank} and the [`std::io` module documentation](https://doc.rust-lang.org/std/io/index.html){target=_blank} for more information.
 
 ## Cargo
 ::: {.subheading}
@@ -1438,7 +2514,7 @@ Start new projects with the latest edition (`2021` at minimum, `2024` if your to
 :::
 
 ### Dependency Version Constraints
-Cargo uses [semantic versioning](https://semver.org). The version string in `Cargo.toml` is a *requirement*, not an exact pin. Cargo selects the newest version that satisfies all constraints in the dependency graph:
+Cargo uses [semantic versioning](https://semver.org){target=_blank}. The version string in `Cargo.toml` is a *requirement*, not an exact pin. Cargo selects the newest version that satisfies all constraints in the dependency graph:
 
 | Requirement             | Meaning                        | Resolves to (e.g.) |
 |-------------------------|--------------------------------|--------------------|
@@ -1521,7 +2597,386 @@ inherits  = "release"
 debug     = true    # keep symbols for profiling
 ```
 
-See [Packages, Crates, and Modules](https://doc.rust-lang.org/book/ch07-00-managing-growing-projects-with-packages-crates-and-modules.html) in *The Rust Programming Language* for more information.
+See [Packages, Crates, and Modules](https://doc.rust-lang.org/book/ch07-00-managing-growing-projects-with-packages-crates-and-modules.html){target=_blank} in *The Rust Programming Language* for more information.
+
+## Common Crates
+A few fellas that I find indispensable.
+
+### clap
+::: {.subheading}
+Command-line argument parsing, the civilized way
+:::
+
+[clap](https://docs.rs/clap/latest/clap/){target=_blank} (Command Line Argument Parser) turns a Rust struct into a fully-featured CLI: `--help`, `--version`, validation, subcommands, and shell completions all come for free. You describe what your program accepts; clap handles the rest.
+
+Add it to `Cargo.toml` with the `derive` feature, which enables the attribute-based API used throughout this section:
+
+```toml
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+```
+
+#### The Derive API
+
+The derive API lets you describe your CLI as a struct. Clap reads the struct and its attributes at compile time and generates the parser automatically. This is the approach you will use in almost all real projects.
+
+```rust
+use clap::Parser;
+
+#[derive(Parser)]
+#[command(name = "greet", version = "1.0", about = "Greet someone")]
+struct Cli {
+    /// The name to greet
+    name: String,
+
+    /// How many times to repeat the greeting
+    #[arg(short, long, default_value_t = 1)]
+    count: u32,
+}
+
+fn main() {
+    let cli = Cli::parse();
+
+    for _ in 0..cli.count {
+        println!("Hello, {}!", cli.name);
+    }
+}
+```
+
+Running `./greet --help` produces:
+
+```
+Greet someone
+
+Usage: greet [OPTIONS] <NAME>
+
+Arguments:
+  <NAME>  The name to greet
+
+Options:
+  -c, --count <COUNT>  How many times to repeat the greeting [default: 1]
+  -h, --help           Print help
+  -V, --version        Print version
+```
+
+`Cli::parse()` reads `std::env::args()`, validates the input, and returns a populated `Cli`. If parsing fails, it prints an error and exits — no `Result` to unwrap.
+
+#### `#[derive(Parser)]`
+
+`Parser` is the [trait](#traits) that drives everything. Applying `#[derive(Parser)]` to a struct generates an implementation of that [trait](#traits), including the `parse()` and `try_parse()` associated functions. Without it, none of the other clap attributes do anything.
+
+```rust
+#[derive(Parser)]          // generates Cli::parse(), Cli::try_parse(), etc.
+struct Cli { ... }
+```
+
+`try_parse()` is available when you want to handle errors yourself instead of letting clap exit:
+
+```rust
+let cli = Cli::try_parse()?;   // returns Result<Cli, clap::Error>
+```
+
+#### `#[command(...)]` Attributes
+
+`#[command(...)]` applies to the struct as a whole and controls top-level metadata about your program.
+
+```rust
+#[derive(Parser)]
+#[command(
+    name    = "pexs24",
+    version = env!("CARGO_PKG_VERSION"),
+    author  = "Curtis",
+    about   = "Process expression files for the 2024 dataset",
+)]
+struct Cli { ... }
+```
+
+| Attribute                            | Effect                                                  |
+|--------------------------------------|---------------------------------------------------------|
+| `name = "pexs24"`                    | Sets the program name shown in usage and help text      |
+| `version = "1.2.3"`                  | Sets the version shown by `--version`                   |
+| `version = env!("CARGO_PKG_VERSION")`| Reads the version from `Cargo.toml` at compile time     |
+| `author = "..."`                     | Sets the author shown in `--help`                       |
+| `about = "..."`                      | One-line description shown at the top of `--help`       |
+| `long_about = "..."`                 | Longer description shown in `--help` (multiline)        |
+
+**`name = "pexs24"`** matters because clap uses the binary file name by default. If your binary is named `target/debug/pexs24_dev`, that ugly name shows up in every usage example. Setting `name` pins it to a clean, version-independent string.
+
+**`version = env!("CARGO_PKG_VERSION")`** is worth pausing on. `env!` is a built-in Rust macro that reads an [environment variable](https://doc.rust-lang.org/cargo/reference/environment-variables.html){target=_blank} at *compile time*. Cargo sets `CARGO_PKG_VERSION` to the `version` field in your `Cargo.toml` before invoking the compiler. The result is that your `--version` output always matches your `Cargo.toml` with zero manual synchronization.
+
+```toml
+# Cargo.toml
+[package]
+version = "0.3.1"
+```
+
+```
+$ pexs24 --version
+pexs24 0.3.1
+```
+
+Change the version in one place; the binary reflects it automatically.
+
+#### `#[arg(...)]` Attributes
+
+`#[arg(...)]` applies to individual fields and controls how each argument is parsed.
+
+##### Positional Arguments
+
+A field with no `short` or `long` attribute is positional — the user supplies it by position, not by name.
+
+```rust
+#[derive(Parser)]
+struct Cli {
+    #[arg(name = "FILE", num_args = 1)]
+    input: String,
+}
+```
+
+```
+Usage: prog <FILE>
+```
+
+**What does `name = "FILE"` mean?**
+
+The `name` attribute in `#[arg(...)]` sets the argument's internal **ID** and, for positional arguments, its **metavar** — the placeholder text shown in usage and help output. The uppercase `FILE` in `<FILE>` is a Unix convention: metavars are written in ALL_CAPS to visually distinguish the placeholder from the flags around it, and to make the type of input obvious at a glance.
+
+```
+Usage: prog [OPTIONS] <FILE>              # FILE is the metavar
+           ^^^^^^^^   ^^^^^^
+           flags      positional argument
+```
+
+"FILE" is not arbitrary. It communicates meaning to the user: *this argument expects a file path*. By convention:
+
+| Metavar     | Communicates                        |
+|-------------|-------------------------------------|
+| `<FILE>`    | Expects a file path                 |
+| `<DIR>`     | Expects a directory path            |
+| `<HOST>`    | Expects a hostname or IP address    |
+| `<N>`       | Expects a number                    |
+| `<PATTERN>` | Expects a regular expression        |
+| `<KEY>`     | Expects a key string                |
+
+Clap will use the field name (uppercased) as the metavar if you omit `name`. So a field named `input` would display as `<INPUT>`. Setting `name = "FILE"` gives you a more informative, idiomatic label without renaming the Rust field.
+
+If you want to control the metavar display independently of the ID, use `value_name` instead:
+
+```rust
+#[arg(value_name = "FILE")]
+input: String,
+```
+
+`value_name` only affects the display; it does not change the ID. This is the preferred approach in clap 4.
+
+**`num_args = 1`** tells clap how many values this argument consumes. For a single value it is the default, so you typically omit it. More useful forms:
+
+| `num_args`    | Meaning                                         |
+|---------------|-------------------------------------------------|
+| `1`           | Exactly one value (the default)                 |
+| `0..=1`       | Zero or one value (use `Option<T>` for the field) |
+| `1..`         | One or more values (use `Vec<T>` for the field) |
+| `0..`         | Zero or more values                             |
+| `3`           | Exactly three values                            |
+
+##### Flags and Options
+
+Adding `short` and/or `long` turns a field into a named argument rather than a positional one.
+
+```rust
+#[derive(Parser)]
+struct Cli {
+    /// Enable verbose output
+    #[arg(short, long)]
+    verbose: bool,          // --verbose / -v
+
+    /// Output file path
+    #[arg(short, long, value_name = "FILE")]
+    output: Option<String>, // --output <FILE> / -o <FILE>, optional
+
+    /// Number of threads
+    #[arg(short = 'j', long = "jobs", default_value_t = 4)]
+    jobs: u32,              // --jobs <JOBS> / -j <JOBS>
+}
+```
+
+`short` and `long` without values derive from the field name: `verbose` becomes `-v` and `--verbose`. Assign explicit characters or strings when the default conflicts or is not what you want.
+
+`bool` fields paired with `short`/`long` become **flags** — they are `false` by default and become `true` when passed. No value is consumed.
+
+`Option<T>` fields are **optional arguments** — omitting them produces `None`; passing them produces `Some(value)`.
+
+##### Common `#[arg(...)]` Attributes
+
+| Attribute                  | Effect                                                      |
+|----------------------------|-------------------------------------------------------------|
+| `short`                    | Add a short flag derived from the field name (`-v`)         |
+| `short = 'x'`              | Add a specific short flag (`-x`)                            |
+| `long`                     | Add a long flag derived from the field name (`--verbose`)   |
+| `long = "my-flag"`         | Add a specific long flag                                    |
+| `value_name = "FILE"`      | Set the metavar shown in help text                          |
+| `name = "FILE"`            | Set the argument's internal ID (and metavar for positionals)|
+| `default_value = "8080"`   | String default, parsed into the field's type                |
+| `default_value_t = 8080`   | Typed default — no parsing, must match the field type       |
+| `required = true`          | Force the argument to be provided (overrides `Option<T>`)   |
+| `num_args = 1..`           | Accept multiple values into a `Vec<T>`                      |
+| `env = "MY_VAR"`           | Fall back to an [environment variable](https://doc.rust-lang.org/cargo/reference/environment-variables.html){target=_blank} if the flag is absent  |
+| `hide = true`              | Omit the argument from help output                          |
+
+Doc comments (`/// ...`) above a field become the help text for that argument. Clap reads them directly — no separate `help = "..."` attribute needed.
+
+#### Multiple Values
+
+When a flag should accept a list of values, use `Vec<T>` and `num_args`:
+
+```rust
+#[derive(Parser)]
+struct Cli {
+    /// Input files to process
+    #[arg(value_name = "FILE", num_args = 1..)]
+    inputs: Vec<String>,
+
+    /// Tags to apply
+    #[arg(short, long, value_name = "TAG")]
+    tags: Vec<String>,         // --tag foo --tag bar
+}
+```
+
+Positional `Vec<T>` with `num_args = 1..` collects all remaining positional arguments. Named `Vec<T>` fields (with `short`/`long`) allow the flag to be repeated: `--tag foo --tag bar`.
+
+#### Subcommands
+
+Subcommands model tools like `git commit` or `cargo build` where the first argument selects a mode of operation. Define an enum with `#[derive(Subcommand)]` and embed it in your top-level struct:
+
+```rust
+use clap::{Parser, Subcommand};
+
+#[derive(Parser)]
+#[command(name = "tool")]
+struct Cli {
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    /// Compress a file
+    Compress {
+        #[arg(value_name = "FILE")]
+        input: String,
+
+        #[arg(short, long, value_name = "FILE")]
+        output: Option<String>,
+    },
+    /// List available formats
+    Formats,
+}
+
+fn main() {
+    let cli = Cli::parse();
+
+    match cli.command {
+        Commands::Compress { input, output } => {
+            let dest = output.unwrap_or_else(|| format!("{}.gz", input));
+            println!("Compressing {} -> {}", input, dest);
+        }
+        Commands::Formats => {
+            println!("Supported: gz, zst, xz");
+        }
+    }
+}
+```
+
+```
+$ tool --help
+Usage: tool <COMMAND>
+
+Commands:
+  compress  Compress a file
+  formats   List available formats
+  help      Print this message or the help of a subcommand
+
+$ tool compress --help
+Compress a file
+
+Usage: tool compress [OPTIONS] <FILE>
+
+Arguments:
+  <FILE>
+
+Options:
+  -o, --output <FILE>
+  -h, --help           Print help
+```
+
+Each subcommand gets its own `--help` page automatically.
+
+#### A Complete Example
+
+Putting it all together: a realistic CLI for a file processing tool.
+
+```rust
+use clap::Parser;
+
+#[derive(Parser)]
+#[command(
+    name    = "pexs24",
+    version = env!("CARGO_PKG_VERSION"),
+    about   = "Process expression files for the 2024 dataset",
+)]
+struct Cli {
+    /// Input file to process
+    #[arg(value_name = "FILE", num_args = 1)]
+    input: String,
+
+    /// Write output to FILE instead of stdout
+    #[arg(short, long, value_name = "FILE")]
+    output: Option<String>,
+
+    /// Number of worker threads
+    #[arg(short = 'j', long = "jobs", default_value_t = 4, value_name = "N")]
+    jobs: u32,
+
+    /// Enable verbose logging
+    #[arg(short, long)]
+    verbose: bool,
+}
+
+fn main() {
+    let cli = Cli::parse();
+
+    if cli.verbose {
+        eprintln!("Processing {} with {} threads", cli.input, cli.jobs);
+    }
+
+    match cli.output {
+        Some(path) => println!("Writing to {}", path),
+        None       => println!("Writing to stdout"),
+    }
+}
+```
+
+```
+$ pexs24 --help
+Process expression files for the 2024 dataset
+
+Usage: pexs24 [OPTIONS] <FILE>
+
+Arguments:
+  <FILE>  Input file to process
+
+Options:
+  -o, --output <FILE>  Write output to FILE instead of stdout
+  -j, --jobs <N>       Number of worker threads [default: 4]
+  -v, --verbose        Enable verbose logging
+  -h, --help           Print help
+  -V, --version        Print version
+
+$ pexs24 --version
+pexs24 0.3.1
+```
+
+See [clap documentation](https://docs.rs/clap/latest/clap/){target=_blank} and the [clap derive reference](https://docs.rs/clap/latest/clap/_derive/index.html){target=_blank} for the full attribute catalog.
 
 ## Key Differences from C/C++
 ::: {.subheading}
@@ -1545,10 +3000,12 @@ Quick Reference
 | `printf`                       | `println!("{}",  val)`                 |
 
 ## Where to Go Next
-- The [Rust Book](https://doc.rust-lang.org/book/) is free online and excellent.
-- [Rust by Example](https://doc.rust-lang.org/rust-by-example/) is terse.
-- [The Cargo Book](https://doc.rust-lang.org/cargo/) Cargo inside out.
-- [Rustlings](https://github.com/rust-lang/rustlings) is a set of small exercises that build muscle memory quickly.
-- [docs.rs](https://docs.rs) is the standard library and crate documentation hub — well worth bookmarking.
+- The [Rust Book](https://doc.rust-lang.org/book/){target=_blank} is free online and excellent.
+- [Rust by Example](https://doc.rust-lang.org/rust-by-example/){target=_blank} is terse.
+- [The Cargo Book](https://doc.rust-lang.org/cargo/){target=_blank} Cargo inside out.
+    - [Environment Variables](https://doc.rust-lang.org/cargo/reference/environment-variables.html){target=_blank}
+- [Rustlings](https://github.com/rust-lang/rustlings){target=_blank} is a set of small exercises that build muscle memory quickly.
+- [docs.rs](https://docs.rs){target=_blank} is the standard library and crate documentation hub — well worth bookmarking.
+
 
 The compiler error messages are unusually good. Read them carefully — they usually tell you exactly what's wrong and often suggest the fix.
