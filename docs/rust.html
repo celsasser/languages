@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-03-28">
+<meta name="dcterms.date" content="2026-03-29">
 
 <title>Rust for C/C++ Programmers – Computer Language Notebook</title>
 <style>
@@ -425,7 +425,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   </ul></li>
   <li><a href="#key-differences-from-cc" id="toc-key-differences-from-cc" class="nav-link" data-scroll-target="#key-differences-from-cc">Key Differences from C/C++</a></li>
-  <li><a href="#where-to-go-next" id="toc-where-to-go-next" class="nav-link" data-scroll-target="#where-to-go-next">Where to Go Next</a></li>
+  <li><a href="#where-to-go-next" id="toc-where-to-go-next" class="nav-link" data-scroll-target="#where-to-go-next">Where to Go Next</a>
+  <ul>
+  <li><a href="#the-console" id="toc-the-console" class="nav-link" data-scroll-target="#the-console">The Console</a></li>
+  <li><a href="#documentation" id="toc-documentation" class="nav-link" data-scroll-target="#documentation">Documentation</a></li>
+  <li><a href="#books" id="toc-books" class="nav-link" data-scroll-target="#books">Books</a></li>
+  <li><a href="#practice" id="toc-practice" class="nav-link" data-scroll-target="#practice">Practice</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -446,7 +452,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">March 28, 2026</p>
+      <p class="date">March 29, 2026</p>
     </div>
   </div>
   
@@ -2439,7 +2445,7 @@ Tip
 <div class="subheading">
 <p>Reading and writing files: unbuffered, buffered, and binary</p>
 </div>
-<p>File I/O in Rust is built around the <code>std::fs</code> and <code>std::io</code> modules. The landscape includes basic file operations, buffered I/O for performance, line-oriented reading, and binary I/O with byte order control.</p>
+<p>File I/O in Rust is built around the <a href="https://doc.rust-lang.org/std/fs/index.html" target="_blank"><code>std::fs</code></a> and <a href="https://doc.rust-lang.org/std/io/index.html" target="_blank"><code>std::io</code></a> modules. The landscape includes basic file operations, buffered I/O for performance, line-oriented reading, and binary I/O with byte order control.</p>
 <section id="basic-file-operations" class="level3">
 <h3 class="anchored" data-anchor-id="basic-file-operations">Basic File Operations</h3>
 <p><strong>Opening and creating files:</strong></p>
@@ -2622,7 +2628,7 @@ Tip
 </section>
 <section id="the-byteorder-crate" class="level3">
 <h3 class="anchored" data-anchor-id="the-byteorder-crate">The <code>byteorder</code> Crate</h3>
-<p>For more convenient binary I/O, the <code>byteorder</code> crate provides traits that extend readers/writers:</p>
+<p>For more convenient binary I/O, the <a href="https://crates.io/crates/byteorder" target="_blank"><code>byteorder</code></a> crate provides traits that extend readers/writers:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb138"><pre class="sourceCode toml code-with-copy"><code class="sourceCode toml"><span id="cb138-1"><a href="#cb138-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cargo.toml</span></span>
 <span id="cb138-2"><a href="#cb138-2" aria-hidden="true" tabindex="-1"></a><span class="kw">[dependencies]</span></span>
 <span id="cb138-3"><a href="#cb138-3" aria-hidden="true" tabindex="-1"></a><span class="dt">byteorder</span> <span class="op">=</span> <span class="st">"1.5"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -3489,6 +3495,24 @@ pexs24 0.3.1</code></pre>
 </section>
 <section id="where-to-go-next" class="level2">
 <h2 class="anchored" data-anchor-id="where-to-go-next">Where to Go Next</h2>
+<p><a href="https://doc.rust-lang.org/stable/" target="_blank">Rust Home</a> is the parent to nearly everything below. It’s actually called “Rust Documentation”, but he’s outgrown those britches.</p>
+<section id="the-console" class="level3">
+<h3 class="anchored" data-anchor-id="the-console">The Console</h3>
+<p>The compiler error messages are unusually good. Read them carefully — they usually tell you exactly what’s wrong and often suggest the fix.</p>
+<ul>
+<li><code>cargo doc --open</code> is super cool. It will generate documentation for your project and all its dependencies, and open it in your browser. Keep this guy close at hand. Consider making it a task.</li>
+<li><code>rustc --explain &lt;error-code&gt;</code> provides a detailed explanation of an error code.</li>
+</ul>
+</section>
+<section id="documentation" class="level3">
+<h3 class="anchored" data-anchor-id="documentation">Documentation</h3>
+<ul>
+<li>The <a href="https://doc.rust-lang.org/stable/std/index.html">Standard Library</a> is the foundation of Rust. It documents everything in <code>std::*</code>.</li>
+<li><a href="https://docs.rs" target="_blank">docs.rs</a> is the standard library and crate documentation hub — well worth bookmarking.</li>
+</ul>
+</section>
+<section id="books" class="level3">
+<h3 class="anchored" data-anchor-id="books">Books</h3>
 <ul>
 <li>The <a href="https://doc.rust-lang.org/book/" target="_blank">Rust Book</a> is free online and excellent.</li>
 <li><a href="https://doc.rust-lang.org/rust-by-example/" target="_blank">Rust by Example</a> is terse.</li>
@@ -3496,12 +3520,16 @@ pexs24 0.3.1</code></pre>
 <ul>
 <li><a href="https://doc.rust-lang.org/cargo/reference/environment-variables.html" target="_blank">Environment Variables</a></li>
 </ul></li>
-<li><a href="https://github.com/rust-lang/rustlings" target="_blank">Rustlings</a> is a set of small exercises that build muscle memory quickly.</li>
-<li><a href="https://docs.rs" target="_blank">docs.rs</a> is the standard library and crate documentation hub — well worth bookmarking.</li>
 </ul>
-<p>The compiler error messages are unusually good. Read them carefully — they usually tell you exactly what’s wrong and often suggest the fix.</p>
+</section>
+<section id="practice" class="level3">
+<h3 class="anchored" data-anchor-id="practice">Practice</h3>
+<ul>
+<li><a href="https://github.com/rust-lang/rustlings" target="_blank">Rustlings</a> is a set of small exercises that build muscle memory quickly.</li>
+</ul>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

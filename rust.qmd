@@ -2053,7 +2053,7 @@ See [Common Collections](https://doc.rust-lang.org/book/ch08-00-common-collectio
 Reading and writing files: unbuffered, buffered, and binary
 :::
 
-File I/O in Rust is built around the `std::fs` and `std::io` modules. The landscape includes basic file operations, buffered I/O for performance, line-oriented reading, and binary I/O with byte order control.
+File I/O in Rust is built around the [`std::fs`](https://doc.rust-lang.org/std/fs/index.html){target=_blank} and [`std::io`](https://doc.rust-lang.org/std/io/index.html){target=_blank} modules. The landscape includes basic file operations, buffered I/O for performance, line-oriented reading, and binary I/O with byte order control.
 
 ### Basic File Operations
 
@@ -2278,7 +2278,7 @@ writer.flush()?;
 
 ### The `byteorder` Crate
 
-For more convenient binary I/O, the `byteorder` crate provides traits that extend readers/writers:
+For more convenient binary I/O, the [`byteorder`](https://crates.io/crates/byteorder){target="_blank"} crate provides traits that extend readers/writers:
 
 ```toml
 # Cargo.toml
@@ -3000,12 +3000,23 @@ Quick Reference
 | `printf`                       | `println!("{}",  val)`                 |
 
 ## Where to Go Next
+[Rust Home](https://doc.rust-lang.org/stable/){target=_blank} is the parent to nearly everything below. It's actually called "Rust Documentation", but he's outgrown those britches.
+
+### The Console
+The compiler error messages are unusually good. Read them carefully — they usually tell you exactly what's wrong and often suggest the fix.
+
+- `cargo doc --open` is super cool. It will generate documentation for your project and all its dependencies, and open it in your browser. Keep this guy close at hand. Consider making it a task.
+- `rustc --explain <error-code>` provides a detailed explanation of an error code.
+
+### Documentation
+- The [Standard Library](https://doc.rust-lang.org/stable/std/index.html) is the foundation of Rust. It documents everything in `std::*`.
+- [docs.rs](https://docs.rs){target=_blank} is the standard library and crate documentation hub — well worth bookmarking.
+
+### Books
 - The [Rust Book](https://doc.rust-lang.org/book/){target=_blank} is free online and excellent.
 - [Rust by Example](https://doc.rust-lang.org/rust-by-example/){target=_blank} is terse.
 - [The Cargo Book](https://doc.rust-lang.org/cargo/){target=_blank} Cargo inside out.
     - [Environment Variables](https://doc.rust-lang.org/cargo/reference/environment-variables.html){target=_blank}
+
+### Practice
 - [Rustlings](https://github.com/rust-lang/rustlings){target=_blank} is a set of small exercises that build muscle memory quickly.
-- [docs.rs](https://docs.rs){target=_blank} is the standard library and crate documentation hub — well worth bookmarking.
-
-
-The compiler error messages are unusually good. Read them carefully — they usually tell you exactly what's wrong and often suggest the fix.

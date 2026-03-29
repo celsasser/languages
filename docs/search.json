@@ -202,7 +202,7 @@
     "href": "rust.html#where-to-go-next",
     "title": "Rust for C/C++ Programmers",
     "section": "Where to Go Next",
-    "text": "Where to Go Next\n\nThe Rust Book is free online and excellent.\nRust by Example is terse.\nThe Cargo Book Cargo inside out.\n\nEnvironment Variables\n\nRustlings is a set of small exercises that build muscle memory quickly.\ndocs.rs is the standard library and crate documentation hub — well worth bookmarking.\n\nThe compiler error messages are unusually good. Read them carefully — they usually tell you exactly what’s wrong and often suggest the fix.",
+    "text": "Where to Go Next\nRust Home is the parent to nearly everything below. It’s actually called “Rust Documentation”, but he’s outgrown those britches.\n\nThe Console\nThe compiler error messages are unusually good. Read them carefully — they usually tell you exactly what’s wrong and often suggest the fix.\n\ncargo doc --open is super cool. It will generate documentation for your project and all its dependencies, and open it in your browser. Keep this guy close at hand. Consider making it a task.\nrustc --explain &lt;error-code&gt; provides a detailed explanation of an error code.\n\n\n\nDocumentation\n\nThe Standard Library is the foundation of Rust. It documents everything in std::*.\ndocs.rs is the standard library and crate documentation hub — well worth bookmarking.\n\n\n\nBooks\n\nThe Rust Book is free online and excellent.\nRust by Example is terse.\nThe Cargo Book Cargo inside out.\n\nEnvironment Variables\n\n\n\n\nPractice\n\nRustlings is a set of small exercises that build muscle memory quickly.",
     "crumbs": [
       "Languages",
       "The Rust Language"
