@@ -627,7 +627,7 @@ ZAP    A, [W2++]       ; Clear accumulator and increment
 FIR Filter Inner Loop
 :::
 
-Here is a complete, practical example showing the FIR filter computation that we discussed in our  [Applied DSP](https://celsasser.github.io/ucsd-appdsp-notes/) notebook. This computes one output sample:
+Here is a complete, practical example showing the FIR filter computation that we discussed in our  [Applied DSP](https://celsasser.github.io/ucsd-appdsp-notes/){target=_blank} notebook. This computes one output sample:
 
 $$
 y[n] = \sum_{k=0}^{N-1} a_k \cdot x[n-k]

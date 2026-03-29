@@ -28,7 +28,7 @@ Rust rarely does things behind your back. Integer overflow is checked in debug b
 ## Project Anatomy
 Three nested concepts organize Rust code: **packages**, **crates**, and **modules**. They map roughly — but not exactly — onto what you know from C and Python.
 
-[![](images/rust-01.jpg){fig-align="center" width=9in}](https://iota-for-flutter.github.io/tutorial/fundamentals/rust/project-structure.html)
+[![](images/rust-01.jpg){fig-align="center" width=9in}](https://iota-for-flutter.github.io/tutorial/fundamentals/rust/project-structure.html){target=_blank}
 
 ### Crates
 A **crate** is the fundamental unit of compilation, meaning it is the smallest unit of code that Rust will compile. The Rust compiler takes a crate and produces either an executable or a library. Think of it as the equivalent of a compiled C library (`.a`, `.so`) or a Python package on PyPI — the distributable unit that other projects depend on.
@@ -493,7 +493,7 @@ for n in &nums {
 }
 ```
 
-See [Common Programming Concepts](https://doc.rust-lang.org/book/ch03-00-common-programming-concepts.html) in *The Rust Programming Language* for more information.
+See [Common Programming Concepts](https://doc.rust-lang.org/book/ch03-00-common-programming-concepts.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ## Macros
 Throughout this chapter you have seen `println!`, `vec!`, `format!`, and `panic!`. The `!` signals a **macro call**, not a function call. Macros in Rust are code that writes code at compile time, before the compiler type-checks anything.
@@ -532,9 +532,9 @@ let p2 = p.clone();     // Clone
 assert_eq!(p, p2);      // PartialEq
 ```
 
-You can write your own macros with `macro_rules!` (declarative macros) or procedural macro crates. For most work, the standard library macros and [`derive`](https://doc.rust-lang.org/book/ch20-05-macros.html#custom-derive-macros) cover what you need.
+You can write your own macros with `macro_rules!` (declarative macros) or procedural macro crates. For most work, the standard library macros and [`derive`](https://doc.rust-lang.org/book/ch20-05-macros.html#custom-derive-macros){target=_blank} cover what you need.
 
-See [Macros](https://doc.rust-lang.org/book/ch20-05-macros.html) in *The Rust Programming Language* for more information.
+See [Macros](https://doc.rust-lang.org/book/ch20-05-macros.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ## Memory Management
 This is the heart of Rust. If you understand this section, you understand Rust.
@@ -840,7 +840,7 @@ The compiler will tell you. Common situations:
 Start simple, let the compiler guide you, and the syntax will become natural over time.
 :::
 
-See [Validating References with Lifetimes](https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html) in *The Rust Programming Language* for more information.
+See [Validating References with Lifetimes](https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ## Smart Pointers
 When you need heap allocation beyond what `Vec` and `String` already handle, Rust provides smart pointer types. C++ developers will recognize the ideas.
@@ -927,7 +927,7 @@ let counter = Arc::new(Mutex::new(0));
 | `Rc<T>`  | Shared    | No          | `shared_ptr<T>` (single-threaded)     |
 | `Arc<T>` | Shared    | Yes         | `shared_ptr<T>` with atomic ref count |
 
-See [Smart Pointers](https://doc.rust-lang.org/book/ch15-00-smart-pointers.html) in *The Rust Programming Language* for more information.
+See [Smart Pointers](https://doc.rust-lang.org/book/ch15-00-smart-pointers.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ## Structs, Enums, and Traits
 ### Structs
@@ -1109,7 +1109,7 @@ impl TrafficLight {
             TrafficLight::Green  => 90,
         }
     }
-    
+
     fn can_go(&self) -> bool {
         matches!(self, TrafficLight::Green)
     }
@@ -1157,7 +1157,7 @@ let text: Option<String> = Some(s);     // Same enum, different T
 - Results with success/error variants (`Result<T, E>`)
 - Abstract syntax trees, parsers, state with payloads
 
-See [Enums and Pattern Matching](https://doc.rust-lang.org/book/ch06-00-enums.html) in *The Rust Programming Language* for more information.
+See [Enums and Pattern Matching](https://doc.rust-lang.org/book/ch06-00-enums.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ### Traits
 Traits are Rust's answer to interfaces. A trait defines behaviour; structs implement it.
@@ -1201,7 +1201,7 @@ struct Point { x: f64, y: f64 }
 // Now you can: println!("{:?}", p);
 ```
 
-See [Structs](https://doc.rust-lang.org/book/ch05-00-structs.html) in *The Rust Programming Language* for more information.
+See [Structs](https://doc.rust-lang.org/book/ch05-00-structs.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ## Generics and Trait Bounds
 Generics are Rust's equivalent of C++ templates, but they interact with the trait system in a way that makes constraints explicit and checked at compile time. A generic function works over any type, constrained by trait bounds:
@@ -1264,13 +1264,13 @@ fn make_sounds(animals: &[Box<dyn Animal>]) {
 
 This is the Rust equivalent of virtual methods in C++. The analogy is direct: `Box<dyn Trait>` is roughly what a pointer-to-base class with a vtable is in C++. Prefer `impl Trait` when the type is known at compile time; reach for `dyn Trait` when you need runtime polymorphism or heterogeneous collections.
 
-See [Generic Types, Traits, and Lifetimes](https://doc.rust-lang.org/book/ch10-00-generics.html) in *The Rust Programming Language* for more information.
+See [Generic Types, Traits, and Lifetimes](https://doc.rust-lang.org/book/ch10-00-generics.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ## Pattern Matching
 Pattern matching in Rust is deeper than a switch statement. It simultaneously **tests the structure** of a value and **extracts** data from it. Every `match` arm is a pattern, and the compiler guarantees you have handled every possible case — exhaustiveness is enforced at compile time.
 
 ### The `match` Expression
-[`match`](https://doc.rust-lang.org/book/ch19-01-all-the-places-for-patterns.html#match-arms) as per *The Rust Programming Language*.
+[`match`](https://doc.rust-lang.org/book/ch19-01-all-the-places-for-patterns.html#match-arms){target=_blank} as per *The Rust Programming Language*.
 
 ```rust
 let n = 7;
@@ -1483,7 +1483,7 @@ match dir {
 
 Adding a new variant to an enum breaks every exhaustive match in the codebase at compile time. You cannot silently miss a case. This is one of the most powerful refactoring guarantees Rust offers.
 
-See [Pattern Matching](https://doc.rust-lang.org/book/ch19-00-patterns.html) in *The Rust Programming Language* for more information.
+See [Pattern Matching](https://doc.rust-lang.org/book/ch19-00-patterns.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ## Closures and Iterators
 ### Closures
@@ -1525,7 +1525,7 @@ greet();
 // name is no longer accessible here
 ```
 
-See [Closures](https://doc.rust-lang.org/book/ch13-01-closures.html) in *The Rust Programming Language* for more information.
+See [Closures](https://doc.rust-lang.org/book/ch13-01-closures.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ### Iterators
 The `Iterator` [trait](#traits) powers a functional-style pipeline over any collection. The adapters are *lazy* — nothing is computed until you drive the iterator with a terminal operation.
@@ -1586,7 +1586,7 @@ println!("{:?}", v);   // [2, 4, 6]
 
 The compiler optimizes iterator chains aggressively. A chain of `.filter().map().collect()` typically compiles to the same machine code as an equivalent hand-written loop.
 
-See [Iterators](https://doc.rust-lang.org/book/ch13-02-iterators.html) in *The Rust Programming Language* for more information.
+See [Iterators](https://doc.rust-lang.org/book/ch13-02-iterators.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ## Errors as Values
 ::: {.subheading}
@@ -1651,7 +1651,7 @@ Common examples:
 
 ```rust
 Result<String, io::Error>       // returns String or io::Error
-Result<i32, ParseIntError>      // returns i32 or ParseIntError  
+Result<i32, ParseIntError>      // returns i32 or ParseIntError
 Result<(), Box<dyn Error>>      // returns nothing (unit type) or any error type
 ```
 
@@ -2019,7 +2019,7 @@ fn rejects_negative_input() {
 `.unwrap()` and `.expect()` are appropriate in tests and prototypes. In production code, a panic is a crash with no recovery. Prefer `?`, `match`, `if let`, or the `unwrap_or` variants, which give callers a chance to handle the failure.
 :::
 
-See [Error Handling](https://doc.rust-lang.org/book/ch09-00-error-handling.html) in *The Rust Programming Language* for more information.
+See [Error Handling](https://doc.rust-lang.org/book/ch09-00-error-handling.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ## Common Collections
 
@@ -2046,7 +2046,7 @@ for (k, v) in &map {
 }
 ```
 
-See [Common Collections](https://doc.rust-lang.org/book/ch08-00-common-collections.html) in *The Rust Programming Language* for more information.
+See [Common Collections](https://doc.rust-lang.org/book/ch08-00-common-collections.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ## File I/O
 ::: {.subheading}
@@ -2234,7 +2234,7 @@ let value: u32 = 0x12345678;
 // Write as little-endian
 file.write_all(&value.to_le_bytes())?;
 
-// Write as big-endian  
+// Write as big-endian
 file.write_all(&value.to_be_bytes())?;
 
 // Write in native byte order
@@ -2273,7 +2273,7 @@ writer.flush()?;
 
 **All primitive integer types** (`u8`, `i8`, `u16`, `i16`, `u32`, `i32`, `u64`, `i64`, `u128`, `i128`, `usize`, `isize`) and **floats** (`f32`, `f64`) have these methods:
 - `to_le_bytes()` / `from_le_bytes()` — little-endian
-- `to_be_bytes()` / `from_be_bytes()` — big-endian  
+- `to_be_bytes()` / `from_be_bytes()` — big-endian
 - `to_ne_bytes()` / `from_ne_bytes()` — native endian
 
 ### The `byteorder` Crate
@@ -2370,10 +2370,10 @@ struct Header {
 
 fn read_header(path: &str) -> io::Result<Header> {
     let mut file = File::open(path)?;
-    
+
     let mut buf = [0u8; 8];
     file.read_exact(&mut buf)?;
-    
+
     Ok(Header {
         magic: u32::from_le_bytes([buf[0], buf[1], buf[2], buf[3]]),
         version: u16::from_le_bytes([buf[4], buf[5]]),
@@ -2391,7 +2391,7 @@ use std::io::{BufReader, BufRead};
 fn process_log_file(path: &str) -> io::Result<()> {
     let file = File::open(path)?;
     let reader = BufReader::new(file);
-    
+
     for line in reader.lines() {
         let line = line?;
         if line.contains("ERROR") {
@@ -2411,18 +2411,18 @@ use std::io::{BufWriter, Write};
 fn write_csv(path: &str, data: &[(u32, f64)]) -> io::Result<()> {
     let file = File::create(path)?;
     let mut writer = BufWriter::new(file);
-    
+
     writeln!(writer, "id,value")?;
     for (id, value) in data {
         writeln!(writer, "{},{:.2}", id, value)?;
     }
-    
+
     writer.flush()?;
     Ok(())
 }
 ```
 
-See [Reading a File](https://doc.rust-lang.org/book/ch12-02-reading-a-file.html) and the [`std::io` module documentation](https://doc.rust-lang.org/std/io/index.html) for more information.
+See [Reading a File](https://doc.rust-lang.org/book/ch12-02-reading-a-file.html){target=_blank} and the [`std::io` module documentation](https://doc.rust-lang.org/std/io/index.html){target=_blank} for more information.
 
 ## Cargo
 ::: {.subheading}
@@ -2514,7 +2514,7 @@ Start new projects with the latest edition (`2021` at minimum, `2024` if your to
 :::
 
 ### Dependency Version Constraints
-Cargo uses [semantic versioning](https://semver.org). The version string in `Cargo.toml` is a *requirement*, not an exact pin. Cargo selects the newest version that satisfies all constraints in the dependency graph:
+Cargo uses [semantic versioning](https://semver.org){target=_blank}. The version string in `Cargo.toml` is a *requirement*, not an exact pin. Cargo selects the newest version that satisfies all constraints in the dependency graph:
 
 | Requirement             | Meaning                        | Resolves to (e.g.) |
 |-------------------------|--------------------------------|--------------------|
@@ -2597,7 +2597,7 @@ inherits  = "release"
 debug     = true    # keep symbols for profiling
 ```
 
-See [Packages, Crates, and Modules](https://doc.rust-lang.org/book/ch07-00-managing-growing-projects-with-packages-crates-and-modules.html) in *The Rust Programming Language* for more information.
+See [Packages, Crates, and Modules](https://doc.rust-lang.org/book/ch07-00-managing-growing-projects-with-packages-crates-and-modules.html){target=_blank} in *The Rust Programming Language* for more information.
 
 ## Common Crates
 A few fellas that I find indispensable.
@@ -2607,7 +2607,7 @@ A few fellas that I find indispensable.
 Command-line argument parsing, the civilized way
 :::
 
-[clap](https://docs.rs/clap/latest/clap/) (Command Line Argument Parser) turns a Rust struct into a fully-featured CLI: `--help`, `--version`, validation, subcommands, and shell completions all come for free. You describe what your program accepts; clap handles the rest.
+[clap](https://docs.rs/clap/latest/clap/){target=_blank} (Command Line Argument Parser) turns a Rust struct into a fully-featured CLI: `--help`, `--version`, validation, subcommands, and shell completions all come for free. You describe what your program accepts; clap handles the rest.
 
 Add it to `Cargo.toml` with the `derive` feature, which enables the attribute-based API used throughout this section:
 
@@ -2702,7 +2702,7 @@ struct Cli { ... }
 
 **`name = "pexs24"`** matters because clap uses the binary file name by default. If your binary is named `target/debug/pexs24_dev`, that ugly name shows up in every usage example. Setting `name` pins it to a clean, version-independent string.
 
-**`version = env!("CARGO_PKG_VERSION")`** is worth pausing on. `env!` is a built-in Rust macro that reads an [environment variable](https://doc.rust-lang.org/cargo/reference/environment-variables.html) at *compile time*. Cargo sets `CARGO_PKG_VERSION` to the `version` field in your `Cargo.toml` before invoking the compiler. The result is that your `--version` output always matches your `Cargo.toml` with zero manual synchronization.
+**`version = env!("CARGO_PKG_VERSION")`** is worth pausing on. `env!` is a built-in Rust macro that reads an [environment variable](https://doc.rust-lang.org/cargo/reference/environment-variables.html){target=_blank} at *compile time*. Cargo sets `CARGO_PKG_VERSION` to the `version` field in your `Cargo.toml` before invoking the compiler. The result is that your `--version` output always matches your `Cargo.toml` with zero manual synchronization.
 
 ```toml
 # Cargo.toml
@@ -2820,7 +2820,7 @@ struct Cli {
 | `default_value_t = 8080`   | Typed default — no parsing, must match the field type       |
 | `required = true`          | Force the argument to be provided (overrides `Option<T>`)   |
 | `num_args = 1..`           | Accept multiple values into a `Vec<T>`                      |
-| `env = "MY_VAR"`           | Fall back to an [environment variable](https://doc.rust-lang.org/cargo/reference/environment-variables.html) if the flag is absent  |
+| `env = "MY_VAR"`           | Fall back to an [environment variable](https://doc.rust-lang.org/cargo/reference/environment-variables.html){target=_blank} if the flag is absent  |
 | `hide = true`              | Omit the argument from help output                          |
 
 Doc comments (`/// ...`) above a field become the help text for that argument. Clap reads them directly — no separate `help = "..."` attribute needed.
@@ -2976,7 +2976,7 @@ $ pexs24 --version
 pexs24 0.3.1
 ```
 
-See [clap documentation](https://docs.rs/clap/latest/clap/) and the [clap derive reference](https://docs.rs/clap/latest/clap/_derive/index.html) for the full attribute catalog.
+See [clap documentation](https://docs.rs/clap/latest/clap/){target=_blank} and the [clap derive reference](https://docs.rs/clap/latest/clap/_derive/index.html){target=_blank} for the full attribute catalog.
 
 ## Key Differences from C/C++
 ::: {.subheading}
@@ -3000,12 +3000,12 @@ Quick Reference
 | `printf`                       | `println!("{}",  val)`                 |
 
 ## Where to Go Next
-- The [Rust Book](https://doc.rust-lang.org/book/) is free online and excellent.
-- [Rust by Example](https://doc.rust-lang.org/rust-by-example/) is terse.
-- [The Cargo Book](https://doc.rust-lang.org/cargo/) Cargo inside out.
-    - [Environment Variables](https://doc.rust-lang.org/cargo/reference/environment-variables.html)
-- [Rustlings](https://github.com/rust-lang/rustlings) is a set of small exercises that build muscle memory quickly.
-- [docs.rs](https://docs.rs) is the standard library and crate documentation hub — well worth bookmarking.
+- The [Rust Book](https://doc.rust-lang.org/book/){target=_blank} is free online and excellent.
+- [Rust by Example](https://doc.rust-lang.org/rust-by-example/){target=_blank} is terse.
+- [The Cargo Book](https://doc.rust-lang.org/cargo/){target=_blank} Cargo inside out.
+    - [Environment Variables](https://doc.rust-lang.org/cargo/reference/environment-variables.html){target=_blank}
+- [Rustlings](https://github.com/rust-lang/rustlings){target=_blank} is a set of small exercises that build muscle memory quickly.
+- [docs.rs](https://docs.rs){target=_blank} is the standard library and crate documentation hub — well worth bookmarking.
 
 
 The compiler error messages are unusually good. Read them carefully — they usually tell you exactly what's wrong and often suggest the fix.
