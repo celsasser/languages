@@ -28,7 +28,7 @@ Rust rarely does things behind your back. Integer overflow is checked in debug b
 ## Project Anatomy
 Three nested concepts organize Rust code: **packages**, **crates**, and **modules**. They map roughly — but not exactly — onto what you know from C and Python.
 
-[![](images/rust-01.jpg){fig-align="center" width=9in}](https://iota-for-flutter.github.io/tutorial/fundamentals/rust/project-structure.html){target=_blank}
+[![](images/rust-01.jpg){fig-align="center" width=9in}](https://iota-for-flutter.github.io/tutorial/fundamentals/rust/project-structure.html){target="_blank" rel="noopener noreferrer"}
 
 ### Crates
 A **crate** is the fundamental unit of compilation, meaning it is the smallest unit of code that Rust will compile. The Rust compiler takes a crate and produces either an executable or a library. Think of it as the equivalent of a compiled C library (`.a`, `.so`) or a Python package on PyPI — the distributable unit that other projects depend on.
@@ -62,7 +62,7 @@ In modern Rust (since 2018), `mod.rs` is often replaced by a file with the same 
 :::
 
 ### Modules
-A **module** is a namespace within a crate — the closest equivalent to a Python module. Modules organize code into logical units and control what is visible outside (`pub`) versus private. Items are **private by default** — you opt into visibility explicitly. Before we dive deep on our own, we are to share *The Rust Programming Language*'s  ["Modules Cheat Sheet"](https://doc.rust-lang.org/book/ch07-02-defining-modules-to-control-scope-and-privacy.html). It was just what I was looking for when learning about modules; so, here it is word for word:
+A **module** is a namespace within a crate — the closest equivalent to a Python module. Modules organize code into logical units and control what is visible outside (`pub`) versus private. Items are **private by default** — you opt into visibility explicitly. Before we dive deep on our own, we are to share *The Rust Programming Language*'s  ["Modules Cheat Sheet"](https://doc.rust-lang.org/book/ch07-02-defining-modules-to-control-scope-and-privacy.html){target="_blank"}. It was just what I was looking for when learning about modules; so, here it is word for word:
 
 ::: {.exploration data-label="Modules Cheat Sheet"}
 Before we get to the details of modules and paths, here we provide a quick reference on how modules, paths, the use keyword, and the pub keyword work in the compiler, and how most developers organize their code. We’ll be going through examples of each of these rules throughout this chapter, but this is a great place to refer to as a reminder of how modules work.
@@ -492,7 +492,7 @@ for n in &nums {
 }
 ```
 
-See [Common Programming Concepts](https://doc.rust-lang.org/book/ch03-00-common-programming-concepts.html){target=_blank} in *The Rust Programming Language* for more information.
+See [Common Programming Concepts](https://doc.rust-lang.org/book/ch03-00-common-programming-concepts.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for more information.
 
 ### Operators
 ::: {.subheading}
@@ -607,7 +607,7 @@ let p3 = p1 + p2;  // uses our Add implementation
 | `[]` | `Index` | `index()` |
 | `[]` (mut) | `IndexMut` | `index_mut()` |
 
-See [Appendix B: Operators](https://doc.rust-lang.org/book/appendix-02-operators.html){target=_blank} in *The Rust Programming Language* for the complete reference.
+See [Appendix B: Operators](https://doc.rust-lang.org/book/appendix-02-operators.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for the complete reference.
 
 ## Macros
 Throughout this chapter you have seen `println!`, `vec!`, `format!`, and `panic!`. The `!` signals a **macro call**, not a function call. Macros in Rust are code that writes code at compile time, before the compiler type-checks anything.
@@ -646,9 +646,9 @@ let p2 = p.clone();     // Clone
 assert_eq!(p, p2);      // PartialEq
 ```
 
-You can write your own macros with `macro_rules!` (declarative macros) or procedural macro crates. For most work, the standard library macros and [`derive`](https://doc.rust-lang.org/book/ch20-05-macros.html#custom-derive-macros){target=_blank} cover what you need.
+You can write your own macros with `macro_rules!` (declarative macros) or procedural macro crates. For most work, the standard library macros and [`derive`](https://doc.rust-lang.org/book/ch20-05-macros.html#custom-derive-macros){target="_blank" rel="noopener noreferrer"} cover what you need.
 
-See [Macros](https://doc.rust-lang.org/book/ch20-05-macros.html){target=_blank} in *The Rust Programming Language* for more information.
+See [Macros](https://doc.rust-lang.org/book/ch20-05-macros.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for more information.
 
 ## Memory Management
 This is the heart of Rust. If you understand this section, you understand Rust.
@@ -967,7 +967,7 @@ The compiler will tell you. Common situations:
 Start simple, let the compiler guide you, and the syntax will become natural over time.
 :::
 
-See [Validating References with Lifetimes](https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html){target=_blank} in *The Rust Programming Language* for more information.
+See [Validating References with Lifetimes](https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for more information.
 
 ## Smart Pointers
 When you need heap allocation beyond what `Vec` and `String` already handle, Rust provides smart pointer types. C++ developers will recognize the ideas.
@@ -1054,7 +1054,7 @@ let counter = Arc::new(Mutex::new(0));
 | `Rc<T>`  | Shared    | No          | `shared_ptr<T>` (single-threaded)     |
 | `Arc<T>` | Shared    | Yes         | `shared_ptr<T>` with atomic ref count |
 
-See [Smart Pointers](https://doc.rust-lang.org/book/ch15-00-smart-pointers.html){target=_blank} in *The Rust Programming Language* for more information.
+See [Smart Pointers](https://doc.rust-lang.org/book/ch15-00-smart-pointers.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for more information.
 
 ## Structs, Enums, and Traits
 ### Structs
@@ -1543,7 +1543,7 @@ with data
 - Results with success/error variants (`Result<T, E>`)
 - Abstract syntax trees, parsers, state with payloads
 
-See [Enums and Pattern Matching](https://doc.rust-lang.org/book/ch06-00-enums.html){target=_blank} in *The Rust Programming Language* for more information.
+See [Enums and Pattern Matching](https://doc.rust-lang.org/book/ch06-00-enums.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for more information.
 
 ### Traits
 Traits are Rust's answer to interfaces. A trait defines behaviour; structs implement it.
@@ -1587,7 +1587,7 @@ struct Point { x: f64, y: f64 }
 // Now you can: println!("{:?}", p);
 ```
 
-See [Structs](https://doc.rust-lang.org/book/ch05-00-structs.html){target=_blank} in *The Rust Programming Language* for more information.
+See [Structs](https://doc.rust-lang.org/book/ch05-00-structs.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for more information.
 
 ## Generics and Trait Bounds
 Generics are Rust's equivalent of C++ templates, but they interact with the trait system in a way that makes constraints explicit and checked at compile time. A generic function works over any type, constrained by trait bounds:
@@ -1650,13 +1650,13 @@ fn make_sounds(animals: &[Box<dyn Animal>]) {
 
 This is the Rust equivalent of virtual methods in C++. The analogy is direct: `Box<dyn Trait>` is roughly what a pointer-to-base class with a vtable is in C++. Prefer `impl Trait` when the type is known at compile time; reach for `dyn Trait` when you need runtime polymorphism or heterogeneous collections.
 
-See [Generic Types, Traits, and Lifetimes](https://doc.rust-lang.org/book/ch10-00-generics.html){target=_blank} in *The Rust Programming Language* for more information.
+See [Generic Types, Traits, and Lifetimes](https://doc.rust-lang.org/book/ch10-00-generics.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for more information.
 
 ## Pattern Matching
 Pattern matching in Rust is deeper than a switch statement. It simultaneously **tests the structure** of a value and **extracts** data from it. Every `match` arm is a pattern, and the compiler guarantees you have handled every possible case — exhaustiveness is enforced at compile time.
 
 ### The `match` Expression
-[`match`](https://doc.rust-lang.org/book/ch19-01-all-the-places-for-patterns.html#match-arms){target=_blank} as per *The Rust Programming Language*.
+[`match`](https://doc.rust-lang.org/book/ch19-01-all-the-places-for-patterns.html#match-arms){target="_blank" rel="noopener noreferrer"} as per *The Rust Programming Language*.
 
 ```rust
 let n = 7;
@@ -1869,7 +1869,7 @@ match dir {
 
 Adding a new variant to an enum breaks every exhaustive match in the codebase at compile time. You cannot silently miss a case. This is one of the most powerful refactoring guarantees Rust offers.
 
-See [Pattern Matching](https://doc.rust-lang.org/book/ch19-00-patterns.html){target=_blank} in *The Rust Programming Language* for more information.
+See [Pattern Matching](https://doc.rust-lang.org/book/ch19-00-patterns.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for more information.
 
 ## Closures and Iterators
 ### Closures
@@ -1911,7 +1911,7 @@ greet();
 // name is no longer accessible here
 ```
 
-See [Closures](https://doc.rust-lang.org/book/ch13-01-closures.html){target=_blank} in *The Rust Programming Language* for more information.
+See [Closures](https://doc.rust-lang.org/book/ch13-01-closures.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for more information.
 
 ### Iterators
 The `Iterator` [trait](#traits) powers a functional-style pipeline over any collection. The adapters are *lazy* — nothing is computed until you drive the iterator with a terminal operation.
@@ -1972,7 +1972,7 @@ println!("{:?}", v);   // [2, 4, 6]
 
 The compiler optimizes iterator chains aggressively. A chain of `.filter().map().collect()` typically compiles to the same machine code as an equivalent hand-written loop.
 
-See [Iterators](https://doc.rust-lang.org/book/ch13-02-iterators.html){target=_blank} in *The Rust Programming Language* for more information.
+See [Iterators](https://doc.rust-lang.org/book/ch13-02-iterators.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for more information.
 
 ## Errors as Values
 ::: {.subheading}
@@ -2421,7 +2421,7 @@ fn rejects_negative_input() {
 `.unwrap()` and `.expect()` are appropriate in tests and prototypes. In production code, a panic is a crash with no recovery. Prefer `?`, `match`, `if let`, or the `unwrap_or` variants, which give callers a chance to handle the failure.
 :::
 
-See [Error Handling](https://doc.rust-lang.org/book/ch09-00-error-handling.html){target=_blank} in *The Rust Programming Language* for more information.
+See [Error Handling](https://doc.rust-lang.org/book/ch09-00-error-handling.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for more information.
 
 ## Common Collections
 ![](images/rust-ccs.png){fig-align="center" width=12in}
@@ -2447,14 +2447,14 @@ for (k, v) in &map {
 }
 ```
 
-See [Common Collections](https://doc.rust-lang.org/book/ch08-00-common-collections.html){target=_blank} in *The Rust Programming Language* for more information.
+See [Common Collections](https://doc.rust-lang.org/book/ch08-00-common-collections.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for more information.
 
 ## File I/O
 ::: {.subheading}
 Reading and writing files: unbuffered, buffered, and binary
 :::
 
-File I/O in Rust is built around the [`std::fs`](https://doc.rust-lang.org/std/fs/index.html){target=_blank} and [`std::io`](https://doc.rust-lang.org/std/io/index.html){target=_blank} modules. The landscape includes basic file operations, buffered I/O for performance, line-oriented reading, and binary I/O with byte order control.
+File I/O in Rust is built around the [`std::fs`](https://doc.rust-lang.org/std/fs/index.html){target="_blank" rel="noopener noreferrer"} and [`std::io`](https://doc.rust-lang.org/std/io/index.html){target="_blank" rel="noopener noreferrer"} modules. The landscape includes basic file operations, buffered I/O for performance, line-oriented reading, and binary I/O with byte order control.
 
 ### Basic File Operations
 ###### Opening and creating files
@@ -2666,7 +2666,7 @@ writer.flush()?;
 - `to_ne_bytes()` / `from_ne_bytes()` — native endian
 
 ### The `byteorder` Crate
-For more convenient binary I/O, the [`byteorder`](https://crates.io/crates/byteorder){target="_blank"} crate provides traits that extend readers/writers:
+For more convenient binary I/O, the [`byteorder`](https://crates.io/crates/byteorder){target="_blank" rel="noopener noreferrer"} crate provides traits that extend readers/writers:
 
 ```toml
 # Cargo.toml
@@ -2804,7 +2804,7 @@ fn write_csv(path: &str, data: &[(u32, f64)]) -> io::Result<()> {
 }
 ```
 
-See [Reading a File](https://doc.rust-lang.org/book/ch12-02-reading-a-file.html){target=_blank} and the [`std::io` module documentation](https://doc.rust-lang.org/std/io/index.html){target=_blank} for more information.
+See [Reading a File](https://doc.rust-lang.org/book/ch12-02-reading-a-file.html){target="_blank" rel="noopener noreferrer"} and the [`std::io` module documentation](https://doc.rust-lang.org/std/io/index.html){target="_blank" rel="noopener noreferrer"} for more information.
 
 ## Cargo
 ::: {.subheading}
@@ -2896,7 +2896,7 @@ Start new projects with the latest edition (`2021` at minimum, `2024` if your to
 :::
 
 ### Dependency Version Constraints
-Cargo uses [semantic versioning](https://semver.org){target=_blank}. The version string in `Cargo.toml` is a *requirement*, not an exact pin. Cargo selects the newest version that satisfies all constraints in the dependency graph:
+Cargo uses [semantic versioning](https://semver.org){target="_blank" rel="noopener noreferrer"}. The version string in `Cargo.toml` is a *requirement*, not an exact pin. Cargo selects the newest version that satisfies all constraints in the dependency graph:
 
 | Requirement             | Meaning                        | Resolves to (e.g.) |
 |-------------------------|--------------------------------|--------------------|
@@ -2979,17 +2979,17 @@ inherits  = "release"
 debug     = true    # keep symbols for profiling
 ```
 
-See [Packages, Crates, and Modules](https://doc.rust-lang.org/book/ch07-00-managing-growing-projects-with-packages-crates-and-modules.html){target=_blank} in *The Rust Programming Language* for more information.
+See [Packages, Crates, and Modules](https://doc.rust-lang.org/book/ch07-00-managing-growing-projects-with-packages-crates-and-modules.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for more information.
 
 ## Common Crates
 A few fellas that I find indispensable.
 
-### clap
+### `clap`
 ::: {.subheading}
 Command-line argument parsing, the civilized way
 :::
 
-[clap](https://docs.rs/clap/latest/clap/){target=_blank} (Command Line Argument Parser) turns a Rust struct into a fully-featured CLI: `--help`, `--version`, validation, subcommands, and shell completions all come for free. You describe what your program accepts; clap handles the rest.
+[clap](https://docs.rs/clap/latest/clap/){target="_blank" rel="noopener noreferrer"} (Command Line Argument Parser) turns a Rust struct into a fully-featured CLI: `--help`, `--version`, validation, subcommands, and shell completions all come for free. You describe what your program accepts; clap handles the rest.
 
 Add it to `Cargo.toml` with the `derive` feature, which enables the attribute-based API used throughout this section:
 
@@ -3081,7 +3081,7 @@ struct Cli { ... }
 
 **`name = "pexs24"`** matters because clap uses the binary file name by default. If your binary is named `target/debug/pexs24_dev`, that ugly name shows up in every usage example. Setting `name` pins it to a clean, version-independent string.
 
-**`version = env!("CARGO_PKG_VERSION")`** is worth pausing on. `env!` is a built-in Rust macro that reads an [environment variable](https://doc.rust-lang.org/cargo/reference/environment-variables.html){target=_blank} at *compile time*. Cargo sets `CARGO_PKG_VERSION` to the `version` field in your `Cargo.toml` before invoking the compiler. The result is that your `--version` output always matches your `Cargo.toml` with zero manual synchronization.
+**`version = env!("CARGO_PKG_VERSION")`** is worth pausing on. `env!` is a built-in Rust macro that reads an [environment variable](https://doc.rust-lang.org/cargo/reference/environment-variables.html){target="_blank" rel="noopener noreferrer"} at *compile time*. Cargo sets `CARGO_PKG_VERSION` to the `version` field in your `Cargo.toml` before invoking the compiler. The result is that your `--version` output always matches your `Cargo.toml` with zero manual synchronization.
 
 ```toml
 # Cargo.toml
@@ -3194,7 +3194,7 @@ struct Cli {
 | `default_value_t = 8080` | Typed default — no parsing, must match the field type                                                                                             |
 | `required = true`        | Force the argument to be provided (overrides `Option<T>`)                                                                                         |
 | `num_args = 1..`         | Accept multiple values into a `Vec<T>`                                                                                                            |
-| `env = "MY_VAR"`         | Fall back to an [environment variable](https://doc.rust-lang.org/cargo/reference/environment-variables.html){target=_blank} if the flag is absent |
+| `env = "MY_VAR"`         | Fall back to an [environment variable](https://doc.rust-lang.org/cargo/reference/environment-variables.html){target="_blank" rel="noopener noreferrer"} if the flag is absent |
 | `hide = true`            | Omit the argument from help output                                                                                                                |
 
 Doc comments (`/// ...`) above a field become the help text for that argument. Clap reads them directly — no separate `help = "..."` attribute needed.
@@ -3218,7 +3218,18 @@ struct Cli {
 Positional `Vec<T>` with `num_args = 1..` collects all remaining positional arguments. Named `Vec<T>` fields (with `short`/`long`) allow the flag to be repeated: `--tag foo --tag bar`.
 
 #### Subcommands
-Subcommands model tools like `git commit` or `cargo build` where the first argument selects a mode of operation. Define an enum with `#[derive(Subcommand)]` and embed it in your top-level struct:
+Subcommands model tools like `git commit` or `cargo build` where the first argument selects a mode of operation. Clap supports both, and both may have their own options:
+
+`<command> [command-options] <subcommand> [subcommand-options] [subcommand-args]`
+
+- `command`: (defined on the top-level `Cli` struct)
+- `command-options`: (defined on the top-level `Cli` struct)
+- `subcommand`: (defined inside a specific enum variant)
+- `subcommand-options`: (defined inside a specific enum variant)
+
+If a command option should work in either position, mark it `global = true`.
+
+Define an enum with `#[derive(Subcommand)]` and embed it in your top-level `Parser` struct. By convention this struct is named `Cli`, but any name works — clap derives from the struct name you call `.parse()` on:
 
 ```rust
 use clap::{Parser, Subcommand};
@@ -3226,6 +3237,14 @@ use clap::{Parser, Subcommand};
 #[derive(Parser)]
 #[command(name = "tool")]
 struct Cli {
+    /// Command-level option (applies to the root command)
+    #[arg(long, value_name = "FILE", default_value = "tool.toml")]
+    config: String,
+
+    /// Global option: accepted before or after the subcommand
+    #[arg(short, long, global = true)]
+    verbose: bool,
+
     #[command(subcommand)]
     command: Commands,
 }
@@ -3247,6 +3266,10 @@ enum Commands {
 fn main() {
     let cli = Cli::parse();
 
+    if cli.verbose {
+        eprintln!("Using config: {}", cli.config);
+    }
+
     match cli.command {
         Commands::Compress { input, output } => {
             let dest = output.unwrap_or_else(|| format!("{}.gz", input));
@@ -3261,12 +3284,17 @@ fn main() {
 
 ```
 $ tool --help
-Usage: tool <COMMAND>
+Usage: tool [OPTIONS] <COMMAND>
 
 Commands:
   compress  Compress a file
   formats   List available formats
   help      Print this message or the help of a subcommand
+
+Options:
+      --config <FILE>  [default: tool.toml]
+  -v, --verbose
+  -h, --help           Print help
 
 $ tool compress --help
 Compress a file
@@ -3278,13 +3306,39 @@ Arguments:
 
 Options:
   -o, --output <FILE>
+  -v, --verbose
   -h, --help           Print help
 ```
 
 Each subcommand gets its own `--help` page automatically.
 
+##### Optional Subcommands
+If the tool should run without a subcommand (falling back to some default behavior), make the field `Option<Commands>`:
+
+```rust
+#[derive(Parser)]
+struct Cli {
+    #[command(subcommand)]
+    command: Option<Commands>,
+}
+
+fn main() {
+    let cli = Cli::parse();
+
+    match cli.command {
+        Some(Commands::Compress { input, output }) => { /* ... */ }
+        Some(Commands::Formats)                    => { /* ... */ }
+        None                                       => println!("No subcommand given; try --help"),
+    }
+}
+```
+
 #### A Complete Example
-Putting it all together: a realistic CLI for a file processing tool.
+::: {.subheading}
+Sans subcommands
+:::
+
+Putting it all together: a realistic flat CLI (no subcommands) for a file processing tool, combining positional arguments, optional flags, typed defaults, and version output.
 
 ```rust
 use clap::Parser;
@@ -3347,7 +3401,7 @@ $ pexs24 --version
 pexs24 0.3.1
 ```
 
-See [clap documentation](https://docs.rs/clap/latest/clap/){target=_blank} and the [clap derive reference](https://docs.rs/clap/latest/clap/_derive/index.html){target=_blank} for the full attribute catalog.
+See [clap documentation](https://docs.rs/clap/latest/clap/){target="_blank" rel="noopener noreferrer"} and the [clap derive reference](https://docs.rs/clap/latest/clap/_derive/index.html){target="_blank" rel="noopener noreferrer"} for the full attribute catalog.
 
 ## Key Differences from C/C++
 ::: {.subheading}
@@ -3371,7 +3425,7 @@ Quick Reference
 | `printf`                       | `println!("{}",  val)`                 |
 
 ## Where to Go Next
-[Rust Home](https://doc.rust-lang.org/stable/){target=_blank} is the parent to nearly everything below. It's actually called "Rust Documentation", but he's outgrown those britches.
+[Rust Home](https://doc.rust-lang.org/stable/){target="_blank" rel="noopener noreferrer"} is the parent to nearly everything below. It's actually called "Rust Documentation", but he's outgrown those britches.
 
 ### The Console
 The compiler error messages are unusually good. Read them carefully — they usually tell you exactly what's wrong and often suggest the fix.
@@ -3380,14 +3434,14 @@ The compiler error messages are unusually good. Read them carefully — they usu
 - `rustc --explain <error-code>` provides a detailed explanation of an error code.
 
 ### Documentation
-- The [Standard Library](https://doc.rust-lang.org/stable/std/index.html) is the foundation of Rust. It documents everything in `std::*`.
-- [docs.rs](https://docs.rs){target=_blank} is the standard library and crate documentation hub — well worth bookmarking.
+- The [Standard Library](https://doc.rust-lang.org/stable/std/index.html){target="_blank"} is the foundation of Rust. It documents everything in `std::*`.
+- [docs.rs](https://docs.rs){target="_blank" rel="noopener noreferrer"} is the standard library and crate documentation hub — well worth bookmarking.
 
 ### Books
-- The [Rust Book](https://doc.rust-lang.org/book/){target=_blank} is free online and excellent.
-- [Rust by Example](https://doc.rust-lang.org/rust-by-example/){target=_blank} is terse.
-- [The Cargo Book](https://doc.rust-lang.org/cargo/){target=_blank} Cargo inside out.
-   - [Environment Variables](https://doc.rust-lang.org/cargo/reference/environment-variables.html){target=_blank}
+- The [Rust Book](https://doc.rust-lang.org/book/){target="_blank" rel="noopener noreferrer"} is free online and excellent.
+- [Rust by Example](https://doc.rust-lang.org/rust-by-example/){target="_blank" rel="noopener noreferrer"} is terse.
+- [The Cargo Book](https://doc.rust-lang.org/cargo/){target="_blank" rel="noopener noreferrer"} Cargo inside out.
+   - [Environment Variables](https://doc.rust-lang.org/cargo/reference/environment-variables.html){target="_blank" rel="noopener noreferrer"}
 
 ### Practice
-- [Rustlings](https://github.com/rust-lang/rustlings){target=_blank} is a set of small exercises that build muscle memory quickly.
+- [Rustlings](https://github.com/rust-lang/rustlings){target="_blank" rel="noopener noreferrer"} is a set of small exercises that build muscle memory quickly.

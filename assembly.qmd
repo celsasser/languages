@@ -627,7 +627,7 @@ ZAP    A, [W2++]       ; Clear accumulator and increment
 FIR Filter Inner Loop
 :::
 
-Here is a complete, practical example showing the FIR filter computation that we discussed in our  [Applied DSP](https://celsasser.github.io/ucsd-appdsp-notes/){target=_blank} notebook. This computes one output sample:
+Here is a complete, practical example showing the FIR filter computation that we discussed in our  [Applied DSP](https://celsasser.github.io/ucsd-appdsp-notes/){target="_blank" rel="noopener noreferrer"} notebook. This computes one output sample:
 
 $$
 y[n] = \sum_{k=0}^{N-1} a_k \cdot x[n-k]
@@ -1053,5 +1053,5 @@ plt.show()
 - Understand your debugger's disassembly view
 
 ## Further Reading
-- [GCC Inline Assembly](https://gcc.gnu.org/onlinedocs/gcc/Using-Assembly-Language-with-C.html){target="_blank" rel="noopener"} - How to integrate assembly code within C programs
-- [PC Assembly Language](./reference/pcasm-book.pdf){target="_blank" rel="noopener"} by Paul A. Carter - Comprehensive assembly language textbook (x86 focused, but concepts apply)
+- [GCC Inline Assembly](https://gcc.gnu.org/onlinedocs/gcc/Using-Assembly-Language-with-C.html){target="_blank" rel="noopener noreferrer"} - How to integrate assembly code within C programs
+- [PC Assembly Language](./reference/pcasm-book.pdf){target="_blank" rel="noopener noreferrer"} by Paul A. Carter - Comprehensive assembly language textbook (x86 focused, but concepts apply)
