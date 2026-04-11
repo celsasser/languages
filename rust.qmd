@@ -512,8 +512,8 @@ Rust operators are listed here from highest to lowest precedence. Higher precede
 | 3 | `-expr` | Negation (arithmetic) | `-5`, `-x` |
 | 3 | `!expr` | Logical/bitwise NOT | `!true`, `!0b1010` |
 | 3 | `*expr` | Dereference | `*ptr`, `*boxed_value` |
-| 3 | `&expr` | Borrow (immutable reference) | `&x`, `&mut y` |
-| 3 | `&mut expr` | Mutable borrow | `&mut vec` |
+| 3 | `&expr` | Borrow (immutable reference) | `&x`, `&y` |
+| 3 | `&mut expr` | Mutable borrow | `&mut y`, `&mut vec` |
 | 4 | `as` | Type cast | `x as f64`, `5 as u8` |
 | 5 | `*` | Multiplication | `3 * 4` |
 | 5 | `/` | Division | `10 / 2` |
