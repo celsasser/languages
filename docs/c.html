@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-03-28">
+<meta name="dcterms.date" content="2026-04-11">
 
 <title>The C Language – Computer Language Notebook</title>
 <style>
@@ -431,7 +431,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">March 28, 2026</p>
+      <p class="date">April 11, 2026</p>
     </div>
   </div>
   
@@ -520,7 +520,7 @@ window.Quarto = {
 </section>
 <section id="the-standard-library-and-io" class="level4">
 <h4 class="anchored" data-anchor-id="the-standard-library-and-io">The Standard Library and I/O</h4>
-<p>C provides a rich <a href="https://www.ibm.com/docs/en/i/7.5.0?topic=extensions-standard-c-library-functions-table-by-name" target="_blank">Standard Library</a> (often referred to as <code>libc</code>). Unlike higher-level languages, C does not have built-in statements for Input/Output (I/O). Instead, I/O is handled by functions in the standard library, primarily defined in <code>&lt;stdio.h&gt;</code>.</p>
+<p>C provides a rich <a href="https://www.ibm.com/docs/en/i/7.5.0?topic=extensions-standard-c-library-functions-table-by-name" target="_blank" rel="noopener noreferrer">Standard Library</a> (often referred to as <code>libc</code>). Unlike higher-level languages, C does not have built-in statements for Input/Output (I/O). Instead, I/O is handled by functions in the standard library, primarily defined in <code>&lt;stdio.h&gt;</code>.</p>
 <ul>
 <li><strong><code>printf</code> / <code>scanf</code></strong>: The workhorses for formatted output and input.</li>
 <li><strong><code>fprintf</code> / <code>fscanf</code></strong>: Versions that work with file streams.</li>
@@ -542,7 +542,7 @@ window.Quarto = {
 </section>
 <section id="the-compiler" class="level3">
 <h3 class="anchored" data-anchor-id="the-compiler">The Compiler</h3>
-<p>A <strong>compiler</strong> is a program that translates computer code written in one programming language (the source language, like C) into another language (the target language, usually machine code or assembly). For the dsPIC, we typically use the <a href="https://www.microchip.com/en-us/tools-resources/develop/mplab-xc-compilers/xc16" target="_blank">XC16</a> compiler.</p>
+<p>A <strong>compiler</strong> is a program that translates computer code written in one programming language (the source language, like C) into another language (the target language, usually machine code or assembly). For the dsPIC, we typically use the <a href="https://www.microchip.com/en-us/tools-resources/develop/mplab-xc-compilers/xc16" target="_blank" rel="noopener noreferrer">XC16</a> compiler.</p>
 </section>
 <section id="the-linker" class="level3">
 <h3 class="anchored" data-anchor-id="the-linker">The Linker</h3>
@@ -683,10 +683,10 @@ window.Quarto = {
 <p><code>__attribute__((..))</code></p>
 </div>
 <p><strong>Important distinction:</strong> <code>__attribute__</code> is NOT a preprocessor directive. It is a <em>compiler extension</em> (GCC and compatible compilers like XC16) that provides instructions to the compiler at compile time, not at preprocessing time.</p>
-<p><a href="https://gcc.gnu.org/onlinedocs/gcc/Function-Attributes.html" target="_blank">Declaring Attributes of Functions - GCC Documentation</a>:</p>
+<p><a href="https://gcc.gnu.org/onlinedocs/gcc/Function-Attributes.html" target="_blank" rel="noopener noreferrer">Declaring Attributes of Functions - GCC Documentation</a>:</p>
 <blockquote class="blockquote">
 <p>…you can use function attributes to specify certain function properties that may help the compiler optimize calls or check code more carefully for correctness. For example, you can use attributes to specify that a function never returns (noreturn), returns a value depending only on the values of its arguments (const), or has printf-style arguments (format).</p>
-<p>You can also use attributes to control memory placement, code generation options or call/return conventions within the function being annotated. Many of these attributes are target-specific. For example, many targets support attributes for defining interrupt handler functions, which typically must follow special register usage and return conventions. Such attributes are described in the subsection for each target. However, a considerable number of attributes are supported by most, if not all targets. Those are described in the <a href="https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html" target="_blank">Common Function Attributes</a> section.</p>
+<p>You can also use attributes to control memory placement, code generation options or call/return conventions within the function being annotated. Many of these attributes are target-specific. For example, many targets support attributes for defining interrupt handler functions, which typically must follow special register usage and return conventions. Such attributes are described in the subsection for each target. However, a considerable number of attributes are supported by most, if not all targets. Those are described in the <a href="https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html" target="_blank" rel="noopener noreferrer">Common Function Attributes</a> section.</p>
 </blockquote>
 <section id="syntax" class="level5">
 <h5 class="anchored" data-anchor-id="syntax">Syntax</h5>
@@ -2293,7 +2293,7 @@ Result_{Q15} = (A_{Q15} \times B_{Q15}) &gt;&gt; 15
 <p><strong>Caveat:</strong> Bit field layout is compiler-dependent. For portable code, use bitwise operations instead.</p>
 <div class="exploration" data-label="Bit Field TRISCBITS">
 <p><code>TRISCBITS</code> is a <em>bit field</em> and is used to control the direction of pins on Port C: whether each pin is an input or output. This struct overlays the 16-bit TRISC hardware <a href="./glossary.html#register">register</a>, giving you named access to individual bits instead of having to manually mask and shift.</p>
-<p>It’s in <code>p33FJ256GP506.h</code> which is included via <code>xc.h</code> (which is the chip selector). We use it in <a href="https://github.com/celsasser/blinkblocking" target="_blank">BlinkBlocking</a>.</p>
+<p>It’s in <code>p33FJ256GP506.h</code> which is included via <code>xc.h</code> (which is the chip selector). We use it in <a href="https://github.com/celsasser/blinkblocking" target="_blank" rel="noopener noreferrer">BlinkBlocking</a>.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb70"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define TRISC TRISC</span></span>
 <span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a><span class="kw">extern</span> <span class="dt">volatile</span> <span class="dt">uint16_t</span> TRISC __attribute__<span class="op">((</span>__sfr__<span class="op">));</span></span>
 <span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a><span class="kw">typedef</span> <span class="kw">struct</span> tagTRISCBITS <span class="op">{</span></span>
