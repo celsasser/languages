@@ -433,7 +433,37 @@ div.panel-h6:has(> table:first-child) {
   font-size: 10pt;
 }
 
-/**** spacing and layout ****/
+/**** composable fellas ****/
+.border-light-1pt {
+  border: 1pt solid #dcd8d8;
+  border-radius: 5pt;
+}
+
+.border-light-2pt {
+  border: 2pt solid #dcd8d8;
+  border-radius: 6pt;
+}
+
+.border-light-3pt {
+  border: 3pt solid #dcd8d8;
+  border-radius: 7pt;
+}
+
+.border-light-4pt {
+  border: 4pt solid #dcd8d8;
+  border-radius: 8pt;
+}
+
+.border-dark-1pt {
+  border: 1pt solid #444;
+  border-radius: 6pt;
+}
+
+.border-dark-2pt {
+  border: 2pt solid #444;
+  border-radius: 6pt;
+}
+
 .indent-l-1em {
   padding-left: 1em;
 }

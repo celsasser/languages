@@ -2423,27 +2423,170 @@ fn rejects_negative_input() {
 
 See [Error Handling](https://doc.rust-lang.org/book/ch09-00-error-handling.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for more information.
 
-## Common Collections
+## Collections
+::: {.subheading}
+The fellas you'd bring home to mother
+:::
+
 ![](images/rust-ccs.png){fig-align="center" width=12in}
 
+### Vec\<T\>
+::: {.subheading}
+A growable, heap-allocated array
+:::
+
+`Vec<T>` is the most-used collection in Rust. It owns its elements, stores them contiguously in memory, and grows automatically as you push to it.
+
+###### Creating and populating
 ```rust
-// Vec<T> — growable array (like std::vector)
+// With an explicit type annotation
 let mut v: Vec<i32> = Vec::new();
-v.push(1);
-v.push(2);
-v.push(3);
-let third = v[2];           // 3 — panics if index is out of bounds
-let safe = v.get(10);       // None — returns Option<&i32> instead of panicking
+v.push(10);
+v.push(20);
+v.push(30);
 
-// HashMap<K, V>
+// With the vec! macro — type inferred from literals
+let mut scores = vec![95, 87, 72, 100, 68];
+
+// Pre-allocated capacity avoids repeated reallocation
+let mut big: Vec<String> = Vec::with_capacity(1000);
+```
+
+###### Indexing
+Indexing a `Vec` with `[]` requires the index type to be `usize`, not a general integer. Using `i32`, `u32`, or any other integer type directly will not compile; you must cast explicitly with `as usize`.
+
+```rust
+let v = vec![10, 20, 30];
+
+// Indexing requires usize
+let i: usize = 1;
+println!("{}", v[i]);       // 20
+
+// Casting from another integer type
+let j: i32 = 2;
+println!("{}", v[j as usize]);  // 30 — explicit cast required
+
+// [] panics if out of bounds; .get() returns Option<&T> instead
+let safe = v.get(99);       // None — no panic
+let found = v.get(0);       // Some(&10)
+```
+
+The `[]` operator is implemented via the `Index` trait. When you define your own struct and want it to be indexable, you implement `Index<usize>` for it. The compiler error you saw ("need to implement something") is exactly that trait being required.
+
+###### Iterating
+```rust
+let v = vec![1, 2, 3];
+
+// Borrow each element — v is still usable after the loop
+for x in &v {
+    println!("{}", x);
+}
+
+// Mutable borrow — modify elements in place
+let mut v = vec![1, 2, 3];
+for x in &mut v {
+    *x *= 10;
+}
+// v is now [10, 20, 30]
+
+// Consuming iteration — takes ownership of each element
+for x in v {
+    println!("{}", x);
+}
+// v is moved; it cannot be used here
+```
+
+###### Cloning
+Because `Vec<T>` owns its data, assignment moves it rather than copying it. Use `.clone()` when you need an independent copy.
+
+```rust
+let original = vec![String::from("alpha"), String::from("beta")];
+
+// Move: original is no longer accessible
+let moved = original;
+
+// Clone: both variables own independent copies of the data
+let source = vec![String::from("alpha"), String::from("beta")];
+let copy = source.clone();   // deep copy — each String is cloned too
+
+// For Vec<T> where T: Copy (e.g. i32), clone and copy are equivalent in cost
+let nums = vec![1, 2, 3];
+let nums_copy = nums.clone();
+println!("{:?}", nums);      // still accessible
+```
+
+`.clone()` on a `Vec<T>` is a deep clone: it clones the vector and every element inside it. For large vecs of heap-allocated types (like `String`), this is not free.
+
+###### Sorting
+`Vec<T>` provides two sorting methods. The right choice depends on whether your element type implements `Ord` and whether you need stability.
+
+```rust
+// .sort() — stable, requires T: Ord
+let mut nums = vec![3, 1, 4, 1, 5, 9, 2, 6];
+nums.sort();
+println!("{:?}", nums);  // [1, 1, 2, 3, 4, 5, 6, 9]
+
+// Reverse order
+nums.sort_by(|a, b| b.cmp(a));
+
+// .sort_by_key() — sort by a derived value
+let mut words = vec!["banana", "fig", "apple", "date"];
+words.sort_by_key(|w| w.len());
+println!("{:?}", words);  // ["fig", "fig", "date", "apple", "banana"]
+                          // (stable: ties preserve original order)
+```
+
+Floating-point types (`f32`, `f64`) do not implement `Ord` because `NaN` breaks total ordering. Use `.sort_by()` with `.partial_cmp()` and handle the `None` case:
+
+```rust
+let mut floats = vec![3.1, 0.5, 2.7, 1.4];
+floats.sort_by(|a, b| a.partial_cmp(b).unwrap());
+println!("{:?}", floats);  // [0.5, 1.4, 2.7, 3.1]
+```
+
+For a custom struct, derive or implement `Ord` to make `.sort()` available, or use `.sort_by()` to keep the struct simple:
+
+```rust
+#[derive(Debug)]
+struct Student {
+    name: String,
+    grade: u32,
+}
+
+let mut students = vec![
+    Student { name: String::from("Zara"), grade: 88 },
+    Student { name: String::from("Alex"), grade: 95 },
+    Student { name: String::from("Maya"), grade: 72 },
+];
+
+// Sort by grade ascending
+students.sort_by_key(|s| s.grade);
+
+// Sort by name
+students.sort_by(|a, b| a.name.cmp(&b.name));
+```
+
+### HashMap\<K, V\>
+::: {.subheading}
+Key-value store with O(1) average lookup
+:::
+
+```rust
 use std::collections::HashMap;
-let mut map = HashMap::new();
-map.insert("key", 42);
-let val = map.get("key");   // Option<&i32>
 
-// Iterate
-for (k, v) in &map {
-    println!("{}: {}", k, v);
+let mut map: HashMap<String, i32> = HashMap::new();
+map.insert(String::from("alpha"), 1);
+map.insert(String::from("beta"), 2);
+
+// Lookup returns Option<&V>
+let val = map.get("alpha");  // Some(&1)
+
+// Insert only if key is absent
+map.entry(String::from("gamma")).or_insert(3);
+
+// Iterate over key-value pairs
+for (key, value) in &map {
+    println!("{}: {}", key, value);
 }
 ```
 
