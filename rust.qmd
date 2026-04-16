@@ -347,7 +347,11 @@ This is the `pip install` + `import` of Rust, collapsed into one tool that also 
 | Package manager       | (none built in)          | pip                 | cargo             |
 
 ## The Basics
-### Variables and Mutability
+### Variables
+::: {.subheading}
+and Mutability
+:::
+
 In C you declare a variable and it's mutable by default. In Rust, variables are **immutable by default**. You opt into mutability with `mut`.
 
 ```rust
@@ -364,6 +368,7 @@ This isn't just style — the compiler uses immutability information to reason a
 A **scalar type** represents a single value.
 :::
 
+#### Scalar Types
 Rust is statically typed. Types are usually inferred, but you can annotate explicitly. Rust has four primary *scalar types*: integers, floating-point numbers, Booleans, and characters:
 
 ```rust
@@ -424,6 +429,60 @@ fn sum(arr: &[i32; 5]) -> i32 {
 }
 ```
 
+#### String Types
+::: {.subheading}
+`String` and `&str`
+:::
+
+Rust has two string types. The distinction maps directly onto owned vs. borrowed:
+
+| Type     | Owned? | Mutable? | Lives on  | Analogy                    |
+|----------|--------|----------|-----------|----------------------------|
+| `String` | Yes    | Yes      | Heap      | `std::string` in C++       |
+| `&str`   | No     | No       | Anywhere  | `std::string_view` in C++  |
+
+##### Representation
+
+`String` stores three things: a pointer to heap memory, a length (bytes used), and a capacity (bytes allocated). It is **not** null-terminated. The length field is what tells Rust where the string ends.
+
+`&str` is a fat pointer: a pointer into some UTF-8 buffer plus a length. It borrows that buffer — it owns nothing and cannot outlive the data it points into.
+
+Both types are guaranteed to contain valid UTF-8. Rust will not let you construct an invalid string.
+
+##### Creating a `String`
+
+```rust
+let a = String::from("hello");       // from a literal
+let b = "hello".to_string();         // same, alternate spelling
+let c = format!("{} {}", a, b);      // build from parts — like sprintf
+let d = String::new();               // empty, build up with push/push_str
+let mut e = String::new();
+e.push('!');                         // append a char
+e.push_str(" world");                // append a &str
+```
+
+##### String literals are `&str`
+
+```rust
+let s: &str = "hello";               // stored in the binary, 'static lifetime
+let t: &str = &a[0..3];             // slice of an existing String
+```
+
+##### When to use which
+
+Use `&str` for function parameters whenever you only need to read the text. It accepts both `String` and literals without any conversion:
+
+```rust
+fn greet(name: &str) {
+    println!("Hello, {}!", name);
+}
+
+greet("world");                      // literal — works
+greet(&String::from("Alice"));       // String — works, coerces automatically
+```
+
+Use `String` when you need to own or mutate the text.
+
 ### Values
 ::: {.subheading}
 The "Null Problem"
@@ -456,6 +515,106 @@ In Rust, `()` is called the **unit type** (and also the **unit value**). It is e
 - `Ok(())` -> "I succeeded. That's all you need to know."
 
 In short, `()` is Rust's way to say "no meaningful value," whether as a function's return type or as the success payload in types like `Result<(), E>`.
+
+
+### Slices
+::: {.subheading}
+A view into a sequence, without copying
+:::
+
+A slice is a reference to a contiguous subsequence of an array or string. It is a *fat pointer*: two words wide, carrying both a pointer to the first element and a length. No heap allocation, no copy.
+
+```rust
+let a = [10, 20, 30, 40, 50];
+
+let all   = &a[..];      // [10, 20, 30, 40, 50] — the whole array
+let first = &a[..3];     // [10, 20, 30]           — open on the right
+let last  = &a[2..];     // [30, 40, 50]           — open on the left
+let mid   = &a[1..4];    // [20, 30, 40]           — half-open (end excluded)
+let incl  = &a[1..=3];   // [20, 30, 40]           — inclusive end with ..=
+```
+
+#### Range syntax
+
+| Syntax    | Meaning                          |
+|-----------|----------------------------------|
+| `[..]`    | Entire sequence                  |
+| `[a..b]`  | From index `a` up to (not including) `b` |
+| `[a..=b]` | From index `a` through `b` (inclusive)   |
+| `[a..]`   | From index `a` to the end        |
+| `[..b]`   | From the start up to (not including) `b` |
+
+#### No negative indices
+
+Unlike Python, Rust slices do not accept negative indices. To index relative to the end, use `len()`:
+
+```rust
+let a = [10, 20, 30, 40, 50];
+
+let last_one = &a[a.len() - 1..];   // [50]       — Python's [-1:]
+let last_two = &a[a.len() - 2..];   // [40, 50]   — Python's [-2:]
+let all_but_last = &a[..a.len()-1]; // [10,20,30,40] — Python's [:-1]
+```
+
+#### Slice types
+
+| Type    | Meaning                              |
+|---------|--------------------------------------|
+| `&[T]`  | Shared slice of any array or `Vec<T>` |
+| `&str`  | String slice (a view into UTF-8 text) |
+
+These are the idiomatic types for function parameters that only need to read a sequence. A function accepting `&[i32]` works with arrays, `Vec<i32>`, and slices of either. A function accepting `&str` works with `String`, string literals, and string slices.
+
+### Conversions
+::: {.subheading}
+Look at the target type, not the source
+:::
+
+Rust's conversions are deliberate and explicit. The key mental shift from languages like Python: think about what type you want to end up with, then find the method or trait that produces it.
+
+#### Numeric casts with `as`
+
+`as` performs primitive numeric casts. It is explicit and never implicit:
+
+```rust
+let i: i32 = 42;
+let f: f64 = i as f64;
+let b: u8  = 255i32 as u8;    // truncates if out of range — be careful
+```
+
+#### `From` and `Into`
+
+For non-primitive conversions, Rust uses the `From` and `Into` traits. If `A: From<B>`, then you can write `A::from(b)` or, equivalently, `b.into()` (the compiler figures out the target from context):
+
+```rust
+let s: String = String::from("hello");   // &str → String via From
+let s: String = "hello".into();          // same, using Into
+let n: i64    = i64::from(42i32);        // i32 → i64
+```
+
+`From`/`Into` conversions are infallible by definition. If the conversion can fail, use `TryFrom`/`TryInto` instead, which return `Result`.
+
+#### Parsing strings with `.parse()`
+
+`.parse()` converts a `&str` to any type that implements `FromStr`. The target type is inferred from context:
+
+```rust
+let n: i32  = "42".parse().unwrap();
+let f: f64  = "3.14".parse().unwrap();
+let b: bool = "true".parse().unwrap();
+```
+
+Because `.parse()` returns `Result`, you handle failure explicitly. In real code use `?` or match rather than `.unwrap()`.
+
+#### `String` and `&str`
+
+| From      | To       | How                        |
+|-----------|----------|----------------------------|
+| `&str`    | `String` | `String::from(s)` or `s.to_string()` or `s.into()` |
+| `String`  | `&str`   | `&s` or `s.as_str()` (coercion, no copy) |
+| `String`  | `&str`   | `&s[..]` — explicit slice  |
+
+The `String` → `&str` direction is free: it is just taking a reference to the existing buffer.
 
 ### Functions
 ```rust
@@ -730,35 +889,6 @@ r3.push_str(", world");
 ```
 
 This feels restrictive at first. In practice it eliminates a huge class of bugs: data races, iterator invalidation, use-after-free. The compiler is your enforcer.
-
-### Slices
-A slice is a reference to a contiguous sequence — a view into an array or string without copying:
-
-```rust
-let a = [1, 2, 3, 4, 5];
-let slice = &a[1..3];    // [2, 3] — no copy
-
-let s = String::from("hello world");
-let word = &s[0..5];     // "hello" — &str, no copy
-```
-
-`&str` (string slice) and `&[T]` (array slice) are the idiomatic ways to pass read-only sequence data to functions.
-
-### The String Types
-Rust has two main string types, which confuses newcomers:
-
-| Type     | Owned?      | Mutable? | Analogy                             |
-|----------|-------------|----------|-------------------------------------|
-| `String` | Yes         | Yes      | `std::string` in C++                |
-| `&str`   | No (a view) | No       | `const char*` or `std::string_view` |
-
-```rust
-let owned: String = String::from("hello");
-let view: &str = "world";          // string literals are &str
-let slice: &str = &owned[0..3];    // borrow part of owned
-```
-
-Functions that just need to read a string should accept `&str` — it works with both `String` and string literals.
 
 ### Lifetimes
 ::: {.subheading}
