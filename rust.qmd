@@ -2331,6 +2331,10 @@ while let Ok(line) = read_next_line(&mut reader) {
 This is particularly natural for anything that produces a stream of results: reading lines, polling a queue, consuming an iterator of fallible operations. The loop structure mirrors the data structure.
 
 ### The `?` Operator
+::: {.subheading}
+Sometimes called the *error propagation operator*
+:::
+
 Inside a function that returns `Result`, the `?` operator is shorthand for "if this is an `Err`, return it immediately to the caller; if it is `Ok`, unwrap and continue."
 
 ```rust
@@ -2353,6 +2357,37 @@ fn read_file(path: &str) -> Result<String, io::Error> {
 ```
 
 `?` eliminates that boilerplate. In a function that makes several fallible calls, it keeps the happy path readable while still propagating every error to the caller.
+
+::: {.callout-important}
+The `?` operator can only be used in functions whose return type is compatible with the value the `?` is used on. This is because the `?` operator is defined to perform an early return of a value out of the function and if the return type of the calling function and function called are not compatible, then you will experience a compiler error. What is "compatible"?
+
+1. **Exact error type match.** The simplest case: both the caller and callee use the same error type, so no conversion is needed.
+
+2. **`From` trait conversion.** The caller's error type `E1` does not have to match the callee's error type `E2` exactly. It only needs `E1: From<E2>`. When that impl exists, `?` automatically calls `E1::from(e2)` before performing the early return. This is why you can mix calls to different libraries inside one function as long as you use an error type (like a custom enum or `Box<dyn Error>`) that knows how to absorb all of them.
+
+    ```rust
+    use std::num::ParseIntError;
+    use std::fmt;
+
+    #[derive(Debug)]
+    enum AppError {
+        Parse(ParseIntError),
+        TooBig,
+    }
+
+    impl From<ParseIntError> for AppError {
+        fn from(e: ParseIntError) -> Self { AppError::Parse(e) }
+    }
+
+    fn parse_and_check(s: &str) -> Result<i32, AppError> {
+        let n: i32 = s.parse()?;   // ParseIntError → AppError via From, automatically
+        if n > 100 { return Err(AppError::TooBig); }
+        Ok(n)
+    }
+    ```
+
+3. **`Option` in a function returning `Option`.** `?` is not limited to `Result`. Inside a function that returns `Option<T>`, you can use `?` on any `Option` value. It returns `None` immediately if the value is `None`, otherwise it unwraps and continues. You cannot mix the two: `?` on an `Option` inside a function returning `Result` is a compile error.
+:::
 
 ### Choosing the Right Tool
 | Situation                             | Use                             |

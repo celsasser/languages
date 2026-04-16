@@ -411,6 +411,7 @@ div.panel-h6:has(> table:first-child) {
 }
 
 /**** overrides ****/
+/*
 .cell-output-display code:not(.sourceCode),
 .cell-output-stdout code:not(.sourceCode) {
   background-color: #fbfcfc;
@@ -427,9 +428,14 @@ div.panel-h6:has(> table:first-child) {
   font-family: Monospace;
   font-size: 10pt;
 }
+*/
 
-.sourceCode {
-  border-radius: 5px;
+.sourceCode,
+div.sourceCode,
+code.sourceCode
+{
+  background-color: rgb(236, 238, 244);
+  border-radius: 6pt;
   font-size: 10pt;
 }
 
