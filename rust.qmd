@@ -616,6 +616,53 @@ Because `.parse()` returns `Result`, you handle failure explicitly. In real code
 
 The `String` → `&str` direction is free: it is just taking a reference to the existing buffer.
 
+::: {.callout-important title="Wonder-Twin Power Activate in the form of Turbofish"}
+The following example is taken out of our [exs24](https://github.com/celsasser/exs24-parser) parser:
+
+```rust
+let seconds: f32 = seconds_text
+    .parse::<f32>()
+    .map_err(|error| format!("Invalid seconds value '{}': {}", value_text, error))?;
+```
+
+Notice the `::<f32>` attached to `parse`. That fella is called a *turbofish*. In the example above, I found that I could remove it and it would still compile. So I asked Claude, and this is what he said:
+
+---
+
+It is not a cast. It is called the **turbofish** syntax, and it is a way to supply a generic type parameter directly to a method call. `parse()` is defined as:
+
+```rust
+fn parse<F: FromStr>(&self) -> Result<F, F::Err>
+```
+
+The `F` is a generic parameter. Rust needs to know what type F is before it can do anything. There are two ways to tell it:
+
+1. Turbofish on the method:
+
+    ```rust
+    "3.14".parse::<f32>()
+    ```
+
+2. Type annotation on the binding:
+
+    ```rust
+    let seconds: f32 = seconds_text.parse()...
+    ```
+
+In your code, both are present at the same time, which is why removing the *turbofish* is fine. The `: f32` annotation on seconds gives the compiler enough information to infer `F = f32` without being told explicitly on the `.parse()` call. The *turbofish* becomes necessary when there is no annotation for the compiler to infer from, or when the inference is ambiguous. For example:
+
+```rust
+// compiler has no idea what type to parse into — turbofish required
+let n = "42".parse::<i32>().unwrap();
+
+// annotation does the same job — turbofish optional
+let n: i32 = "42".parse().unwrap();
+```
+
+The `::<>` spelling looks strange but follows the same pattern as other generic syntax. The extra `::` is there because `<` alone would be ambiguous with a less-than operator at the call site.
+
+:::
+
 ### Functions
 ```rust
 fn add(a: i32, b: i32) -> i32 {
