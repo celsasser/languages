@@ -731,7 +731,7 @@ The following example is taken out of our [exs24](https://github.com/celsasser/e
 ```rust
 let seconds: f32 = seconds_text
     .parse::<f32>()
-    .map_err(|error| format!("Invalid seconds value '{}': {}", value_text, error))?;
+    .map_err(|error| format!("Invalid seconds value '{}': {}", seconds_text, error))?;
 ```
 
 Notice the `::<f32>` attached to `parse`. That fella is called a *turbofish*. In the example above, I found that I could remove it and it would still compile. So I asked Claude, and this is what he said:
