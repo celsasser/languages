@@ -11,18 +11,19 @@ The designers asked a pointed question: *can we have the performance of C with m
 The answer is Rust.
 
 ### The Core Design Decisions
-**1. Ownership replaces manual memory management.** Rather than `malloc`/`free` or smart pointers bolted on after the fact, Rust builds ownership into the type system. The compiler tracks who owns what, and memory is freed automatically when the owner goes out of scope. No GC, no runtime overhead.
+###### 1. Ownership replaces manual memory management
+Rather than `malloc`/`free` or smart pointers bolted on after the fact, Rust builds ownership into the type system. The compiler tracks who owns what, and memory is freed automatically when the owner goes out of scope. No GC, no runtime overhead.
 
-###### 2. Borrowing replaces raw pointers.
+###### 2. Borrowing replaces raw pointers
 Instead of passing pointers around freely, Rust has a formal concept of *borrowing* — you can lend a reference to data without transferring ownership. The compiler (the *borrow checker*) enforces that references are always valid. No dangling pointers, no use-after-free.
 
-###### 3. Fearless concurrency.
+###### 3. Fearless concurrency
 Data races are a compile error. The same ownership rules that prevent memory bugs also make entire classes of concurrency bugs impossible.
 
-###### 4. Zero-cost abstractions.
+###### 4. Zero-cost abstractions
 Rust's high-level features ([iterators](#iterators), [generics](#generics-and-trait-bounds), [traits](#traits)) compile down to the same machine code you'd write by hand. You don't pay for what you don't use — the same guarantee C++ makes, but delivered more consistently.
 
-###### 5. Explicit over implicit.
+###### 5. Explicit over implicit
 Rust rarely does things behind your back. Integer overflow is checked in debug builds and wraps in release (with explicit opt-in). Type coercions are almost never automatic. Mutability must be declared. This is intentionally more verbose than C++ in places, in exchange for fewer surprises.
 
 ## Cheat Sheet
@@ -388,6 +389,57 @@ let x: i32 = 42;
 let y: f64 = x as f64;
 ```
 
+#### Tuples
+A tuple groups a fixed number of values of different types into a single compound value. Unlike arrays, the elements do not have to share a type.
+
+```rust
+let point: (f64, f64) = (1.0, 2.5);
+let record: (i32, &str, bool) = (42, "alice", true);
+```
+
+**Accessing elements** uses dot notation with a zero-based index. The index must be a literal — you cannot index a tuple with a variable.
+
+```rust
+let t = (10, "hello", 3.14);
+
+let n = t.0;    // 10   — i32
+let s = t.1;    // "hello" — &str
+let f = t.2;    // 3.14 — f64
+```
+
+**Destructuring** is the idiomatic way to unpack a tuple, especially when returning multiple values from a function:
+
+```rust
+fn min_max(v: &[i32]) -> (i32, i32) {
+    let mut lo = v[0];
+    let mut hi = v[0];
+    for &x in v {
+        if x < lo { lo = x; }
+        if x > hi { hi = x; }
+    }
+    (lo, hi)
+}
+
+let (low, high) = min_max(&[3, 1, 4, 1, 5, 9]);
+println!("{} {}", low, high);   // 1 9
+```
+
+Use `_` to ignore fields you don't need:
+
+```rust
+let (_, second, _) = (1, 2, 3);
+```
+
+**The unit type `()`** is the zero-element tuple. It is Rust's equivalent of `void` — the implicit return type of functions that return nothing, and the success payload in `Result<(), E>` when a function either succeeds with no data or fails.
+
+```rust
+fn greet(name: &str) -> () {    // () is implicit, rarely written explicitly
+    println!("Hello, {}!", name);
+}
+```
+
+Tuples are stack-allocated and implement `Copy` when all their elements do. They are most useful for returning multiple values from a function and for temporary groupings where defining a named struct would be overkill. For anything you'll pass around extensively, prefer a named struct — it documents intent and the fields have names.
+
 #### Fixed-Length Arrays
 Arrays in Rust are fixed-size collections of elements of the same type, allocated on the stack. The syntax is `[T; N]` where `T` is the element type and `N` is the length, which must be known at compile time.
 
@@ -467,6 +519,63 @@ e.push_str(" world");                // append a &str
 let s: &str = "hello";               // stored in the binary, 'static lifetime
 let t: &str = &a[0..3];             // slice of an existing String
 ```
+
+##### Common methods
+
+Most string methods are defined on `&str` and are therefore available on both `String` and `&str`. Methods that produce a new owned string return `String`; methods that just inspect or slice return `&str` or a primitive.
+
+```rust
+let s = String::from("  Hello, World!  ");
+
+// Inspection
+s.len();                            // byte count (not char count)
+s.is_empty();                       // true if len() == 0
+s.contains("World");                // true
+s.starts_with("  He");             // true
+s.ends_with("!  ");                // true
+
+// Searching
+s.find("World");                    // Some(9) — byte offset of first match
+s.trim();                           // "&Hello, World!" — strip whitespace both ends
+s.trim_start();                     // strip leading whitespace only
+s.trim_end();                       // strip trailing whitespace only
+
+// Transforming (returns new String)
+s.to_lowercase();                   // "  hello, world!  "
+s.to_uppercase();                   // "  HELLO, WORLD!  "
+s.replace("World", "Rust");        // "  Hello, Rust!  "
+s.replacen("l", "L", 2);          // replace first 2 occurrences
+
+// Splitting (returns iterators — collect into Vec if you need indexing)
+let words: Vec<&str> = s.split_whitespace().collect();  // ["Hello,", "World!"]
+let parts: Vec<&str> = "a,b,c".split(',').collect();    // ["a", "b", "c"]
+let lines: Vec<&str> = "one\ntwo\nthree".lines().collect();
+
+// Characters (UTF-8 aware)
+"hello".chars().count();            // 5 — char count, not byte count
+"hello".chars().nth(1);            // Some('e')
+
+// Repeating
+"ab".repeat(3);                     // "ababab"
+```
+
+| Method                   | Returns         | What it does                              |
+|--------------------------|-----------------|-------------------------------------------|
+| `.len()`                 | `usize`         | Byte length                               |
+| `.is_empty()`            | `bool`          | True if zero bytes                        |
+| `.contains(pat)`         | `bool`          | True if pattern is present                |
+| `.starts_with(pat)`      | `bool`          | Prefix check                              |
+| `.ends_with(pat)`        | `bool`          | Suffix check                              |
+| `.find(pat)`             | `Option<usize>` | Byte offset of first match                |
+| `.trim()`                | `&str`          | Strip leading and trailing whitespace     |
+| `.to_lowercase()`        | `String`        | New lowercased string                     |
+| `.to_uppercase()`        | `String`        | New uppercased string                     |
+| `.replace(from, to)`     | `String`        | Replace all occurrences                   |
+| `.split(pat)`            | iterator        | Split on pattern                          |
+| `.split_whitespace()`    | iterator        | Split on any whitespace, skipping empties |
+| `.lines()`               | iterator        | Split on line endings                     |
+| `.chars()`               | iterator        | Unicode scalar values (not bytes)         |
+| `.repeat(n)`             | `String`        | Concatenate `n` copies                    |
 
 ##### When to use which
 
@@ -1255,6 +1364,143 @@ let counter = Arc::new(Mutex::new(0));
 
 See [Smart Pointers](https://doc.rust-lang.org/book/ch15-00-smart-pointers.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for more information.
 
+## Concurrency
+::: {.subheading}
+Fearless concurrency: the compiler enforces thread safety
+:::
+
+Rust's ownership and type system make data races a compile-time error, not a runtime surprise. The two key guarantees:
+
+- A value can be sent to another thread only if its type implements `Send`
+- A value can be shared (via reference) across threads only if its type implements `Sync`
+
+The compiler enforces these automatically. If you try to share a non-thread-safe type across threads, it will not compile.
+
+### Threads
+
+`std::thread::spawn` starts a new OS thread. It takes a closure that captures the values it needs. The `move` keyword transfers ownership of captured values into the thread — required because the spawned thread may outlive the calling scope.
+
+```rust
+use std::thread;
+
+let handle = thread::spawn(move || {
+    println!("running in a new thread");
+});
+
+handle.join().unwrap();   // wait for the thread to finish
+```
+
+`spawn` returns a `JoinHandle<T>` where `T` is whatever the closure returns. `.join()` blocks until the thread finishes and returns `Result<T, _>`.
+
+#### Spawning multiple threads
+
+```rust
+use std::thread;
+
+let handles: Vec<_> = (0..5).map(|i| {
+    thread::spawn(move || {
+        println!("thread {}", i);
+    })
+}).collect();
+
+for handle in handles {
+    handle.join().unwrap();
+}
+```
+
+### Shared State with `Mutex<T>`
+
+A `Mutex<T>` (mutual exclusion lock) protects a value so only one thread can access it at a time. You access the value by calling `.lock()`, which blocks until the lock is available and returns a `MutexGuard<T>`. The guard releases the lock automatically when it goes out of scope.
+
+```rust
+use std::sync::Mutex;
+
+let m = Mutex::new(0);
+
+{
+    let mut val = m.lock().unwrap();
+    *val += 1;
+}   // lock released here
+```
+
+`.lock()` returns `Result` because it can fail if the previous lock holder panicked while holding it (a "poisoned" mutex). `.unwrap()` is common in practice — a poisoned mutex usually means something has gone badly wrong already.
+
+### `Arc<Mutex<T>>`: Shared Mutable State Across Threads
+
+To share mutable state across multiple threads you need both:
+
+- `Arc<T>` — shared ownership across threads (thread-safe reference counting)
+- `Mutex<T>` — exclusive access for mutation
+
+Combined as `Arc<Mutex<T>>`, this is the standard pattern for shared mutable state in Rust. It is the direct equivalent of a `shared_ptr<mutex>` guarding a value in C++, but the compiler verifies you always lock before accessing.
+
+```rust
+use std::sync::{Arc, Mutex};
+use std::thread;
+
+let counter = Arc::new(Mutex::new(0));
+
+let handles: Vec<_> = (0..10).map(|_| {
+    let counter = Arc::clone(&counter);
+    thread::spawn(move || {
+        let mut val = counter.lock().unwrap();
+        *val += 1;
+    })
+}).collect();
+
+for handle in handles {
+    handle.join().unwrap();
+}
+
+println!("final count: {}", *counter.lock().unwrap());  // 10
+```
+
+Each thread gets its own `Arc` clone (cheap: just increments a reference count). Each clone points to the same `Mutex`. Only one thread can hold the lock at a time, so the increments are safe.
+
+### Message Passing with Channels
+
+An alternative to shared state: send values between threads via a channel. `std::sync::mpsc` provides a **multi-producer, single-consumer** channel.
+
+```rust
+use std::sync::mpsc;
+use std::thread;
+
+let (sender, receiver) = mpsc::channel();
+
+thread::spawn(move || {
+    sender.send(42).unwrap();
+});
+
+let value = receiver.recv().unwrap();
+println!("received: {}", value);   // 42
+```
+
+`send` takes ownership of the value — it is moved into the channel. `recv` blocks until a value arrives and returns `Result<T, _>`. Use `try_recv` for a non-blocking check that returns immediately with `Err` if nothing is ready.
+
+Multiple producers are supported by cloning the sender:
+
+```rust
+let sender2 = sender.clone();
+```
+
+### Quick Reference
+
+| Need                              | Tool                              |
+|-----------------------------------|-----------------------------------|
+| Run code on a new thread          | `thread::spawn(move \|\| { ... })` |
+| Wait for a thread to finish       | `handle.join()`                   |
+| Protect shared data               | `Mutex<T>`                        |
+| Share data across threads         | `Arc<T>`                          |
+| Share mutable data across threads | `Arc<Mutex<T>>`                   |
+| Send values between threads       | `mpsc::channel()`                 |
+| Send values, multiple producers   | Clone the `Sender`                |
+
+::: {.callout-tip}
+Prefer message passing over shared state when the design allows it. Channels make data flow explicit and eliminate the need for locks entirely. Reach for `Arc<Mutex<T>>` when multiple threads genuinely need to read and write the same value.
+:::
+
+See [Fearless Concurrency](https://doc.rust-lang.org/book/ch16-00-concurrency.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for more information.
+
 ## Structs, Enums, and Traits
 #### Quick Reference
 | Goal                   | Syntax                                           | Location            |
@@ -1787,6 +2033,79 @@ struct Point { x: f64, y: f64 }
 // Now you can: println!("{:?}", p);
 ```
 
+#### Implementing `Display` and `Debug`
+
+`Debug` and `Display` are the two formatting traits you will implement most often.
+
+**`Debug`** is for developer output — `{:?}` and `{:#?}`. It is almost always derived automatically:
+
+```rust
+#[derive(Debug)]
+struct Point {
+    x: f64,
+    y: f64,
+}
+
+let p = Point { x: 1.0, y: 2.5 };
+println!("{:?}", p);    // Point { x: 1.0, y: 2.5 }
+println!("{:#?}", p);   // pretty-printed, indented
+```
+
+`{:#?}` (the "alternate" format) prints with indentation — useful for nested structures.
+
+**`Display`** is for user-facing output — `{}`. It cannot be derived; you implement it manually via `std::fmt::Display`:
+
+```rust
+use std::fmt;
+
+struct Point {
+    x: f64,
+    y: f64,
+}
+
+impl fmt::Display for Point {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "({}, {})", self.x, self.y)
+    }
+}
+
+let p = Point { x: 1.0, y: 2.5 };
+println!("{}", p);           // (1, 2.5)
+let s = p.to_string();       // Display also gives you .to_string() for free
+```
+
+The `fmt` method writes into a formatter using `write!` (same syntax as `println!` but targeting the formatter). Return `fmt::Result` — either `Ok(())` on success or an error if writing failed.
+
+**Implementing both** is the standard pattern for any type you plan to use in output or error handling. `Debug` for internal diagnostics, `Display` for anything a user might see:
+
+```rust
+use std::fmt;
+
+#[derive(Debug)]
+struct Color {
+    red: u8,
+    green: u8,
+    blue: u8,
+}
+
+impl fmt::Display for Color {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "#{:02X}{:02X}{:02X}", self.red, self.green, self.blue)
+    }
+}
+
+let c = Color { red: 255, green: 128, blue: 0 };
+println!("{}", c);    // #FF8000   — Display
+println!("{:?}", c);  // Color { red: 255, green: 128, blue: 0 } — Debug
+```
+
+Implementing `Display` automatically gives your type `.to_string()` via a blanket impl in the standard library — no extra work required.
+
+| Trait     | Format spec | Derived? | Audience   | Also provides   |
+|-----------|-------------|----------|------------|-----------------|
+| `Debug`   | `{:?}`      | Yes      | Developer  | `{:#?}` pretty-print |
+| `Display` | `{}`        | No       | User       | `.to_string()`  |
+
 See [Structs](https://doc.rust-lang.org/book/ch05-00-structs.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for more information.
 
 ## Generics and Trait Bounds
@@ -2111,6 +2430,78 @@ greet();
 // name is no longer accessible here
 ```
 
+#### `Fn`, `FnMut`, and `FnOnce`
+
+Every closure implements one or more of three traits. The compiler assigns them automatically based on what the closure does with its captured values. You rarely name these traits when writing closures, but you must understand them when writing functions that *accept* closures as parameters.
+
+| Trait     | Can be called | Captures         | When the compiler assigns it                        |
+|-----------|---------------|------------------|-----------------------------------------------------|
+| `FnOnce`  | Once only     | By value (moves) | Closure consumes a captured value                   |
+| `FnMut`   | Many times    | By mutable ref   | Closure mutates a captured value                    |
+| `Fn`      | Many times    | By shared ref    | Closure only reads captured values (or captures none) |
+
+They form a hierarchy: every `Fn` is also `FnMut`, and every `FnMut` is also `FnOnce`. So `FnOnce` is the most permissive bound (accepts all closures) and `Fn` is the most restrictive (only accepts closures that don't mutate or consume captures).
+
+**`FnOnce`** — the closure consumes something it captured, so it can only run once:
+
+```rust
+let name = String::from("Alice");
+let greet = move || {
+    let owned = name;           // name is moved out — closure can only run once
+    println!("hello, {}", owned);
+};
+greet();
+// greet();  // compile error: cannot call FnOnce closure more than once
+```
+
+**`FnMut`** — the closure mutates a captured value but does not consume it:
+
+```rust
+let mut count = 0;
+let mut increment = || {
+    count += 1;                 // mutably borrows count
+    println!("count: {}", count);
+};
+increment();   // count: 1
+increment();   // count: 2
+```
+
+**`Fn`** — the closure only reads captured values; safe to call any number of times concurrently:
+
+```rust
+let greeting = String::from("hello");
+let greet = |name: &str| println!("{}, {}!", greeting, name);  // borrows greeting
+greet("Alice");   // hello, Alice!
+greet("Bob");     // hello, Bob!
+```
+
+#### Choosing the right bound for function parameters
+
+When you write a function that takes a closure, pick the bound based on what you need:
+
+```rust
+// Accept any closure — call it once
+fn call_once<F: FnOnce()>(f: F) {
+    f();
+}
+
+// Accept closures that can be called repeatedly
+fn call_twice<F: Fn()>(f: F) {
+    f();
+    f();
+}
+
+// Accept closures that mutate state — must be mut
+fn call_and_mutate<F: FnMut()>(mut f: F) {
+    f();
+    f();
+}
+```
+
+Use the most permissive bound that satisfies your needs. If you only call the closure once, use `FnOnce` — it accepts all closures. If you call it multiple times and don't need mutation, use `Fn`. If you need mutation across calls, use `FnMut`.
+
+Standard library functions follow this pattern. `.map()` takes `FnMut` (called once per element, may mutate state). `thread::spawn` takes `FnOnce + Send` (runs once on a new thread, must own its captures).
+
 See [Closures](https://doc.rust-lang.org/book/ch13-01-closures.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for more information.
 
 ### Iterators
@@ -2127,50 +2518,157 @@ let result: Vec<i32> = nums.iter()
 println!("{:?}", result);   // [4, 16, 36]
 ```
 
-Common adapters:
+#### `.iter()` vs `.into_iter()` vs `.iter_mut()`
 
-| Method                  | What it does                              |
-|-------------------------|-------------------------------------------|
-| `.map(f)`               | Transform each element                    |
-| `.filter(p)`            | Keep elements where the predicate is true |
-| `.fold(init, f)`        | Reduce to a single accumulated value      |
-| `.enumerate()`          | Pair each element with its index          |
-| `.zip(iter)`            | Combine two iterators element by element  |
-| `.take(n)`              | Stop after n elements                     |
-| `.skip(n)`              | Skip the first n elements                 |
-| `.flat_map(f)`          | Map, then flatten one level               |
-| `.any(p)` / `.all(p)`   | Short-circuit boolean tests               |
-| `.sum()` / `.product()` | Numeric reductions                        |
+The first decision for any iterator chain is which of the three entry points to use:
 
-Terminal operations that drive the iteration:
-
-```rust
-let v = vec![1, 2, 3, 4, 5];
-
-let total: i32  = v.iter().sum();                           // 15
-let count       = v.iter().filter(|&&x| x > 2).count();    // 3
-let found       = v.iter().find(|&&x| x == 3);             // Some(&3)
-let doubled: Vec<i32> = v.iter().map(|&x| x * 2).collect();
-```
-
-**`.iter()` vs `.into_iter()` vs `.iter_mut()`:**
-
-| Method         | Yields   | Effect on collection |
-|----------------|----------|----------------------|
-| `.iter()`      | `&T`     | Borrows              |
-| `.iter_mut()`  | `&mut T` | Mutably borrows      |
-| `.into_iter()` | `T`      | Consumes             |
+| Method         | Yields   | Effect on collection | Use when                        |
+|----------------|----------|----------------------|---------------------------------|
+| `.iter()`      | `&T`     | Borrows              | Reading without consuming       |
+| `.iter_mut()`  | `&mut T` | Mutably borrows      | Modifying elements in place     |
+| `.into_iter()` | `T`      | Consumes             | You no longer need the original |
 
 ```rust
 let mut v = vec![1, 2, 3];
 
-for x in v.iter_mut() {
-    *x *= 2;
-}
+// Borrow — v still usable after
+for x in v.iter() { print!("{} ", x); }
+
+// Mutably borrow — modify in place
+for x in v.iter_mut() { *x *= 2; }
 println!("{:?}", v);   // [2, 4, 6]
+
+// Consume — v is moved, no longer accessible
+for x in v.into_iter() { print!("{} ", x); }
 ```
 
-The compiler optimizes iterator chains aggressively. A chain of `.filter().map().collect()` typically compiles to the same machine code as an equivalent hand-written loop.
+#### Adapter chain
+
+Adapters transform the iterator without running it. They are chained together and only evaluated when a terminal operation is called.
+
+**`.map(f)`** — transform each element:
+
+```rust
+let v = vec![1, 2, 3];
+let doubled: Vec<i32> = v.iter().map(|&x| x * 2).collect();  // [2, 4, 6]
+```
+
+**`.filter(p)`** — keep elements where predicate is true:
+
+```rust
+let evens: Vec<i32> = (1..=10).filter(|x| x % 2 == 0).collect();  // [2, 4, 6, 8, 10]
+```
+
+**`.map` + `.filter` together** — the bread and butter of iterator chains:
+
+```rust
+let result: Vec<String> = names.iter()
+    .filter(|n| n.len() > 3)
+    .map(|n| n.to_uppercase())
+    .collect();
+```
+
+**`.enumerate()`** — pair each element with its zero-based index:
+
+```rust
+let fruits = vec!["apple", "banana", "cherry"];
+for (i, fruit) in fruits.iter().enumerate() {
+    println!("{}: {}", i, fruit);   // 0: apple, 1: banana, 2: cherry
+}
+```
+
+**`.zip(iter)`** — combine two iterators element by element into tuples, stopping at the shorter one:
+
+```rust
+let names = vec!["Alice", "Bob", "Carol"];
+let scores = vec![95, 87, 72];
+
+let pairs: Vec<_> = names.iter().zip(scores.iter()).collect();
+// [("Alice", 95), ("Bob", 87), ("Carol", 72)]
+```
+
+**`.flat_map(f)`** — map each element to an iterator, then flatten one level:
+
+```rust
+let words = vec!["hello world", "foo bar"];
+let chars: Vec<&str> = words.iter()
+    .flat_map(|s| s.split_whitespace())
+    .collect();
+// ["hello", "world", "foo", "bar"]
+```
+
+**`.fold(init, f)`** — reduce to a single accumulated value, starting from `init`:
+
+```rust
+let sum = vec![1, 2, 3, 4, 5].iter().fold(0, |acc, &x| acc + x);  // 15
+
+// Building a String from parts
+let sentence = vec!["one", "two", "three"]
+    .iter()
+    .fold(String::new(), |mut acc, &word| {
+        if !acc.is_empty() { acc.push(' '); }
+        acc.push_str(word);
+        acc
+    });
+// "one two three"
+```
+
+**`.take(n)` and `.skip(n)`** — limit or offset the sequence:
+
+```rust
+let v = vec![10, 20, 30, 40, 50];
+let middle: Vec<_> = v.iter().skip(1).take(3).collect();  // [20, 30, 40]
+```
+
+**`.chain(iter)`** — concatenate two iterators:
+
+```rust
+let a = vec![1, 2, 3];
+let b = vec![4, 5, 6];
+let combined: Vec<_> = a.iter().chain(b.iter()).collect();  // [1, 2, 3, 4, 5, 6]
+```
+
+**`.any(p)` and `.all(p)`** — short-circuit boolean tests:
+
+```rust
+let v = vec![2, 4, 6, 8];
+v.iter().all(|&x| x % 2 == 0);   // true — all even
+v.iter().any(|&x| x > 5);        // true — at least one > 5
+```
+
+#### Terminal operations
+
+Terminal operations consume the iterator and produce a result.
+
+```rust
+let v = vec![1, 2, 3, 4, 5];
+
+let total: i32      = v.iter().copied().sum();                  // 15
+let product: i32    = v.iter().copied().product();              // 120
+let count           = v.iter().filter(|&&x| x > 2).count();    // 3
+let found           = v.iter().find(|&&x| x == 3);             // Some(&3)
+let position        = v.iter().position(|&x| x == 3);          // Some(2)
+let max             = v.iter().max();                           // Some(&5)
+let min             = v.iter().min();                           // Some(&1)
+let collected: Vec<i32> = v.iter().copied().collect();
+```
+
+| Terminal           | Returns           | What it does                            |
+|--------------------|-------------------|-----------------------------------------|
+| `.collect()`       | collection        | Drive the chain into a `Vec`, `HashMap`, etc. |
+| `.count()`         | `usize`           | Count remaining elements                |
+| `.sum()`           | `T`               | Sum all elements                        |
+| `.product()`       | `T`               | Multiply all elements                   |
+| `.max()` / `.min()`| `Option<&T>`      | Largest or smallest element             |
+| `.find(p)`         | `Option<&T>`      | First element matching predicate        |
+| `.position(p)`     | `Option<usize>`   | Index of first element matching predicate |
+| `.any(p)`          | `bool`            | True if any element matches             |
+| `.all(p)`          | `bool`            | True if all elements match              |
+| `.for_each(f)`     | `()`              | Run a closure on each element           |
+
+::: {.callout-tip}
+The compiler optimizes iterator chains aggressively. A `.filter().map().collect()` chain typically compiles to the same machine code as an equivalent hand-written loop. You pay nothing for the abstraction.
+:::
 
 See [Iterators](https://doc.rust-lang.org/book/ch13-02-iterators.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for more information.
 
@@ -2450,17 +2948,6 @@ Treating errors as values means:
 - **No hidden control flow** — the function signature tells you what errors to expect
 - **No silent failures** — the type system forces you to handle or propagate every error
 - **Composable error handling** — errors are just data, so you can transform, wrap, and combine them like any other value
-
-This is the foundation. The [Error Handling](#error-handling) section that follows shows you the *tools* for working with these error values: the `?` operator, `if let` for selective handling, `.unwrap()` and `.expect()` for prototyping, and the extraction family for getting the value out when you know it's there.
-
-But those are techniques. What you've learned here is the model: errors are enum values, `Result<T, E>` is the container, and the `Error` trait defines the contract for how to display and chain them.
-
-## Error Handling
-::: {.subheading}
-Tools for working with error values
-:::
-
-Now that you understand what errors *are* in Rust — enum values wrapped in `Result<T, E>` — this section covers the practical tools for *handling* them.
 
 ### `if let` for Error Handling
 Because `Result` is an enum, `if let` works on it naturally. The most common form you will see in real code handles only the error case and ignores success:
@@ -2810,6 +3297,63 @@ students.sort_by_key(|s| s.grade);
 students.sort_by(|a, b| a.name.cmp(&b.name));
 ```
 
+###### Working methods
+
+The methods you will reach for most in everyday code:
+
+```rust
+let mut v = vec![3, 1, 4, 1, 5, 9, 2, 6];
+
+// Adding and removing
+v.push(7);                      // append to end
+let last = v.pop();             // remove from end → Some(7)
+v.insert(2, 99);                // insert 99 at index 2, shifting right
+v.remove(2);                    // remove element at index 2, shifting left
+
+// Querying
+v.len();                        // number of elements
+v.is_empty();                   // true if len() == 0
+v.contains(&5);                 // true if 5 is present
+v.iter().position(|&x| x == 5); // Some(index) of first match
+
+// Slicing and windowing
+let first_three = &v[..3];      // slice — no copy
+for window in v.windows(3) { } // overlapping windows of length 3: [1,2,3], [2,3,4], ...
+for chunk in v.chunks(3) { }   // non-overlapping chunks of up to 3 elements
+
+// Filtering in place
+v.retain(|&x| x % 2 == 0);     // keep only even numbers — modifies v in place
+
+// Deduplication (input must be sorted for full effect)
+v.sort();
+v.dedup();                      // remove consecutive duplicates
+
+// Flattening
+let nested = vec![vec![1, 2], vec![3, 4]];
+let flat: Vec<i32> = nested.into_iter().flatten().collect();  // [1, 2, 3, 4]
+
+// Extending
+let mut a = vec![1, 2, 3];
+a.extend([4, 5, 6]);            // append elements from any iterable
+```
+
+| Method                    | What it does                                      |
+|---------------------------|---------------------------------------------------|
+| `.push(x)`                | Append `x` to the end                            |
+| `.pop()`                  | Remove and return the last element as `Option<T>` |
+| `.insert(i, x)`           | Insert `x` at index `i`, shifting right          |
+| `.remove(i)`              | Remove element at index `i`, shifting left       |
+| `.len()` / `.is_empty()`  | Length query                                      |
+| `.contains(&x)`           | Linear search for `x`                            |
+| `.retain(\|x\| pred)`      | Keep only elements matching predicate             |
+| `.dedup()`                | Remove consecutive duplicates (sort first)       |
+| `.windows(n)`             | Iterator of overlapping slices of length `n`     |
+| `.chunks(n)`              | Iterator of non-overlapping slices of up to `n`  |
+| `.extend(iter)`           | Append all elements from an iterator             |
+| `.truncate(n)`            | Shorten to at most `n` elements                  |
+| `.clear()`                | Remove all elements (keeps allocation)           |
+| `.drain(range)`           | Remove and yield elements in a range             |
+
 ### HashMap\<K, V\>
 ::: {.subheading}
 Key-value store with O(1) average lookup
@@ -2833,6 +3377,83 @@ for (key, value) in &map {
     println!("{}: {}", key, value);
 }
 ```
+
+### HashSet\<T\>
+::: {.subheading}
+Unordered collection of unique values
+:::
+
+`HashSet<T>` stores values with no duplicates and provides O(1) average membership testing. Think of it as a `HashMap<T, ()>` — the same hashing machinery, but you only care whether a value is present, not what it maps to.
+
+```rust
+use std::collections::HashSet;
+
+let mut set: HashSet<i32> = HashSet::new();
+set.insert(1);
+set.insert(2);
+set.insert(3);
+set.insert(2);   // duplicate — silently ignored
+
+println!("{}", set.len());        // 3
+println!("{}", set.contains(&2)); // true
+set.remove(&2);
+println!("{}", set.contains(&2)); // false
+```
+
+#### Building from a collection
+
+The most common way to construct a `HashSet` is from an existing iterator via `.collect()`:
+
+```rust
+let v = vec![1, 2, 3, 2, 1];
+let set: HashSet<i32> = v.into_iter().collect();
+// {1, 2, 3} — duplicates removed, order not guaranteed
+```
+
+#### Set operations
+
+`HashSet` implements the standard set operations. All return iterators, so chain `.collect()` to get a new set:
+
+```rust
+let a: HashSet<i32> = [1, 2, 3, 4].iter().copied().collect();
+let b: HashSet<i32> = [3, 4, 5, 6].iter().copied().collect();
+
+// Union — all elements from both sets
+let union: HashSet<_> = a.union(&b).collect();               // {1,2,3,4,5,6}
+
+// Intersection — only elements in both
+let intersection: HashSet<_> = a.intersection(&b).collect(); // {3,4}
+
+// Difference — in a but not b
+let difference: HashSet<_> = a.difference(&b).collect();     // {1,2}
+
+// Symmetric difference — in one but not both
+let sym_diff: HashSet<_> = a.symmetric_difference(&b).collect(); // {1,2,5,6}
+
+// Subset / superset checks
+a.is_subset(&b);    // false
+a.is_superset(&b);  // false
+```
+
+#### Iterating
+
+```rust
+let set: HashSet<&str> = ["apple", "banana", "cherry"].iter().copied().collect();
+
+for item in &set {
+    println!("{}", item);   // order is not guaranteed
+}
+```
+
+#### When to use `HashSet` vs `Vec`
+
+| Need                              | Use         |
+|-----------------------------------|-------------|
+| Ordered sequence, duplicates ok   | `Vec<T>`    |
+| Fast membership test, no duplicates | `HashSet<T>` |
+| Key-value association             | `HashMap<K,V>` |
+
+The membership test `set.contains(&x)` is O(1). The equivalent `vec.contains(&x)` is O(n) — it scans every element. For large collections where you repeatedly check presence, `HashSet` is the right tool.
 
 See [Common Collections](https://doc.rust-lang.org/book/ch08-00-common-collections.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for more information.
 
