@@ -3267,11 +3267,11 @@ println!("{:?}", words);  // ["fig", "fig", "date", "apple", "banana"]
                           // (stable: ties preserve original order)
 ```
 
-Floating-point types (`f32`, `f64`) do not implement `Ord` because `NaN` breaks total ordering. Use `.sort_by()` with `.partial_cmp()` and handle the `None` case:
+Floating-point types (`f32`, `f64`) do not implement `Ord` because `NaN` breaks total ordering. Use `.sort_by()` with `.total_cmp()`, which defines a complete ordering over all float values including `NaN`:
 
 ```rust
-let mut floats = vec![3.1, 0.5, 2.7, 1.4];
-floats.sort_by(|a, b| a.partial_cmp(b).unwrap());
+let mut floats = vec![3.1_f32, 0.5, 2.7, 1.4];
+floats.sort_by(|a, b| a.total_cmp(b));
 println!("{:?}", floats);  // [0.5, 1.4, 2.7, 3.1]
 ```
 
