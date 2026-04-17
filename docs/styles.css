@@ -12,28 +12,28 @@ h2 {
 }
 
 h3 {
-  color: #555;
+  color: #444;
   font-size: 1.7em;
 }
 
 h4 {
-  color: #555;
-  font-size: 1.50em;
-  font-weight: 500;
+  color: #777;
+  font-size: 1.45em;
+  font-weight: 600;
 }
 
 h5 {
   color: #777;
-  font-size: 1.25em;
-  font-weight: 400;
+  font-size: 1.45em;
+  font-weight: 500;
   padding-top: 0.55em;
   margin-bottom: 0.30em;
 }
 
 /* H6 is just a bold heading */
 h6 {
-  color: #555;
-  font-size: 1.1em;
+  color: #808088;
+  font-size: 1.15em;
   font-weight: 600;
   padding-top: 0.25em;
   margin-bottom: 0.25em;
@@ -411,6 +411,7 @@ div.panel-h6:has(> table:first-child) {
 }
 
 /**** overrides ****/
+/*
 .cell-output-display code:not(.sourceCode),
 .cell-output-stdout code:not(.sourceCode) {
   background-color: #fbfcfc;
@@ -427,13 +428,48 @@ div.panel-h6:has(> table:first-child) {
   font-family: Monospace;
   font-size: 10pt;
 }
+*/
 
-.sourceCode {
-  border-radius: 5px;
+.sourceCode,
+div.sourceCode,
+code.sourceCode
+{
+  background-color: rgb(236, 238, 244);
+  border-radius: 6pt;
   font-size: 10pt;
 }
 
-/**** spacing and layout ****/
+/**** composable fellas ****/
+.border-light-1pt {
+  border: 1pt solid #dcd8d8;
+  border-radius: 5pt;
+}
+
+.border-light-2pt {
+  border: 2pt solid #dcd8d8;
+  border-radius: 6pt;
+}
+
+.border-light-3pt {
+  border: 3pt solid #dcd8d8;
+  border-radius: 7pt;
+}
+
+.border-light-4pt {
+  border: 4pt solid #dcd8d8;
+  border-radius: 8pt;
+}
+
+.border-dark-1pt {
+  border: 1pt solid #444;
+  border-radius: 6pt;
+}
+
+.border-dark-2pt {
+  border: 2pt solid #444;
+  border-radius: 6pt;
+}
+
 .indent-l-1em {
   padding-left: 1em;
 }
