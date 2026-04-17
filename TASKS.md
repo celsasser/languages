@@ -4,7 +4,7 @@ The project works towards milestones. Milestones have a scope, though it isn't a
 1. All tasks are completed for a milestone
 2. PR has been created for merge to main.
 3. PR has been approved.
-4. PR has has be squashed and merged to master both remotely and locally.
+4. PR has been squashed and merged to main both remotely and locally.
 5. Delete and create a new "working" branch.
 6. Archive the merged milestone and activate the next one.
 
