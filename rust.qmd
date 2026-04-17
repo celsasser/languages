@@ -726,7 +726,7 @@ Because `.parse()` returns `Result`, you handle failure explicitly. In real code
 The `String` → `&str` direction is free: it is just taking a reference to the existing buffer.
 
 ::: {.callout-important title="Wonder-Twin Power Activate in the form of Turbofish"}
-The following example is taken out of our [exs24](https://github.com/celsasser/exs24-parser) parser:
+The following example is taken out of our [exs24](https://github.com/celsasser/exs24-parser){target=_blank} parser:
 
 ```rust
 let seconds: f32 = seconds_text
