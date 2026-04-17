@@ -3249,7 +3249,7 @@ println!("{:?}", nums);      // still accessible
 `.clone()` on a `Vec<T>` is a deep clone: it clones the vector and every element inside it. For large vecs of heap-allocated types (like `String`), this is not free.
 
 ###### Sorting
-`Vec<T>` provides two sorting methods. The right choice depends on whether your element type implements `Ord` and whether you need stability.
+`Vec<T>` provides several `sort*` methods, including stable and unstable variants. The right choice depends on whether your element type implements `Ord`, whether you need a custom comparison, and whether you need stability.
 
 ```rust
 // .sort() — stable, requires T: Ord
