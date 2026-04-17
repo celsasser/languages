@@ -21,4 +21,13 @@ The project works towards milestones. Milestones have a scope, though it isn't a
 - [x] ~~Add key `String` and `Vec` methods~~ — completed
 - [x] Add `Fn`, `FnMut`, `FnOnce` closure trait coverage
 
+### Future Milestone:
+
+- [ ] Move `## Macros` — currently sits between The Basics and Memory Management; consider folding the common-macros table into The Basics or moving it near Cargo/tooling
+- [ ] Merge `## Generics and Trait Bounds` into `## Structs, Enums, and Traits` — traits without generics are only half the story
+- [ ] Add `use` keyword and namespacing — `use`, `use as`, glob imports, `pub use` re-exports
+- [ ] Add `impl` blocks — associated functions vs methods (`new`, factory methods, `self`/`&self`/`&mut self`) with explicit treatment
+- [ ] Expand `HashMap` — add `.contains_key()`, `.remove()`, iteration, and working methods
+- [ ] Add `BTreeMap` and `BTreeSet` — sorted alternatives to `HashMap`/`HashSet`
+
 ## Archive
