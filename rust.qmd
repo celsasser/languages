@@ -2033,6 +2033,37 @@ struct Point { x: f64, y: f64 }
 // Now you can: println!("{:?}", p);
 ```
 
+::: {.callout-note title="Derive"}
+The compiler is capable of providing basic implementations for some traits via the `#[derive]` attribute. These traits can still be manually implemented if a more complex behavior is required.
+
+The following is a list of traits that may be derived:
+
+- `Debug`: Allows formatting using {:?} for printing.
+- `Clone`: Enables creating a deep copy of a value (.clone()).
+- `Copy`: Gives a type "copy semantics" instead of "move semantics".
+- `Default`: Creates a default value for a type (Default::default()).
+- `PartialEq`/`Eq`: Allows equality comparisons (==).
+- `PartialOrd`/`Ord`: Allows ordering comparisons (<, >).
+- `Hash`: Enables hashing of the type.
+
+```rust
+#[derive(Debug, Clone, PartialEq)]
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+fn main() {
+    let p1 = Point { x: 1, y: 2 };
+    let p2 = p1.clone();    // Enabled by Clone
+    println!("{:?}", p1);   // Enabled by Debug
+    assert_eq!(p1, p2);     // Enabled by PartialEq
+}
+```
+
+For more information, see [Appendix C: Derivable Traits](https://doc.rust-lang.org/book/appendix-03-derivable-traits.html) in *The Rust Programming Language*.
+:::
+
 #### Implementing `Display` and `Debug`
 
 `Debug` and `Display` are the two formatting traits you will implement most often.
@@ -3990,15 +4021,21 @@ debug     = true    # keep symbols for profiling
 
 See [Packages, Crates, and Modules](https://doc.rust-lang.org/book/ch07-00-managing-growing-projects-with-packages-crates-and-modules.html){target="_blank" rel="noopener noreferrer"} in *The Rust Programming Language* for more information.
 
-## Common Crates
-A few fellas that I find indispensable.
+## Crates
+::: {.subheading}
+A few fellas that I have have taken a liking to
+:::
+
+A crate comes in two flavors: *executables* and *libraries*. Library crates don’t have a `main` function, and they don’t compile to an executable. Instead, they define functionality intended to be shared with multiple projects. And when you feel like sharing your brilliance with the world, you can version and publish your library crate to crates.io where it will be hosted for others to pull down.
+
+This little section briefly covers some published crates that I can use help with. Starting with `clap`.
 
 ### `clap`
 ::: {.subheading}
 Command-line argument parsing, the civilized way
 :::
 
-[clap](https://docs.rs/clap/latest/clap/){target="_blank" rel="noopener noreferrer"} (Command Line Argument Parser) turns a Rust struct into a fully-featured CLI: `--help`, `--version`, validation, subcommands, and shell completions all come for free. You describe what your program accepts; clap handles the rest.
+[clap](https://docs.rs/clap/latest/clap/){target="_blank" rel="noopener noreferrer"} (Command Line Argument Parser) turns a Rust struct into a fully-featured CLI: `--help`, `--version`, validation, [subcommands](#subcommands), and shell completions all come for free. You describe what your program accepts; clap handles the rest.
 
 Add it to `Cargo.toml` with the `derive` feature, which enables the attribute-based API used throughout this section:
 
@@ -4008,7 +4045,7 @@ clap = { version = "4", features = ["derive"] }
 ```
 
 #### The Derive API
-The derive API lets you describe your CLI as a struct. Clap reads the struct and its attributes at compile time and generates the parser automatically. This is the approach you will use in almost all real projects.
+The [derive](#derive(parser)) API lets you describe your CLI as a struct. Clap reads the struct and its attributes at compile time and generates the parser automatically. This is the approach you will use in almost all real projects.
 
 ```rust
 use clap::Parser;
@@ -4240,6 +4277,7 @@ If a command option should work in either position, mark it `global = true`.
 
 Define an enum with `#[derive(Subcommand)]` and embed it in your top-level `Parser` struct. By convention this struct is named `Cli`, but any name works — clap derives from the struct name you call `.parse()` on:
 
+
 ```rust
 use clap::{Parser, Subcommand};
 
@@ -4291,7 +4329,19 @@ fn main() {
 }
 ```
 
-```
+::: {.explanation}
+- `#[command(subcommand)]` on the command field tells clap "when parsing, look for a subcommand name here".
+- The enum `Commands` (tagged `#[derive(Subcommand)]`) is the dispatcher — it lists what subcommands are available and routes to the right one.
+- Compress and Formats are the actual subcommands — the things the user types on the command line
+
+**So the flow is**:
+
+1. clap sees a word on the command line.
+2. It hands it to the dispatcher enum (`Command`).
+3. The dispatcher enum matches it to a variant and populates that variant's fields.
+:::
+
+```{bash}
 $ tool --help
 Usage: tool [OPTIONS] <COMMAND>
 

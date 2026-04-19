@@ -381,7 +381,7 @@ div.panel-h6:has(> table:first-child) {
 */
 .subheading>p {
   border-radius: 4px;
-  box-shadow: 1px 2px 4px 0px rgba(0, 0, 0, 0.35);
+  box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.30);
   display: inline-block;
   background-color: #f0f0f4;
   color: #787878;
@@ -436,7 +436,10 @@ code.sourceCode
 {
   background-color: rgb(236, 238, 244);
   border-radius: 6pt;
+  border-color: rgb(172, 172, 181);
+  border-width: 1pt;
   font-size: 10pt;
+  padding-left: 4px;
 }
 
 /**** composable fellas ****/
