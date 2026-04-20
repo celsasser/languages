@@ -932,13 +932,36 @@ See [Appendix B: Operators](https://doc.rust-lang.org/book/appendix-02-operators
 ## Macros
 Throughout this chapter you have seen `println!`, `vec!`, `format!`, and `panic!`. The `!` signals a **macro call**, not a function call. Macros in Rust are code that writes code at compile time, before the compiler type-checks anything.
 
-The practical reason macros exist: some things ordinary functions cannot do. `println!` accepts a variable number of arguments of different types — impossible for a regular Rust function without significant compromise. Macros solve this by expanding at compile time into whatever code is needed.
+Why do macros exist? Because they can do things ordinary functions cannot. For example, `println!` accepts a variable number of arguments of different types — impossible for a regular Rust function without significant compromise. Macros solve this by expanding at compile time into whatever code is needed.
 
 ```rust
 println!("hello");                    // no arguments
 println!("{}", x);                    // one argument
 println!("{} and {}", x, y);          // two arguments, different types fine
 ```
+
+::: {.explanation data-label="Rust Macros vs. C Macros"}
+The fundamental difference is that C macros are based on string substitution (text manipulation), while Rust macros are syntax-aware (token manipulation). Somebody deemed Rust macros "hygienic" and C macros "unhygienic" (poor C).
+
+- **Hygienic**: variables defined inside a macro do not accidentally clash with variables in the surrounding code.
+- **Unhygienic**: variables can unintentionally shadow or overwrite local variables.
+
+###### Input Handling
+- **C Macros**: Treat inputs as raw text. This can lead to operator precedence bugs (e.g.,  becoming  instead of ) unless you manually add parentheses.
+- **Rust Macros**: Match against specific syntax categories like  (expression),  (identifier), or . This ensures the input is syntactically valid before expansion.
+
+###### Types of Macros
+- **C**: Has only one type—the `#define` preprocessor directive.
+- **Rust**: Features two main systems:
+    - **Declarative (macro_rules!)**: Uses pattern matching similar to a  expression to generate code.
+    - **Procedural**: Functions that take a stream of tokens as input and return a stream of tokens as output, allowing for complex transformations like `#[derive]`.
+
+###### Compilation Stage
+C macros are handled by a separate preprocessor before the compiler sees the code. Rust macros are expanded during the early stages of compilation, meaning the compiler "understands" the structure of the expanded code.
+
+###### Visual Distinction
+In Rust, function-like macros are called with a trailing `!` (e.g., `println!`, `vec!`), making them instantly distinguishable from standard functions for better readability. C macros look identical to function calls.
+:::
 
 Common macros you will use regularly:
 
@@ -974,7 +997,7 @@ See [Macros](https://doc.rust-lang.org/book/ch20-05-macros.html){target="_blank"
 ### Formatting
 I am a prehistoric man. I assumed that `eprint!`, `eprintln`, `format!`, `println` would all live together and essentially use the same formatting code. But, if they do, it's not immediately apparent from looking at the source. Let's comare `format!` and `println`:
 
-`eprintln`'s location: `/lib/rustlib/src/rust/library/alloc/src/macros.rs`
+`format!`'s location: `/lib/rustlib/src/rust/library/alloc/src/macros.rs`
 ```rust
 #[macro_export]
 #[stable(feature = "rust1", since = "1.0.0")]
@@ -989,7 +1012,7 @@ macro_rules! format {
 }
 ```
 
-`format!`'s location: `./lib/rustlib/src/rust/library/std/src/macros.rs`
+`println`'s location: `./lib/rustlib/src/rust/library/std/src/macros.rs`
 ```rust
 #[macro_export]
 #[stable(feature = "rust1", since = "1.0.0")]

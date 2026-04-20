@@ -1917,10 +1917,43 @@ window.Quarto = {
 <section id="macros" class="level2">
 <h2 class="anchored" data-anchor-id="macros">Macros</h2>
 <p>Throughout this chapter you have seen <code>println!</code>, <code>vec!</code>, <code>format!</code>, and <code>panic!</code>. The <code>!</code> signals a <strong>macro call</strong>, not a function call. Macros in Rust are code that writes code at compile time, before the compiler type-checks anything.</p>
-<p>The practical reason macros exist: some things ordinary functions cannot do. <code>println!</code> accepts a variable number of arguments of different types — impossible for a regular Rust function without significant compromise. Macros solve this by expanding at compile time into whatever code is needed.</p>
+<p>Why do macros exist? Because they can do things ordinary functions cannot. For example, <code>println!</code> accepts a variable number of arguments of different types — impossible for a regular Rust function without significant compromise. Macros solve this by expanding at compile time into whatever code is needed.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb50"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="pp">println!</span>(<span class="st">"hello"</span>)<span class="op">;</span>                    <span class="co">// no arguments</span></span>
 <span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="pp">println!</span>(<span class="st">"{}"</span><span class="op">,</span> x)<span class="op">;</span>                    <span class="co">// one argument</span></span>
 <span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="pp">println!</span>(<span class="st">"{} and {}"</span><span class="op">,</span> x<span class="op">,</span> y)<span class="op">;</span>          <span class="co">// two arguments, different types fine</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="explanation" data-label="Rust Macros vs. C Macros">
+<p>The fundamental difference is that C macros are based on string substitution (text manipulation), while Rust macros are syntax-aware (token manipulation). Somebody deemed Rust macros “hygienic” and C macros “unhygienic” (poor C).</p>
+<ul>
+<li><strong>Hygienic</strong>: variables defined inside a macro do not accidentally clash with variables in the surrounding code.</li>
+<li><strong>Unhygienic</strong>: variables can unintentionally shadow or overwrite local variables.</li>
+</ul>
+<section id="input-handling" class="level6">
+<h6 class="anchored" data-anchor-id="input-handling">Input Handling</h6>
+<ul>
+<li><strong>C Macros</strong>: Treat inputs as raw text. This can lead to operator precedence bugs (e.g., becoming instead of ) unless you manually add parentheses.</li>
+<li><strong>Rust Macros</strong>: Match against specific syntax categories like (expression), (identifier), or . This ensures the input is syntactically valid before expansion.</li>
+</ul>
+</section>
+<section id="types-of-macros" class="level6">
+<h6 class="anchored" data-anchor-id="types-of-macros">Types of Macros</h6>
+<ul>
+<li><strong>C</strong>: Has only one type—the <code>#define</code> preprocessor directive.</li>
+<li><strong>Rust</strong>: Features two main systems:
+<ul>
+<li><strong>Declarative (macro_rules!)</strong>: Uses pattern matching similar to a expression to generate code.</li>
+<li><strong>Procedural</strong>: Functions that take a stream of tokens as input and return a stream of tokens as output, allowing for complex transformations like <code>#[derive]</code>.</li>
+</ul></li>
+</ul>
+</section>
+<section id="compilation-stage" class="level6">
+<h6 class="anchored" data-anchor-id="compilation-stage">Compilation Stage</h6>
+<p>C macros are handled by a separate preprocessor before the compiler sees the code. Rust macros are expanded during the early stages of compilation, meaning the compiler “understands” the structure of the expanded code.</p>
+</section>
+<section id="visual-distinction" class="level6">
+<h6 class="anchored" data-anchor-id="visual-distinction">Visual Distinction</h6>
+<p>In Rust, function-like macros are called with a trailing <code>!</code> (e.g., <code>println!</code>, <code>vec!</code>), making them instantly distinguishable from standard functions for better readability. C macros look identical to function calls.</p>
+</section>
+</div>
 <p>Common macros you will use regularly:</p>
 <table class="caption-top table">
 <colgroup>
@@ -1989,7 +2022,7 @@ window.Quarto = {
 <section id="formatting" class="level3">
 <h3 class="anchored" data-anchor-id="formatting">Formatting</h3>
 <p>I am a prehistoric man. I assumed that <code>eprint!</code>, <code>eprintln</code>, <code>format!</code>, <code>println</code> would all live together and essentially use the same formatting code. But, if they do, it’s not immediately apparent from looking at the source. Let’s comare <code>format!</code> and <code>println</code>:</p>
-<p><code>eprintln</code>’s location: <code>/lib/rustlib/src/rust/library/alloc/src/macros.rs</code></p>
+<p><code>format!</code>’s location: <code>/lib/rustlib/src/rust/library/alloc/src/macros.rs</code></p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb52"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="at">#[</span>macro_export<span class="at">]</span></span>
 <span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="at">#[</span>stable<span class="at">(</span>feature <span class="op">=</span> <span class="st">"rust1"</span><span class="op">,</span> since <span class="op">=</span> <span class="st">"1.0.0"</span><span class="at">)]</span></span>
 <span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a><span class="at">#[</span>allow_internal_unstable<span class="at">(</span>hint_must_use<span class="op">,</span> liballoc_internals<span class="at">)]</span></span>
@@ -2001,7 +2034,7 @@ window.Quarto = {
 <span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span>)</span>
 <span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb52-11"><a href="#cb52-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><code>format!</code>’s location: <code>./lib/rustlib/src/rust/library/std/src/macros.rs</code></p>
+<p><code>println</code>’s location: <code>./lib/rustlib/src/rust/library/std/src/macros.rs</code></p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb53"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="at">#[</span>macro_export<span class="at">]</span></span>
 <span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="at">#[</span>stable<span class="at">(</span>feature <span class="op">=</span> <span class="st">"rust1"</span><span class="op">,</span> since <span class="op">=</span> <span class="st">"1.0.0"</span><span class="at">)]</span></span>
 <span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a><span class="at">#[</span>cfg_attr<span class="at">(</span>not<span class="at">(</span>test<span class="at">)</span><span class="op">,</span> rustc_diagnostic_item <span class="op">=</span> <span class="st">"println_macro"</span><span class="at">)]</span></span>
