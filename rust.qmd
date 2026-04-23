@@ -1244,9 +1244,17 @@ print_len(&s);               // lend s to the function
 println!("{}", s);           // s still valid after the call
 ```
 
-**The borrow rules** (enforced at compile time):
+##### The Rules
+::: {.subheading}
+Enforced at compile time
+:::
 
-1. You can have *either* one mutable reference *or* any number of immutable references — never both at the same time.
+1. You can have *either* one mutable reference *or* any number of immutable references — never both at the same time. The following spells it out:
+    - We can create a single mutable reference to it: `let s = String::from("🙂"); let rm1 = &mut s`.
+    - We cannot create two mutable references to it: `let s = String::from("😡"); let rm1 = &mut s; let rm2 = &mut s;` ❌. Will fail with compilation error.
+    - We cannot create a single mutable reference and an immutable reference: `let s = String::from("😡"); let rm1 = &mut s; let ri1 = &mut s;` ❌. Will fail with compilation error.
+    - We can create one or more immutable references: `let s = String::from("🙂"); let ri1 = &s; let ri2 = &s; let ri3 = &s;`
+    - Note: reference tracking transcends function boundaries; meaning, it doesn't matter that two references exist to the same object in different functions. It's still two references to the same object.
 2. References must always be valid (no dangling references).
 
 ```rust
@@ -1257,13 +1265,26 @@ let r2 = &s;      // another immutable borrow — fine
 // let r3 = &mut s; // compile error: can't borrow as mutable while immutable borrows exist
 
 println!("{} {}", r1, r2);
-// r1 and r2 go out of use here
+// r1 and r2 are last used here — compiler ends their borrows (see callout below)
 
 let r3 = &mut s;  // now a mutable borrow is fine
 r3.push_str(", world");
 ```
 
 This feels restrictive at first. In practice it eliminates a huge class of bugs: data races, iterator invalidation, use-after-free. The compiler is your enforcer.
+
+::: {.callout-important title="Non-Lexical Lifetimes (NLL)" id=NLL}
+If the example above seems surprising — how can `r3` be valid when `r1` and `r2` were never explicitly dropped? — the answer is **Non-Lexical Lifetimes**, introduced in Rust 2018.
+
+Before NLL, the compiler tied a borrow's lifetime to its enclosing block (`{}`). That meant `r1` and `r2` would stay alive until the `}` closing whatever scope they were declared in, making `r3 = &mut s` a compile error even though `r1` and `r2` are never touched again after the `println!`. This was a real source of frustration.
+
+With NLL, the compiler performs a dataflow analysis to find the last point where each reference is actually *used*. A borrow ends there, not at the end of the block. After the `println!`, `r1` and `r2` are genuinely dead as far as the compiler is concerned. By the time `r3` is created, no immutable borrows are active, so the mutable borrow is legal.
+
+The practical upshot: you rarely need to introduce extra scopes (`{ }`) just to end a borrow early. The compiler figures it out from how you actually use the references.
+
+If you think about how the stack works, this becomes intuitive. When a function runs, local variables are pushed onto the stack frame. A variable is "live" as long as some future instruction needs its value. Once no instruction downstream references it, it is effectively dead — even if the stack frame hasn't been torn down yet. NLL applies exactly that reasoning to borrows: the compiler walks forward through the code and asks "does anything after this point use `r1`?" If not, the borrow is over. The `}` is just the latest possible point a borrow can end, not the only one.
+:::
+
 
 ### Lifetimes
 ::: {.subheading}
@@ -1319,7 +1340,7 @@ let result;
     let s2 = String::from("short");
     result = longest(&s1, &s2);
 }
-// println!("{}", result);  // compile error: s1 and s2 are out of scope
+println!("{}", result);  // compile error: s1 and s2 are out of scope
 ```
 
 The compiler prevents the dangling reference at compile time, not runtime.
@@ -4144,7 +4165,7 @@ What changes between editions is **language syntax and a small number of semanti
 | Edition | Notable changes                                                                                                                                     |
 |---------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
 | 2015    | Original Rust. `extern crate` required. Old module path rules.                                                                                      |
-| 2018    | `extern crate` no longer needed. Clearer `use` paths (`crate::`, `super::`). `async`/`await` syntax. `?` usable in `main`. Non-lexical lifetimes.   |
+| 2018    | `extern crate` no longer needed. Clearer `use` paths (`crate::`, `super::`). `async`/`await` syntax. `?` usable in `main`. [Non-lexical lifetimes](#NLL).   |
 | 2021    | More precise closure captures (captures only what it uses, not the whole struct). `IntoIterator` implemented for arrays. Cargo feature resolver v2. |
 | 2024    | `gen` blocks and coroutines. `impl Trait` lifetime improvements. Stricter `unsafe` requirements.                                                    |
 

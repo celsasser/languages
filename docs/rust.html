@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-04-19">
+<meta name="dcterms.date" content="2026-04-23">
 
 <title>Rust for C/C++ Programmers – Computer Language Notebook</title>
 <style>
@@ -540,7 +540,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">April 19, 2026</p>
+      <p class="date">April 23, 2026</p>
     </div>
   </div>
   
@@ -2218,9 +2218,20 @@ window.Quarto = {
 <span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> s <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"hello"</span>)<span class="op">;</span></span>
 <span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a>print_len(<span class="op">&amp;</span>s)<span class="op">;</span>               <span class="co">// lend s to the function</span></span>
 <span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a><span class="pp">println!</span>(<span class="st">"{}"</span><span class="op">,</span> s)<span class="op">;</span>           <span class="co">// s still valid after the call</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>The borrow rules</strong> (enforced at compile time):</p>
+<section id="the-rules" class="level5">
+<h5 class="anchored" data-anchor-id="the-rules">The Rules</h5>
+<div class="subheading">
+<p>Enforced at compile time</p>
+</div>
 <ol type="1">
-<li>You can have <em>either</em> one mutable reference <em>or</em> any number of immutable references — never both at the same time.</li>
+<li>You can have <em>either</em> one mutable reference <em>or</em> any number of immutable references — never both at the same time. The following spells it out:
+<ul>
+<li>We can create a single mutable reference to it: <code>let s = String::from("🙂"); let rm1 = &amp;mut s</code>.</li>
+<li>We cannot create two mutable references to it: <code>let s = String::from("😡"); let rm1 = &amp;mut s; let rm2 = &amp;mut s;</code> ❌. Will fail with compilation error.</li>
+<li>We cannot create a single mutable reference and an immutable reference: <code>let s = String::from("😡"); let rm1 = &amp;mut s; let ri1 = &amp;mut s;</code> ❌. Will fail with compilation error.</li>
+<li>We can create one or more immutable references: <code>let s = String::from("🙂"); let ri1 = &amp;s; let ri2 = &amp;s; let ri3 = &amp;s;</code></li>
+<li>Note: reference tracking transcends function boundaries; meaning, it doesn’t matter that two references exist to the same object in different functions. It’s still two references to the same object.</li>
+</ul></li>
 <li>References must always be valid (no dangling references).</li>
 </ol>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb67"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> s <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"hello"</span>)<span class="op">;</span></span>
@@ -2230,11 +2241,29 @@ window.Quarto = {
 <span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a><span class="co">// let r3 = &amp;mut s; // compile error: can't borrow as mutable while immutable borrows exist</span></span>
 <span id="cb67-6"><a href="#cb67-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb67-7"><a href="#cb67-7" aria-hidden="true" tabindex="-1"></a><span class="pp">println!</span>(<span class="st">"{} {}"</span><span class="op">,</span> r1<span class="op">,</span> r2)<span class="op">;</span></span>
-<span id="cb67-8"><a href="#cb67-8" aria-hidden="true" tabindex="-1"></a><span class="co">// r1 and r2 go out of use here</span></span>
+<span id="cb67-8"><a href="#cb67-8" aria-hidden="true" tabindex="-1"></a><span class="co">// r1 and r2 are last used here — compiler ends their borrows (see callout below)</span></span>
 <span id="cb67-9"><a href="#cb67-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb67-10"><a href="#cb67-10" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> r3 <span class="op">=</span> <span class="op">&amp;</span><span class="kw">mut</span> s<span class="op">;</span>  <span class="co">// now a mutable borrow is fine</span></span>
 <span id="cb67-11"><a href="#cb67-11" aria-hidden="true" tabindex="-1"></a>r3<span class="op">.</span>push_str(<span class="st">", world"</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>This feels restrictive at first. In practice it eliminates a huge class of bugs: data races, iterator invalidation, use-after-free. The compiler is your enforcer.</p>
+<div id="NLL" class="callout callout-style-default callout-important callout-titled" title="Non-Lexical Lifetimes (NLL)">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Non-Lexical Lifetimes (NLL)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If the example above seems surprising — how can <code>r3</code> be valid when <code>r1</code> and <code>r2</code> were never explicitly dropped? — the answer is <strong>Non-Lexical Lifetimes</strong>, introduced in Rust 2018.</p>
+<p>Before NLL, the compiler tied a borrow’s lifetime to its enclosing block (<code>{}</code>). That meant <code>r1</code> and <code>r2</code> would stay alive until the <code>}</code> closing whatever scope they were declared in, making <code>r3 = &amp;mut s</code> a compile error even though <code>r1</code> and <code>r2</code> are never touched again after the <code>println!</code>. This was a real source of frustration.</p>
+<p>With NLL, the compiler performs a dataflow analysis to find the last point where each reference is actually <em>used</em>. A borrow ends there, not at the end of the block. After the <code>println!</code>, <code>r1</code> and <code>r2</code> are genuinely dead as far as the compiler is concerned. By the time <code>r3</code> is created, no immutable borrows are active, so the mutable borrow is legal.</p>
+<p>The practical upshot: you rarely need to introduce extra scopes (<code>{ }</code>) just to end a borrow early. The compiler figures it out from how you actually use the references.</p>
+<p>If you think about how the stack works, this becomes intuitive. When a function runs, local variables are pushed onto the stack frame. A variable is “live” as long as some future instruction needs its value. Once no instruction downstream references it, it is effectively dead — even if the stack frame hasn’t been torn down yet. NLL applies exactly that reasoning to borrows: the compiler walks forward through the code and asks “does anything after this point use <code>r1</code>?” If not, the borrow is over. The <code>}</code> is just the latest possible point a borrow can end, not the only one.</p>
+</div>
+</div>
+</section>
 </section>
 <section id="lifetimes" class="level3">
 <h3 class="anchored" data-anchor-id="lifetimes">Lifetimes</h3>
@@ -2333,7 +2362,7 @@ window.Quarto = {
 <span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> s2 <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"short"</span>)<span class="op">;</span></span>
 <span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> longest(<span class="op">&amp;</span>s1<span class="op">,</span> <span class="op">&amp;</span>s2)<span class="op">;</span></span>
 <span id="cb70-6"><a href="#cb70-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb70-7"><a href="#cb70-7" aria-hidden="true" tabindex="-1"></a><span class="co">// println!("{}", result);  // compile error: s1 and s2 are out of scope</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb70-7"><a href="#cb70-7" aria-hidden="true" tabindex="-1"></a><span class="pp">println!</span>(<span class="st">"{}"</span><span class="op">,</span> result)<span class="op">;</span>  <span class="co">// compile error: s1 and s2 are out of scope</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The compiler prevents the dangling reference at compile time, not runtime.</p>
 </section>
 </section>
@@ -5206,10 +5235,6 @@ Important
 <p>The key insight is that <strong>editions are per-crate, and all editions can link together</strong>. A crate compiled with edition 2015 and a crate compiled with edition 2021 produce compatible object code. The edition setting lives in <code>Cargo.toml</code> and affects only the crate it belongs to. This means the ecosystem never splits the way Python 2 vs Python 3 did.</p>
 <p>What changes between editions is <strong>language syntax and a small number of semantic rules</strong>, not the standard library. The standard library API is versioned by the Rust release channel separately. An example: in edition 2015 you had to write <code>extern crate serde;</code> at the top of <code>main.rs</code> to bring an external crate into scope. In 2018 that was removed entirely. Both editions call the same <code>serde</code> functions at runtime.</p>
 <table class="caption-top table">
-<colgroup>
-<col style="width: 5%">
-<col style="width: 94%">
-</colgroup>
 <thead>
 <tr class="header">
 <th>Edition</th>
@@ -5223,7 +5248,7 @@ Important
 </tr>
 <tr class="even">
 <td>2018</td>
-<td><code>extern crate</code> no longer needed. Clearer <code>use</code> paths (<code>crate::</code>, <code>super::</code>). <code>async</code>/<code>await</code> syntax. <code>?</code> usable in <code>main</code>. Non-lexical lifetimes.</td>
+<td><code>extern crate</code> no longer needed. Clearer <code>use</code> paths (<code>crate::</code>, <code>super::</code>). <code>async</code>/<code>await</code> syntax. <code>?</code> usable in <code>main</code>. <a href="#NLL">Non-lexical lifetimes</a>.</td>
 </tr>
 <tr class="odd">
 <td>2021</td>
