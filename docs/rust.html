@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-04-23">
+<meta name="dcterms.date" content="2026-04-25">
 
 <title>Rust for C/C++ Programmers – Computer Language Notebook</title>
 <style>
@@ -498,6 +498,11 @@ window.Quarto = {
   <li><a href="#dependency-scopes" id="toc-dependency-scopes" class="nav-link" data-scroll-target="#dependency-scopes">Dependency Scopes</a></li>
   <li><a href="#feature-flags" id="toc-feature-flags" class="nav-link" data-scroll-target="#feature-flags">Feature Flags</a></li>
   <li><a href="#build-profiles" id="toc-build-profiles" class="nav-link" data-scroll-target="#build-profiles">Build Profiles</a></li>
+  <li><a href="#environment-variables" id="toc-environment-variables" class="nav-link" data-scroll-target="#environment-variables">Environment Variables</a>
+  <ul class="collapse">
+  <li><a href="#cargo-sets" id="toc-cargo-sets" class="nav-link" data-scroll-target="#cargo-sets">Cargo Sets</a></li>
+  <li><a href="#cargo-reads" id="toc-cargo-reads" class="nav-link" data-scroll-target="#cargo-reads">Cargo Reads</a></li>
+  </ul></li>
   </ul></li>
   <li><a href="#crates-1" id="toc-crates-1" class="nav-link" data-scroll-target="#crates-1">Crates</a>
   <ul>
@@ -540,7 +545,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">April 23, 2026</p>
+      <p class="date">April 25, 2026</p>
     </div>
   </div>
   
@@ -5369,7 +5374,264 @@ Important
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb234"><pre class="sourceCode toml code-with-copy"><code class="sourceCode toml"><span id="cb234-1"><a href="#cb234-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[profile.bench]</span></span>
 <span id="cb234-2"><a href="#cb234-2" aria-hidden="true" tabindex="-1"></a><span class="dt">inherits</span>  <span class="op">=</span> <span class="st">"release"</span></span>
 <span id="cb234-3"><a href="#cb234-3" aria-hidden="true" tabindex="-1"></a><span class="dt">debug</span>     <span class="op">=</span> <span class="cn">true</span>    <span class="co"># keep symbols for profiling</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="environment-variables" class="level3">
+<h3 class="anchored" data-anchor-id="environment-variables">Environment Variables</h3>
+<p>Cargo sets and reads a number of <a href="https://doc.rust-lang.org/cargo/reference/environment-variables.html" target="_blank">environment variables</a> which you (in your code) can detect or override by setting. The list is long so the lists here are super subsets. See the official documentation (which I think is <a href="https://doc.rust-lang.org/cargo/reference/environment-variables.html" target="_blank">The Cargo Book</a>).</p>
+<section id="cargo-sets" class="level4">
+<h4 class="anchored" data-anchor-id="cargo-sets">Cargo Sets</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 15%">
+<col style="width: 75%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable Name</th>
+<th style="text-align: center;">Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>CARGO</code></td>
+<td style="text-align: center;">Information</td>
+<td>Path to the cargo binary performing the build.</td>
+</tr>
+<tr class="even">
+<td><code>CARGO_MANIFEST_DIR</code></td>
+<td style="text-align: center;">Information</td>
+<td>The directory containing the manifest of your package.</td>
+</tr>
+<tr class="odd">
+<td><code>CARGO_MANIFEST_PATH</code></td>
+<td style="text-align: center;">Information</td>
+<td>The path to the manifest of your package.</td>
+</tr>
+<tr class="even">
+<td><code>CARGO_PKG_VERSION</code></td>
+<td style="text-align: center;">Information</td>
+<td>The full version of your package.</td>
+</tr>
+<tr class="odd">
+<td><code>CARGO_PKG_VERSION_MAJOR</code></td>
+<td style="text-align: center;">Information</td>
+<td>The major version of your package.</td>
+</tr>
+<tr class="even">
+<td><code>CARGO_PKG_VERSION_MINOR</code></td>
+<td style="text-align: center;">Information</td>
+<td>The minor version of your package.</td>
+</tr>
+<tr class="odd">
+<td><code>CARGO_PKG_VERSION_PATCH</code></td>
+<td style="text-align: center;">Information</td>
+<td>The patch version of your package.</td>
+</tr>
+<tr class="even">
+<td><code>CARGO_PKG_VERSION_PRE</code></td>
+<td style="text-align: center;">Information</td>
+<td>The pre-release version of your package.</td>
+</tr>
+<tr class="odd">
+<td><code>CARGO_PKG_AUTHORS</code></td>
+<td style="text-align: center;">Information</td>
+<td>Colon separated list of authors from the manifest of your package.</td>
+</tr>
+<tr class="even">
+<td><code>CARGO_PKG_NAME</code></td>
+<td style="text-align: center;">Information</td>
+<td>The name of your package.</td>
+</tr>
+<tr class="odd">
+<td><code>CARGO_PKG_DESCRIPTION</code></td>
+<td style="text-align: center;">Information</td>
+<td>The description from the manifest of your package.</td>
+</tr>
+<tr class="even">
+<td><code>CARGO_PKG_HOMEPAGE</code></td>
+<td style="text-align: center;">Information</td>
+<td>The home page from the manifest of your package.</td>
+</tr>
+<tr class="odd">
+<td><code>CARGO_PKG_REPOSITORY</code></td>
+<td style="text-align: center;">Information</td>
+<td>The repository from the manifest of your package.</td>
+</tr>
+<tr class="even">
+<td><code>CARGO_PKG_LICENSE</code></td>
+<td style="text-align: center;">Information</td>
+<td>The license from the manifest of your package.</td>
+</tr>
+<tr class="odd">
+<td><code>CARGO_PKG_LICENSE_FILE</code></td>
+<td style="text-align: center;">Information</td>
+<td>The license file from the manifest of your package.</td>
+</tr>
+<tr class="even">
+<td><code>CARGO_PKG_RUST_VERSION</code></td>
+<td style="text-align: center;">Information</td>
+<td>The Rust version from the manifest of your package. Note that this is the minimum Rust version supported by the package, not the current Rust version.</td>
+</tr>
+<tr class="odd">
+<td><code>CARGO_PKG_README</code></td>
+<td style="text-align: center;">Information</td>
+<td>Path to the README file of your package.</td>
+</tr>
+<tr class="even">
+<td><code>CARGO_CRATE_NAME</code></td>
+<td style="text-align: center;">Information</td>
+<td>The name of the crate that is currently being compiled. It is the name of the Cargo target with - converted to _, such as the name of the library, binary, example, integration test, or benchmark.</td>
+</tr>
+<tr class="odd">
+<td><code>CARGO_BIN_NAME</code></td>
+<td style="text-align: center;">Information</td>
+<td>The name of the binary that is currently being compiled. Only set for binaries or binary examples. This name does not include any file extension, such as .exe.</td>
+</tr>
+<tr class="even">
+<td><code>OUT_DIR</code></td>
+<td style="text-align: center;">Information</td>
+<td>If the package has a build script, this is set to the folder where the build script should place its output. See below for more information. (Only set during compilation.) Cargo does not guarantee that this directory is empty, and it is not cleaned between builds.</td>
+</tr>
+<tr class="odd">
+<td><code>CARGO_BIN_EXE_&lt;name&gt;</code></td>
+<td style="text-align: center;">Information</td>
+<td>The absolute path to a binary target’s executable. This is only set when building an integration test or benchmark. This may be used with the env macro to find the executable to run for testing purposes. The <code>&lt;name&gt;</code> is the name of the binary target, exactly as-is. For example, <code>CARGO_BIN_EXE_my-program</code> for a binary named my-program. Binaries are automatically built when the test is built, unless the binary has required features that are not enabled.</td>
+</tr>
+<tr class="even">
+<td><code>CARGO_PRIMARY_PACKAGE</code></td>
+<td style="text-align: center;">Information</td>
+<td>This environment variable will be set if the package being built is primary. Primary packages are the ones the user selected on the command-line, either with -p flags or the defaults based on the current directory and the default workspace members. This variable will not be set when building dependencies, unless a dependency is also a workspace member that was also selected on the command-line. This is only set when compiling the package (not when running binaries or tests).</td>
+</tr>
+<tr class="odd">
+<td><code>CARGO_TARGET_TMPDIR</code></td>
+<td style="text-align: center;">Information</td>
+<td>Only set when building integration test or benchmark code. This is a path to a directory inside the target directory where integration tests or benchmarks are free to put any data needed by the tests/benches. Cargo initially creates this directory but doesn’t manage its content in any way, this is the responsibility of the test code.</td>
+</tr>
+<tr class="even">
+<td><code>CARGO</code></td>
+<td style="text-align: center;">Scripting</td>
+<td>Path to the cargo binary performing the build.</td>
+</tr>
+<tr class="odd">
+<td><code>CARGO_MANIFEST_DIR</code></td>
+<td style="text-align: center;">Scripting</td>
+<td>The directory containing the manifest for the package being built (the package containing the build script). Also note that this is the value of the current working directory of the build script when it starts.</td>
+</tr>
+<tr class="even">
+<td><code>CARGO_MANIFEST_PATH</code></td>
+<td style="text-align: center;">Scripting</td>
+<td>The path to the manifest of your package.</td>
+</tr>
+<tr class="odd">
+<td><code>CARGO_MANIFEST_LINKS</code></td>
+<td style="text-align: center;">Scripting</td>
+<td>the manifest links value.</td>
+</tr>
+<tr class="even">
+<td><code>CARGO_MAKEFLAGS</code></td>
+<td style="text-align: center;">Scripting</td>
+<td>Contains parameters needed for Cargo’s jobserver implementation to parallelize subprocesses. Rustc or cargo invocations from <code>build.rs</code> can already read <code>CARGO_MAKEFLAGS</code>, but GNU Make requires the flags to be specified either directly as arguments, or through the <code>MAKEFLAGS</code> environment variable. Currently Cargo doesn’t set the <code>MAKEFLAGS</code> variable, but it’s free for build scripts invoking GNU Make to set it to the contents of <code>CARGO_MAKEFLAGS</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>CARGO_FEATURE_&lt;name&gt;</code></td>
+<td style="text-align: center;">Scripting</td>
+<td>For each activated feature of the package being built, this environment variable will be present where <code>&lt;name&gt;</code> is the name of the feature uppercased and having - translated to <code>_</code>.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="cargo-reads" class="level4">
+<h4 class="anchored" data-anchor-id="cargo-reads">Cargo Reads</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Variable Name</th>
+<th style="text-align: center;">Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>CARGO_LOG</code></td>
+<td style="text-align: center;">Configuration</td>
+<td>Cargo uses the tracing crate to display debug log messages. The <code>CARGO_LOG</code> environment variable can be set to enable debug logging, with a value such as trace, debug, or warn. Usually it is only used during debugging. For more details refer to the Debug logging.</td>
+</tr>
+<tr class="even">
+<td><code>CARGO_HOME</code></td>
+<td style="text-align: center;">Configuration</td>
+<td>Cargo maintains a local cache of the registry index and of git checkouts of crates. By default these are stored under <code>$HOME/.cargo</code> (<code>%USERPROFILE%\.cargo</code> on Windows), but this variable overrides the location of this directory. Once a crate is cached it is not removed by the clean command. For more details refer to the guide.</td>
+</tr>
+<tr class="odd">
+<td><code>CARGO_TARGET_DIR</code></td>
+<td style="text-align: center;">Configuration</td>
+<td>Location of where to place all generated artifacts, relative to the current working directory. See <a href="https://doc.rust-lang.org/cargo/reference/config.html#buildtarget-dir" target="_blank"><code>build.target-dir</code></a> to set via config.</td>
+</tr>
+<tr class="even">
+<td><code>CARGO</code></td>
+<td style="text-align: center;">Configuration</td>
+<td>If set, Cargo will forward this value instead of setting it to its own auto-detected path when it builds crates and when it executes build scripts and external subcommands. This value is not directly executed by Cargo, and should always point at a command that behaves exactly like cargo, as that’s what users of the variable will be expecting.</td>
+</tr>
+<tr class="odd">
+<td><code>RUSTC</code></td>
+<td style="text-align: center;">Configuration</td>
+<td>Instead of running rustc, Cargo will execute this specified compiler instead. See build.rustc to set via config.</td>
+</tr>
+<tr class="even">
+<td><code>CARGO_ALIAS_&lt;name&gt;</code></td>
+<td style="text-align: center;">Information</td>
+<td>Command aliases, see <a href="https://doc.rust-lang.org/cargo/reference/config.html#alias" target="_blank"><code>alias</code></a>.</td>
+</tr>
+<tr class="odd">
+<td><code>CARGO_BUILD_JOBS</code></td>
+<td style="text-align: center;">Information</td>
+<td>Number of parallel jobs, see <a href="https://doc.rust-lang.org/cargo/reference/config.html#buildjobs" target="_blank"><code>build.jobs</code></a>.</td>
+</tr>
+<tr class="even">
+<td><code>CARGO_BUILD_RUSTC</code></td>
+<td style="text-align: center;">Information</td>
+<td>The rustc executable, see <a href="https://doc.rust-lang.org/cargo/reference/config.html#buildrustc" target="_blank"><code>build.rustc</code></a>.</td>
+</tr>
+<tr class="odd">
+<td><code>CARGO_BUILD_RUSTC_WRAPPER</code></td>
+<td style="text-align: center;">Information</td>
+<td>The <code>rustc</code> wrapper, see <a href="https://doc.rust-lang.org/cargo/reference/config.html#buildrustc-wrapper" target="_blank"><code>build.rustc-wrapper</code></a>.</td>
+</tr>
+<tr class="even">
+<td><code>CARGO_BUILD_RUSTC_WORKSPACE_WRAPPER</code></td>
+<td style="text-align: center;">Information</td>
+<td>The rustc wrapper for workspace members only, see <a href="https://doc.rust-lang.org/cargo/reference/config.html#buildrustc-workspace-wrapper" target="_blank"><code>build.rustc-workspace-wrapper</code></a>.</td>
+</tr>
+<tr class="odd">
+<td><code>CARGO_BUILD_RUSTDOC</code></td>
+<td style="text-align: center;">Information</td>
+<td>The rustdoc executable, see <a href="https://doc.rust-lang.org/cargo/reference/config.html#buildrustdoc" target="_blank"><code>build.rustdoc</code></a>.</td>
+</tr>
+<tr class="even">
+<td><code>CARGO_BUILD_TARGET</code></td>
+<td style="text-align: center;">Information</td>
+<td>The default target platform, see <a href="https://doc.rust-lang.org/cargo/reference/config.html#buildtarget" target="_blank"><code>build.target</code></a>.</td>
+</tr>
+<tr class="odd">
+<td><code>CARGO_BUILD_TARGET_DIR</code></td>
+<td style="text-align: center;">Information</td>
+<td>The default output directory, see <a href="https://doc.rust-lang.org/cargo/reference/config.html#buildtarget-dir" target="_blank"><code>build.target-dir</code></a>.</td>
+</tr>
+<tr class="even">
+<td><code>CARGO_BUILD_BUILD_DIR</code></td>
+<td style="text-align: center;">Information</td>
+<td>The default build directory, see <a href="https://doc.rust-lang.org/cargo/reference/config.html#buildbuild-dir" target="_blank"><code>build.build-dir</code></a>.</td>
+</tr>
+<tr class="odd">
+<td><code>CARGO_BUILD_RUSTFLAGS</code></td>
+<td style="text-align: center;">Information</td>
+<td>Extra rustc flags, see <a href="https://doc.rust-lang.org/cargo/reference/config.html#buildrustflags" target="_blank"><code>build.rustflags</code></a>.</td>
+</tr>
+</tbody>
+</table>
 <p>See <a href="https://doc.rust-lang.org/book/ch07-00-managing-growing-projects-with-packages-crates-and-modules.html" target="_blank" rel="noopener noreferrer">Packages, Crates, and Modules</a> in <em>The Rust Programming Language</em> for more information.</p>
+</section>
 </section>
 </section>
 <section id="crates-1" class="level2">
@@ -5507,8 +5769,8 @@ pexs24 0.3.1</code></pre>
 <h6 class="anchored" data-anchor-id="what-does-name-file-mean">What does <code>name = "FILE"</code> mean?</h6>
 <p>The <code>name</code> attribute in <code>#[arg(...)]</code> sets the argument’s internal <strong>ID</strong> and, for positional arguments, its <strong>metavar</strong> — the placeholder text shown in usage and help output. The uppercase <code>FILE</code> in <code>&lt;FILE&gt;</code> is a Unix convention: metavars are written in ALL_CAPS to visually distinguish the placeholder from the flags around it, and to make the type of input obvious at a glance.</p>
 <pre><code>Usage: prog [OPTIONS] &lt;FILE&gt;              # FILE is the metavar
-           ^^^^^^^^   ^^^^^^
-           flags      positional argument</code></pre>
+            ^^^^^^^^  ^^^^^^
+            flags      positional argument</code></pre>
 <p>“FILE” is not arbitrary. It communicates meaning to the user: <em>this argument expects a file path</em>. By convention:</p>
 <table class="caption-top table">
 <thead>
