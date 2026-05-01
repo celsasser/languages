@@ -934,9 +934,13 @@ See [Common Programming Concepts](https://doc.rust-lang.org/book/ch03-00-common-
 :::
 
 ## Option\<T\>
-I use this guy very frequently, and I very frequently forget how to use him. Hence his high presence on this Rusty totem pole.
+::: {.subheading}
+I use this guy frequently, and I frequently forget how to use him.
+:::
 
-Rust does not have nulls, but it does have an `enum` that can encode the concept of a value being present or absent. This enum is `Option<T>`, and it is defined by the [standard library](https://doc.rust-lang.org/std/option/enum.Option.html) as follows:
+I described `Option<T>` as a pointer and AI got defensive. He's right, it's more than just a pointer. It's an impenetrable fortress built up around a pointer. In the late 90s, just when Java was becomming popular and .NET was a twinkle in Microsft's eye, a commonly quoted statistic was floating around, "90% of C/C++ bugs have to do with memory management". I don't know how accurate it is, but having been a C/C++ developer for many years at the time, I have no doubt that memory management is the primary culprit of all C/C++ bugs.
+
+So what is it about Rust that makes him different? Rust does not have `null`s. It has `None` but no `NULL`. And he has a wicked enum - `Option<T>` - that can encode the concept of a value being present or absent. `Option<T>` is defined by the [standard library](https://doc.rust-lang.org/std/option/enum.Option.html) as follows:
 
 ```rust
 enum Option<T> {
@@ -945,13 +949,23 @@ enum Option<T> {
 }
 ```
 
-Because `Option<T>` is an enum, you can never accidentally use a value that might be absent — the compiler forces you to deal with both variants. There is no null, no undefined, no surprise crash at runtime from a missing value.
+Because `Option<T>` is an enum, you can never accidentally use a value that might be absent — the compiler forces you to deal with both variants. There is no `null`, no `undefined`, no surprise crash at runtime from a missing value.
+
+::: {.explanation data-label="What makes him a Beautiful Beast?"}
+- **Safety Over Pointers**: `Option<T>` is an `enum` used to force safe handling of empty cases, unlike raw pointers in other languages.
+- **Pointer Optimization**: For types that cannot be `null` (like references `&T` or [`Box<T>`](#smart-pointers)), Rust optimizes `Option<T>` to eliminate the tag overhead. Thus, `Option<&T>` is just a pointer, where `0x0` is `None`.
+- **Memory Layout**: While `Option<&T>` is pointer-sized, `Option<T>` (for non-pointer types) contains the payload $T$ and a tag byte, making it larger than `T`.
+- **Optional Boxed Value**: `Option<Box<T>>` represents a pointer to a heap-allocated `T` that might be absent, often used for recursive data structures.
+:::
 
 ### Getting the Value Out
 
-The central question with `Option<T>` is always: how do I get it out of there? It all depends on what your goal is.
+The central question with `Option<T>` is always: how do I get it out of there? It all depends on what your ambition is and to what length of out you want to go. In the following sections we identify the most frequently used methods and `impl` functions for performing just about anything you might want to do with a pointer.
 
-#### `match` — handle both cases explicitly
+##### `match`
+::: {.u-subheading}
+handle both cases explicitly
+:::
 
 The most explicit approach. Use it when the `None` case needs real logic, not just a default value. It's also a sweet (🧁) way of doing type conversion.
 
@@ -964,7 +978,10 @@ match name {
 }
 ```
 
-#### `if let` — handle only `Some`, ignore `None`
+#### `if let`
+::: {.u-subheading}
+handle only `Some`, ignore `None`
+:::
 
 Use when you only care about the success case and want to silently skip `None`.
 
@@ -991,7 +1008,11 @@ if name.is_none() {
 }
 ```
 
-#### `or` — one or the other
+#### `or`
+::: {.u-subheading}
+one or the other
+:::
+
 [or](https://doc.rust-lang.org/std/option/enum.Option.html#method.or): returns `self` if it is `Some`. Otherwise, returns other. Useful for providing a fallback `Option`.
 
 ```rust
@@ -1004,7 +1025,11 @@ let y = Some(100);
 assert_eq!(x.or(y), Some(100));
 ```
 
-#### `or_else` - less expensive `or`
+#### `or_else`
+::: {.u-subheading}
+less expensive `or`
+:::
+
 [or_else](https://doc.rust-lang.org/std/option/enum.Option.html#method.or_else): similar to `or`, but the fallback `Option` is computed by a closure f only if self is `None`. Useful for expensive fallback computations.
 
 ```rust
@@ -1016,7 +1041,11 @@ assert_eq!(None.or_else(vikings), Some("vikings"));
 assert_eq!(None.or_else(nobody), None);
 ```
 
-#### `unwrap_or` — provide a fallback value
+#### `unwrap_or`
+::: {.u-subheading}
+provide a fallback value
+:::
+
 [unwrap_or](https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or): returns the contained `Some` value, or a provided default value if self is `None`. Use when `None` should produce a sensible default and the default is cheap.
 
 ```rust
@@ -1024,14 +1053,22 @@ let name = user_name.unwrap_or("Guest");
 let count = get_count().unwrap_or(0);
 ```
 
-#### `unwrap_or_else` — compute a fallback lazily
+
+#### `unwrap_or_else`
+::: {.u-subheading}
+compute a fallback lazily
+:::
+
 [unwrap_or_else](https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or_else): returns the contained `Some` value, or computes it from a closure f if self is `None`. Useful when the default value is expensive to compute. Use when the fallback is expensive or requires logic — the closure only runs if the value is `None`.
 
 ```rust
 let name = user_name.unwrap_or_else(|| fetch_default_name());
 ```
 
-#### `unwrap` and `expect` — crash on `None`
+#### `unwrap` and `expect`
+::: {.u-subheading}
+crash on `None`
+:::
 
 Use in tests, prototypes, or when you are certain the value is present and want to document that certainty. `expect` is preferred because the message appears in the panic output.
 
@@ -1042,7 +1079,10 @@ let name = user_name.expect("name must be set");  // panics: "name must be set"
 
 Never use these in production paths where `None` is legitimately possible.
 
-#### `?` — propagate `None` up the call stack
+#### `?`
+::: {.u-subheading}
+propagate `None` up the call stack
+:::
 
 Inside a function that returns `Option<T>`, the `?` operator returns `None` immediately if the value is `None`, otherwise unwraps and continues. The same operator you use with `Result`.
 
@@ -1072,7 +1112,11 @@ val.is_none();   // false
 
 These methods let you work with the value inside an `Option` without pulling it out first. They all preserve the `Option` wrapper — `None` passes through unchanged.
 
-#### `.map(f)` — transform the inner value
+#### `.map(f)`
+::: {.u-subheading}
+transform the inner value
+:::
+
 [map](https://doc.rust-lang.org/std/option/enum.Option.html#method.map): transforms the `Some` value into a new `Option` containing the result of applying a function `f`. If `self` is `None`, it remains `None`.
 
 ```rust
@@ -1081,7 +1125,11 @@ let length: Option<usize> = name.map(|n| n.len());
 // None          → None
 ```
 
-#### `.and_then(f)` — chain operations that return `Option`
+#### `.and_then(f)`
+::: {.u-subheading}
+chain operations that return `Option`
+:::
+
 [and_then](https://doc.rust-lang.org/std/option/enum.Option.html#method.and_then): chains operations that themselves return an `Option`. If self is `Some(v)`, applies f to v and returns the resulting `Option`. If self is `None`, returns `None`. Prevents `Option<Option<T>>` (nesting).
 
 Use when the transformation itself might fail (returns `Option`). Prevents `Option<Option<T>>` nesting.
@@ -1096,7 +1144,11 @@ let result = Some("abc").and_then(parse_number);  // None
 let result = None.and_then(parse_number);         // None
 ```
 
-#### `.filter(predicate)` — keep `Some` only if condition holds
+#### `.filter(predicate)`
+::: {.u-subheading}
+keep `Some` only if condition holds
+:::
+
 [filter](https://doc.rust-lang.org/std/option/enum.Option.html#method.filter): returns `None` if the option is `None`, otherwise calls `predicate` with the wrapped value and returns `Some(t)` if `predicate` returns `true` and `None` if `predicate` returns `false`.
 
 ```rust
@@ -1104,7 +1156,11 @@ let age: Option<u32> = Some(15);
 let adult = age.filter(|&a| a >= 18);   // None — 15 fails the predicate
 ```
 
-#### `.ok_or(err)` — convert `Option` to `Result`
+#### `.ok_or(err)`
+::: {.u-subheading}
+convert `Option` to `Result`
+:::
+
 [ok_or](https://doc.rust-lang.org/std/option/enum.Option.html#method.ok_or): converts `Option<T>` into a `Result<T, E>`. If self is `Some(v)`, returns `Ok(v)`. If self is `None`, returns `Err(err)`. When you need to treat `None` as an error:
 
 ```rust

@@ -223,7 +223,7 @@ a.disable-link {
 .explanation,
 .exploration,
 .quote {
-  background-color: #f7fff5;
+  background-color: #f8fff6;
 }
 
 .explanation:not([data-label])::before {
@@ -397,14 +397,24 @@ div.panel-h6:has(> table:first-child) {
   :::
   ```
 */
-.subheading>p {
+.subheading>p,
+.u-subheading>p {
   border-radius: 4px;
-  box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.30);
   display: inline-block;
   background-color: #f0f0f4;
   color: #787878;
   font-weight: 800;
   padding: 0px 5px;
+}
+
+.u-subheading {
+  border-bottom: 1px solid #c8c8c8;
+  margin-bottom: 1em;
+  padding-bottom: 0;
+}
+
+.u-subheading>p {
+  margin-bottom: 0;
 }
 
 .theorem {

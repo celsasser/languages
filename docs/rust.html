@@ -354,22 +354,21 @@ window.Quarto = {
   <ul>
   <li><a href="#getting-the-value-out" id="toc-getting-the-value-out" class="nav-link" data-scroll-target="#getting-the-value-out">Getting the Value Out</a>
   <ul class="collapse">
-  <li><a href="#match-handle-both-cases-explicitly" id="toc-match-handle-both-cases-explicitly" class="nav-link" data-scroll-target="#match-handle-both-cases-explicitly"><code>match</code> — handle both cases explicitly</a></li>
-  <li><a href="#if-let-handle-only-some-ignore-none" id="toc-if-let-handle-only-some-ignore-none" class="nav-link" data-scroll-target="#if-let-handle-only-some-ignore-none"><code>if let</code> — handle only <code>Some</code>, ignore <code>None</code></a></li>
-  <li><a href="#or-one-or-the-other" id="toc-or-one-or-the-other" class="nav-link" data-scroll-target="#or-one-or-the-other"><code>or</code> — one or the other</a></li>
-  <li><a href="#or_else---less-expensive-or" id="toc-or_else---less-expensive-or" class="nav-link" data-scroll-target="#or_else---less-expensive-or"><code>or_else</code> - less expensive <code>or</code></a></li>
-  <li><a href="#unwrap_or-provide-a-fallback-value" id="toc-unwrap_or-provide-a-fallback-value" class="nav-link" data-scroll-target="#unwrap_or-provide-a-fallback-value"><code>unwrap_or</code> — provide a fallback value</a></li>
-  <li><a href="#unwrap_or_else-compute-a-fallback-lazily" id="toc-unwrap_or_else-compute-a-fallback-lazily" class="nav-link" data-scroll-target="#unwrap_or_else-compute-a-fallback-lazily"><code>unwrap_or_else</code> — compute a fallback lazily</a></li>
-  <li><a href="#unwrap-and-expect-crash-on-none" id="toc-unwrap-and-expect-crash-on-none" class="nav-link" data-scroll-target="#unwrap-and-expect-crash-on-none"><code>unwrap</code> and <code>expect</code> — crash on <code>None</code></a></li>
-  <li><a href="#propagate-none-up-the-call-stack" id="toc-propagate-none-up-the-call-stack" class="nav-link" data-scroll-target="#propagate-none-up-the-call-stack"><code>?</code> — propagate <code>None</code> up the call stack</a></li>
+  <li><a href="#if-let" id="toc-if-let" class="nav-link" data-scroll-target="#if-let"><code>if let</code></a></li>
+  <li><a href="#or" id="toc-or" class="nav-link" data-scroll-target="#or"><code>or</code></a></li>
+  <li><a href="#or_else" id="toc-or_else" class="nav-link" data-scroll-target="#or_else"><code>or_else</code></a></li>
+  <li><a href="#unwrap_or" id="toc-unwrap_or" class="nav-link" data-scroll-target="#unwrap_or"><code>unwrap_or</code></a></li>
+  <li><a href="#unwrap_or_else" id="toc-unwrap_or_else" class="nav-link" data-scroll-target="#unwrap_or_else"><code>unwrap_or_else</code></a></li>
+  <li><a href="#unwrap-and-expect" id="toc-unwrap-and-expect" class="nav-link" data-scroll-target="#unwrap-and-expect"><code>unwrap</code> and <code>expect</code></a></li>
+  <li><a href="#section" id="toc-section" class="nav-link" data-scroll-target="#section"><code>?</code></a></li>
   </ul></li>
   <li><a href="#testing-without-extracting" id="toc-testing-without-extracting" class="nav-link" data-scroll-target="#testing-without-extracting">Testing Without Extracting</a></li>
   <li><a href="#transforming-without-extracting" id="toc-transforming-without-extracting" class="nav-link" data-scroll-target="#transforming-without-extracting">Transforming Without Extracting</a>
   <ul class="collapse">
-  <li><a href="#mapf-transform-the-inner-value" id="toc-mapf-transform-the-inner-value" class="nav-link" data-scroll-target="#mapf-transform-the-inner-value"><code>.map(f)</code> — transform the inner value</a></li>
-  <li><a href="#and_thenf-chain-operations-that-return-option" id="toc-and_thenf-chain-operations-that-return-option" class="nav-link" data-scroll-target="#and_thenf-chain-operations-that-return-option"><code>.and_then(f)</code> — chain operations that return <code>Option</code></a></li>
-  <li><a href="#filterpredicate-keep-some-only-if-condition-holds" id="toc-filterpredicate-keep-some-only-if-condition-holds" class="nav-link" data-scroll-target="#filterpredicate-keep-some-only-if-condition-holds"><code>.filter(predicate)</code> — keep <code>Some</code> only if condition holds</a></li>
-  <li><a href="#ok_orerr-convert-option-to-result" id="toc-ok_orerr-convert-option-to-result" class="nav-link" data-scroll-target="#ok_orerr-convert-option-to-result"><code>.ok_or(err)</code> — convert <code>Option</code> to <code>Result</code></a></li>
+  <li><a href="#mapf" id="toc-mapf" class="nav-link" data-scroll-target="#mapf"><code>.map(f)</code></a></li>
+  <li><a href="#and_thenf" id="toc-and_thenf" class="nav-link" data-scroll-target="#and_thenf"><code>.and_then(f)</code></a></li>
+  <li><a href="#filterpredicate" id="toc-filterpredicate" class="nav-link" data-scroll-target="#filterpredicate"><code>.filter(predicate)</code></a></li>
+  <li><a href="#ok_orerr" id="toc-ok_orerr" class="nav-link" data-scroll-target="#ok_orerr"><code>.ok_or(err)</code></a></li>
   </ul></li>
   <li><a href="#dereferencing-and-as_deref" id="toc-dereferencing-and-as_deref" class="nav-link" data-scroll-target="#dereferencing-and-as_deref">Dereferencing and <code>as_deref()</code></a></li>
   <li><a href="#quick-reference" id="toc-quick-reference" class="nav-link" data-scroll-target="#quick-reference">Quick Reference</a></li>
@@ -1966,18 +1965,32 @@ window.Quarto = {
 </section>
 <section id="optiont" class="level2">
 <h2 class="anchored" data-anchor-id="optiont">Option&lt;T&gt;</h2>
-<p>I use this guy very frequently, and I very frequently forget how to use him. Hence his high presence on this Rusty totem pole.</p>
-<p>Rust does not have nulls, but it does have an <code>enum</code> that can encode the concept of a value being present or absent. This enum is <code>Option&lt;T&gt;</code>, and it is defined by the <a href="https://doc.rust-lang.org/std/option/enum.Option.html">standard library</a> as follows:</p>
+<div class="subheading">
+<p>I use this guy frequently, and I frequently forget how to use him.</p>
+</div>
+<p>I described <code>Option&lt;T&gt;</code> as a pointer and AI got defensive. He’s right, it’s more than just a pointer. It’s an impenetrable fortress built up around a pointer. In the late 90s, just when Java was becomming popular and .NET was a twinkle in Microsft’s eye, a commonly quoted statistic was floating around, “90% of C/C++ bugs have to do with memory management”. I don’t know how accurate it is, but having been a C/C++ developer for many years at the time, I have no doubt that memory management is the primary culprit of all C/C++ bugs.</p>
+<p>So what is it about Rust that makes him different? Rust does not have <code>null</code>s. It has <code>None</code> but no <code>NULL</code>. And he has a wicked enum - <code>Option&lt;T&gt;</code> - that can encode the concept of a value being present or absent. <code>Option&lt;T&gt;</code> is defined by the <a href="https://doc.rust-lang.org/std/option/enum.Option.html">standard library</a> as follows:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb50"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="kw">enum</span> <span class="dt">Option</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">{</span></span>
 <span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>    <span class="cn">None</span><span class="op">,</span></span>
 <span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>    <span class="cn">Some</span>(T)<span class="op">,</span></span>
 <span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Because <code>Option&lt;T&gt;</code> is an enum, you can never accidentally use a value that might be absent — the compiler forces you to deal with both variants. There is no null, no undefined, no surprise crash at runtime from a missing value.</p>
+<p>Because <code>Option&lt;T&gt;</code> is an enum, you can never accidentally use a value that might be absent — the compiler forces you to deal with both variants. There is no <code>null</code>, no <code>undefined</code>, no surprise crash at runtime from a missing value.</p>
+<div class="explanation" data-label="What makes him a Beautiful Beast?">
+<ul>
+<li><strong>Safety Over Pointers</strong>: <code>Option&lt;T&gt;</code> is an <code>enum</code> used to force safe handling of empty cases, unlike raw pointers in other languages.</li>
+<li><strong>Pointer Optimization</strong>: For types that cannot be <code>null</code> (like references <code>&amp;T</code> or <a href="#smart-pointers"><code>Box&lt;T&gt;</code></a>), Rust optimizes <code>Option&lt;T&gt;</code> to eliminate the tag overhead. Thus, <code>Option&lt;&amp;T&gt;</code> is just a pointer, where <code>0x0</code> is <code>None</code>.</li>
+<li><strong>Memory Layout</strong>: While <code>Option&lt;&amp;T&gt;</code> is pointer-sized, <code>Option&lt;T&gt;</code> (for non-pointer types) contains the payload <span class="math inline">\(T\)</span> and a tag byte, making it larger than <code>T</code>.</li>
+<li><strong>Optional Boxed Value</strong>: <code>Option&lt;Box&lt;T&gt;&gt;</code> represents a pointer to a heap-allocated <code>T</code> that might be absent, often used for recursive data structures.</li>
+</ul>
+</div>
 <section id="getting-the-value-out" class="level3">
 <h3 class="anchored" data-anchor-id="getting-the-value-out">Getting the Value Out</h3>
-<p>The central question with <code>Option&lt;T&gt;</code> is always: how do I get it out of there? It all depends on what your goal is.</p>
-<section id="match-handle-both-cases-explicitly" class="level4">
-<h4 class="anchored" data-anchor-id="match-handle-both-cases-explicitly"><code>match</code> — handle both cases explicitly</h4>
+<p>The central question with <code>Option&lt;T&gt;</code> is always: how do I get it out of there? It all depends on what your ambition is and to what length of out you want to go. In the following sections we identify the most frequently used methods and <code>impl</code> functions for performing just about anything you might want to do with a pointer.</p>
+<section id="match" class="level5">
+<h5 class="anchored" data-anchor-id="match"><code>match</code></h5>
+<div class="u-subheading">
+<p>handle both cases explicitly</p>
+</div>
 <p>The most explicit approach. Use it when the <code>None</code> case needs real logic, not just a default value. It’s also a sweet (🧁) way of doing type conversion.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb51"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> name<span class="op">:</span> <span class="dt">Option</span><span class="op">&lt;&amp;</span><span class="dt">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="cn">Some</span>(<span class="st">"Alice"</span>)<span class="op">;</span></span>
 <span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -1986,8 +1999,11 @@ window.Quarto = {
 <span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>    <span class="cn">None</span>    <span class="op">=&gt;</span> <span class="pp">println!</span>(<span class="st">"No name provided"</span>)<span class="op">,</span></span>
 <span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="if-let-handle-only-some-ignore-none" class="level4">
-<h4 class="anchored" data-anchor-id="if-let-handle-only-some-ignore-none"><code>if let</code> — handle only <code>Some</code>, ignore <code>None</code></h4>
+<section id="if-let" class="level4">
+<h4 class="anchored" data-anchor-id="if-let"><code>if let</code></h4>
+<div class="u-subheading">
+<p>handle only <code>Some</code>, ignore <code>None</code></p>
+</div>
 <p>Use when you only care about the success case and want to silently skip <code>None</code>.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb52"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">let</span> <span class="cn">Some</span>(n) <span class="op">=</span> name <span class="op">{</span></span>
 <span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">"Hello, {}!"</span><span class="op">,</span> n)<span class="op">;</span></span>
@@ -2002,8 +2018,11 @@ window.Quarto = {
 <span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">"Name is missing"</span>)<span class="op">;</span></span>
 <span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="or-one-or-the-other" class="level4">
-<h4 class="anchored" data-anchor-id="or-one-or-the-other"><code>or</code> — one or the other</h4>
+<section id="or" class="level4">
+<h4 class="anchored" data-anchor-id="or"><code>or</code></h4>
+<div class="u-subheading">
+<p>one or the other</p>
+</div>
 <p><a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.or">or</a>: returns <code>self</code> if it is <code>Some</code>. Otherwise, returns other. Useful for providing a fallback <code>Option</code>.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb55"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> x <span class="op">=</span> <span class="cn">Some</span>(<span class="dv">2</span>)<span class="op">;</span></span>
 <span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> y <span class="op">=</span> <span class="cn">None</span><span class="op">;</span></span>
@@ -2013,8 +2032,11 @@ window.Quarto = {
 <span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> y <span class="op">=</span> <span class="cn">Some</span>(<span class="dv">100</span>)<span class="op">;</span></span>
 <span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a><span class="pp">assert_eq!</span>(x<span class="op">.</span>or(y)<span class="op">,</span> <span class="cn">Some</span>(<span class="dv">100</span>))<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="or_else---less-expensive-or" class="level4">
-<h4 class="anchored" data-anchor-id="or_else---less-expensive-or"><code>or_else</code> - less expensive <code>or</code></h4>
+<section id="or_else" class="level4">
+<h4 class="anchored" data-anchor-id="or_else"><code>or_else</code></h4>
+<div class="u-subheading">
+<p>less expensive <code>or</code></p>
+</div>
 <p><a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.or_else">or_else</a>: similar to <code>or</code>, but the fallback <code>Option</code> is computed by a closure f only if self is <code>None</code>. Useful for expensive fallback computations.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb56"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> nobody() <span class="op">-&gt;</span> <span class="dt">Option</span><span class="op">&lt;&amp;</span><span class="ot">'static</span> <span class="dt">str</span><span class="op">&gt;</span> <span class="op">{</span> <span class="cn">None</span> <span class="op">}</span></span>
 <span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> vikings() <span class="op">-&gt;</span> <span class="dt">Option</span><span class="op">&lt;&amp;</span><span class="ot">'static</span> <span class="dt">str</span><span class="op">&gt;</span> <span class="op">{</span> <span class="cn">Some</span>(<span class="st">"vikings"</span>) <span class="op">}</span></span>
@@ -2023,26 +2045,38 @@ window.Quarto = {
 <span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a><span class="pp">assert_eq!</span>(<span class="cn">None</span><span class="op">.</span>or_else(vikings)<span class="op">,</span> <span class="cn">Some</span>(<span class="st">"vikings"</span>))<span class="op">;</span></span>
 <span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a><span class="pp">assert_eq!</span>(<span class="cn">None</span><span class="op">.</span>or_else(nobody)<span class="op">,</span> <span class="cn">None</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="unwrap_or-provide-a-fallback-value" class="level4">
-<h4 class="anchored" data-anchor-id="unwrap_or-provide-a-fallback-value"><code>unwrap_or</code> — provide a fallback value</h4>
+<section id="unwrap_or" class="level4">
+<h4 class="anchored" data-anchor-id="unwrap_or"><code>unwrap_or</code></h4>
+<div class="u-subheading">
+<p>provide a fallback value</p>
+</div>
 <p><a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or">unwrap_or</a>: returns the contained <code>Some</code> value, or a provided default value if self is <code>None</code>. Use when <code>None</code> should produce a sensible default and the default is cheap.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb57"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> name <span class="op">=</span> user_name<span class="op">.</span>unwrap_or(<span class="st">"Guest"</span>)<span class="op">;</span></span>
 <span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> count <span class="op">=</span> get_count()<span class="op">.</span>unwrap_or(<span class="dv">0</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="unwrap_or_else-compute-a-fallback-lazily" class="level4">
-<h4 class="anchored" data-anchor-id="unwrap_or_else-compute-a-fallback-lazily"><code>unwrap_or_else</code> — compute a fallback lazily</h4>
+<section id="unwrap_or_else" class="level4">
+<h4 class="anchored" data-anchor-id="unwrap_or_else"><code>unwrap_or_else</code></h4>
+<div class="u-subheading">
+<p>compute a fallback lazily</p>
+</div>
 <p><a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or_else">unwrap_or_else</a>: returns the contained <code>Some</code> value, or computes it from a closure f if self is <code>None</code>. Useful when the default value is expensive to compute. Use when the fallback is expensive or requires logic — the closure only runs if the value is <code>None</code>.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb58"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> name <span class="op">=</span> user_name<span class="op">.</span>unwrap_or_else(<span class="op">||</span> fetch_default_name())<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="unwrap-and-expect-crash-on-none" class="level4">
-<h4 class="anchored" data-anchor-id="unwrap-and-expect-crash-on-none"><code>unwrap</code> and <code>expect</code> — crash on <code>None</code></h4>
+<section id="unwrap-and-expect" class="level4">
+<h4 class="anchored" data-anchor-id="unwrap-and-expect"><code>unwrap</code> and <code>expect</code></h4>
+<div class="u-subheading">
+<p>crash on <code>None</code></p>
+</div>
 <p>Use in tests, prototypes, or when you are certain the value is present and want to document that certainty. <code>expect</code> is preferred because the message appears in the panic output.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb59"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> name <span class="op">=</span> user_name<span class="op">.</span>unwrap()<span class="op">;</span>                    <span class="co">// panics: "called unwrap on None"</span></span>
 <span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> name <span class="op">=</span> user_name<span class="op">.</span>expect(<span class="st">"name must be set"</span>)<span class="op">;</span>  <span class="co">// panics: "name must be set"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Never use these in production paths where <code>None</code> is legitimately possible.</p>
 </section>
-<section id="propagate-none-up-the-call-stack" class="level4">
-<h4 class="anchored" data-anchor-id="propagate-none-up-the-call-stack"><code>?</code> — propagate <code>None</code> up the call stack</h4>
+<section id="section" class="level4">
+<h4 class="anchored" data-anchor-id="section"><code>?</code></h4>
+<div class="u-subheading">
+<p>propagate <code>None</code> up the call stack</p>
+</div>
 <p>Inside a function that returns <code>Option&lt;T&gt;</code>, the <code>?</code> operator returns <code>None</code> immediately if the value is <code>None</code>, otherwise unwraps and continues. The same operator you use with <code>Result</code>.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb60"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> first_word(text<span class="op">:</span> <span class="op">&amp;</span><span class="dt">str</span>) <span class="op">-&gt;</span> <span class="dt">Option</span><span class="op">&lt;&amp;</span><span class="dt">str</span><span class="op">&gt;</span> <span class="op">{</span></span>
 <span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> words<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;&amp;</span><span class="dt">str</span><span class="op">&gt;</span> <span class="op">=</span> text<span class="op">.</span>split_whitespace()<span class="op">.</span>collect()<span class="op">;</span></span>
@@ -2066,15 +2100,21 @@ window.Quarto = {
 <section id="transforming-without-extracting" class="level3">
 <h3 class="anchored" data-anchor-id="transforming-without-extracting">Transforming Without Extracting</h3>
 <p>These methods let you work with the value inside an <code>Option</code> without pulling it out first. They all preserve the <code>Option</code> wrapper — <code>None</code> passes through unchanged.</p>
-<section id="mapf-transform-the-inner-value" class="level4">
-<h4 class="anchored" data-anchor-id="mapf-transform-the-inner-value"><code>.map(f)</code> — transform the inner value</h4>
+<section id="mapf" class="level4">
+<h4 class="anchored" data-anchor-id="mapf"><code>.map(f)</code></h4>
+<div class="u-subheading">
+<p>transform the inner value</p>
+</div>
 <p><a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.map">map</a>: transforms the <code>Some</code> value into a new <code>Option</code> containing the result of applying a function <code>f</code>. If <code>self</code> is <code>None</code>, it remains <code>None</code>.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb62"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> length<span class="op">:</span> <span class="dt">Option</span><span class="op">&lt;</span><span class="dt">usize</span><span class="op">&gt;</span> <span class="op">=</span> name<span class="op">.</span>map(<span class="op">|</span>n<span class="op">|</span> n<span class="op">.</span>len())<span class="op">;</span></span>
 <span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a><span class="co">// Some("Alice") → Some(5)</span></span>
 <span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a><span class="co">// None          → None</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="and_thenf-chain-operations-that-return-option" class="level4">
-<h4 class="anchored" data-anchor-id="and_thenf-chain-operations-that-return-option"><code>.and_then(f)</code> — chain operations that return <code>Option</code></h4>
+<section id="and_thenf" class="level4">
+<h4 class="anchored" data-anchor-id="and_thenf"><code>.and_then(f)</code></h4>
+<div class="u-subheading">
+<p>chain operations that return <code>Option</code></p>
+</div>
 <p><a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.and_then">and_then</a>: chains operations that themselves return an <code>Option</code>. If self is <code>Some(v)</code>, applies f to v and returns the resulting <code>Option</code>. If self is <code>None</code>, returns <code>None</code>. Prevents <code>Option&lt;Option&lt;T&gt;&gt;</code> (nesting).</p>
 <p>Use when the transformation itself might fail (returns <code>Option</code>). Prevents <code>Option&lt;Option&lt;T&gt;&gt;</code> nesting.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb63"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> parse_number(s<span class="op">:</span> <span class="op">&amp;</span><span class="dt">str</span>) <span class="op">-&gt;</span> <span class="dt">Option</span><span class="op">&lt;</span><span class="dt">i32</span><span class="op">&gt;</span> <span class="op">{</span></span>
@@ -2085,14 +2125,20 @@ window.Quarto = {
 <span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> result <span class="op">=</span> <span class="cn">Some</span>(<span class="st">"abc"</span>)<span class="op">.</span>and_then(parse_number)<span class="op">;</span>  <span class="co">// None</span></span>
 <span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> result <span class="op">=</span> <span class="cn">None</span><span class="op">.</span>and_then(parse_number)<span class="op">;</span>         <span class="co">// None</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="filterpredicate-keep-some-only-if-condition-holds" class="level4">
-<h4 class="anchored" data-anchor-id="filterpredicate-keep-some-only-if-condition-holds"><code>.filter(predicate)</code> — keep <code>Some</code> only if condition holds</h4>
+<section id="filterpredicate" class="level4">
+<h4 class="anchored" data-anchor-id="filterpredicate"><code>.filter(predicate)</code></h4>
+<div class="u-subheading">
+<p>keep <code>Some</code> only if condition holds</p>
+</div>
 <p><a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.filter">filter</a>: returns <code>None</code> if the option is <code>None</code>, otherwise calls <code>predicate</code> with the wrapped value and returns <code>Some(t)</code> if <code>predicate</code> returns <code>true</code> and <code>None</code> if <code>predicate</code> returns <code>false</code>.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb64"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> age<span class="op">:</span> <span class="dt">Option</span><span class="op">&lt;</span><span class="dt">u32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="cn">Some</span>(<span class="dv">15</span>)<span class="op">;</span></span>
 <span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> adult <span class="op">=</span> age<span class="op">.</span>filter(<span class="op">|&amp;</span>a<span class="op">|</span> a <span class="op">&gt;=</span> <span class="dv">18</span>)<span class="op">;</span>   <span class="co">// None — 15 fails the predicate</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="ok_orerr-convert-option-to-result" class="level4">
-<h4 class="anchored" data-anchor-id="ok_orerr-convert-option-to-result"><code>.ok_or(err)</code> — convert <code>Option</code> to <code>Result</code></h4>
+<section id="ok_orerr" class="level4">
+<h4 class="anchored" data-anchor-id="ok_orerr"><code>.ok_or(err)</code></h4>
+<div class="u-subheading">
+<p>convert <code>Option</code> to <code>Result</code></p>
+</div>
 <p><a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.ok_or">ok_or</a>: converts <code>Option&lt;T&gt;</code> into a <code>Result&lt;T, E&gt;</code>. If self is <code>Some(v)</code>, returns <code>Ok(v)</code>. If self is <code>None</code>, returns <code>Err(err)</code>. When you need to treat <code>None</code> as an error:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb65"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> val<span class="op">:</span> <span class="dt">Result</span><span class="op">&lt;</span><span class="dt">i32</span><span class="op">,</span> <span class="op">&amp;</span><span class="dt">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="cn">Some</span>(<span class="dv">42</span>)<span class="op">.</span>ok_or(<span class="st">"missing value"</span>)<span class="op">;</span>   <span class="co">// Ok(42)</span></span>
 <span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> val<span class="op">:</span> <span class="dt">Result</span><span class="op">&lt;</span><span class="dt">i32</span><span class="op">,</span> <span class="op">&amp;</span><span class="dt">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="cn">None</span><span class="op">.</span>ok_or(<span class="st">"missing value"</span>)<span class="op">;</span>       <span class="co">// Err("missing value")</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
