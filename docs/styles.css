@@ -384,7 +384,6 @@ div.panel-h6:has(> table:first-child) {
   display: block;
   font-size: 1.05em;
   font-weight: bold;
-  /* Increase vertical space below the title */
   position: relative;
 }
 

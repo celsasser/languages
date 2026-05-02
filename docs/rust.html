@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-05-01">
+<meta name="dcterms.date" content="2026-05-02">
 
 <title>Rust for C/C++ Programmers – Computer Language Notebook</title>
 <style>
@@ -382,10 +382,7 @@ window.Quarto = {
   <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
   </ul></li>
   <li><a href="#conditional-compilation" id="toc-conditional-compilation" class="nav-link" data-scroll-target="#conditional-compilation">Conditional Compilation</a></li>
-  <li><a href="#common-macros" id="toc-common-macros" class="nav-link" data-scroll-target="#common-macros">Common Macros</a>
-  <ul class="collapse">
-  <li><a href="#procedural" id="toc-procedural" class="nav-link" data-scroll-target="#procedural">Procedural</a></li>
-  </ul></li>
+  <li><a href="#common-macros" id="toc-common-macros" class="nav-link" data-scroll-target="#common-macros">Common Macros</a></li>
   <li><a href="#homemade-macros" id="toc-homemade-macros" class="nav-link" data-scroll-target="#homemade-macros">Homemade Macros</a>
   <ul class="collapse">
   <li><a href="#declarative-macros-with-macro_rules" id="toc-declarative-macros-with-macro_rules" class="nav-link" data-scroll-target="#declarative-macros-with-macro_rules">Declarative Macros with <code>macro_rules!</code></a></li>
@@ -585,7 +582,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 1, 2026</p>
+      <p class="date">May 2, 2026</p>
     </div>
   </div>
   
@@ -1968,7 +1965,7 @@ window.Quarto = {
 <div class="subheading">
 <p>I use this guy frequently, and I frequently forget how to use him.</p>
 </div>
-<p>I described <code>Option&lt;T&gt;</code> as a pointer and AI got defensive. He’s right, it’s more than just a pointer. It’s an impenetrable fortress built up around a pointer. In the late 90s, just when Java was becomming popular and .NET was a twinkle in Microsft’s eye, a commonly quoted statistic was floating around, “90% of C/C++ bugs have to do with memory management”. I don’t know how accurate it is, but having been a C/C++ developer for many years at the time, I have no doubt that memory management is the primary culprit of all C/C++ bugs.</p>
+<p>I described <code>Option&lt;T&gt;</code> as a pointer and AI got defensive. He’s right, it’s more than just a pointer. It’s an impenetrable fortress built up around a pointer. In the late 90s, just when Java was becoming popular and .NET was a twinkle in Microsft’s eye, a commonly quoted statistic was floating around, “90% of C/C++ bugs have to do with memory management”. I don’t know how accurate it is, but having been a C/C++ developer for many years at the time, I have no doubt that memory management is the primary culprit of all C/C++ bugs.</p>
 <p>So what is it about Rust that makes him different? Rust does not have <code>null</code>s. It has <code>None</code> but no <code>NULL</code>. And he has a wicked enum - <code>Option&lt;T&gt;</code> - that can encode the concept of a value being present or absent. <code>Option&lt;T&gt;</code> is defined by the <a href="https://doc.rust-lang.org/std/option/enum.Option.html">standard library</a> as follows:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb50"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="kw">enum</span> <span class="dt">Option</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">{</span></span>
 <span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>    <span class="cn">None</span><span class="op">,</span></span>
@@ -1979,7 +1976,7 @@ window.Quarto = {
 <ul>
 <li><strong>Safety Over Pointers</strong>: <code>Option&lt;T&gt;</code> is an <code>enum</code> used to force safe handling of empty cases, unlike raw pointers in other languages.</li>
 <li><strong>Pointer Optimization</strong>: For types that cannot be <code>null</code> (like references <code>&amp;T</code> or <a href="#smart-pointers"><code>Box&lt;T&gt;</code></a>), Rust optimizes <code>Option&lt;T&gt;</code> to eliminate the tag overhead. Thus, <code>Option&lt;&amp;T&gt;</code> is just a pointer, where <code>0x0</code> is <code>None</code>.</li>
-<li><strong>Memory Layout</strong>: While <code>Option&lt;&amp;T&gt;</code> is pointer-sized, <code>Option&lt;T&gt;</code> (for non-pointer types) contains the payload <span class="math inline">\(T\)</span> and a tag byte, making it larger than <code>T</code>.</li>
+<li><strong>Memory Layout</strong>: <code>Option&lt;&amp;T&gt;</code> is often pointer-sized, but for other <code>T</code> the representation is an implementation detail. Conceptually, Rust may need extra state to distinguish <code>Some(T)</code> from <code>None</code>, though the exact layout and size depend on the type and any compiler optimizations.</li>
 <li><strong>Optional Boxed Value</strong>: <code>Option&lt;Box&lt;T&gt;&gt;</code> represents a pointer to a heap-allocated <code>T</code> that might be absent, often used for recursive data structures.</li>
 </ul>
 </div>
@@ -2301,7 +2298,7 @@ window.Quarto = {
 <span id="cb74-11"><a href="#cb74-11" aria-hidden="true" tabindex="-1"></a><span class="at">#[</span>cfg<span class="at">(</span>debug_assertions<span class="at">)]</span> <span class="co">// conditionally includes the next item in the build</span></span>
 <span id="cb74-12"><a href="#cb74-12" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> debug_only_check() <span class="op">{</span> <span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><code>#[cfg(...)]</code> and <code>#[derive(...)]</code> are both attribute syntax, but <code>derive</code> is its own subtype. Everything else with <code>#[...]</code> that isn’t <code>derive</code> is an attribute macro.</p>
-<p><strong>Function-like macros</strong> — look like declarative macros (called with <code>!</code>) but are implemented as procedural code. Used when the pattern-matching of <code>macro_rules!</code> is not expressive enough.</p>
+<p><strong>Function-like macros</strong> — look like declarative macros (called with <code>!</code>) but are implemented as procedural code. Used when the pattern-matching of <code>macro_rules!</code> is not expressive enough. The <code>sql!</code> macro from the <code>sqlx</code> crate is a well-known example: it parses and validates a SQL query string against your actual database schema at compile time, turning a runtime error into a compile error.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb75"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> query <span class="op">=</span> <span class="pp">sql!</span>(SELECT <span class="op">*</span> FROM users WHERE id <span class="op">=</span> <span class="dv">1</span>)<span class="op">;</span></span>
 <span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a><span class="co">// sql! can parse and validate the SQL at compile time</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>You are unlikely to write function-like macros early on, but you will use them from crates.</p>
@@ -2346,7 +2343,7 @@ window.Quarto = {
 <td>Function-like (procedural)</td>
 <td><code>name!(...)</code></td>
 <td>procedural crate</td>
-<td><code>sql!</code>, <code>html!</code></td>
+<td><code>sql!::query!</code>, <code>html!</code></td>
 </tr>
 </tbody>
 </table>
@@ -2357,8 +2354,8 @@ window.Quarto = {
 <div class="subheading">
 <p>Runner up title was “debugging”</p>
 </div>
-<p>If you’ve been a C developer, then you are very familiar with conditional compilation. The same capability exists in Rust. And there are lots of ways of going about it. We are just going to look at the attribute macro <code>#[cfg(debug_assertions)]</code> and his inverse <code>#[cfg(not(debug_assertions))]</code>.</p>
-<p><code>#[cfg(debug_assertions)]</code> is a built-in attribute macro, and it can be applied to any item: structs, enums, functions, impl blocks, use statements, modules, individual statements. If the condition is false, the item is completely absent from the compiled output — the compiler never sees it, as if you never wrote it. So in the following:</p>
+<p>If you’ve been a C developer, then you are very familiar with conditional compilation. The same capability exists in Rust. And there are lots of ways of going about it. We are just going to look at the built-in attribute <code>#[cfg(debug_assertions)]</code> and its inverse <code>#[cfg(not(debug_assertions))]</code>.</p>
+<p><code>#[cfg(debug_assertions)]</code> is a built-in attribute evaluated by the compiler, and it can be applied to any item: structs, enums, functions, impl blocks, use statements, modules, individual statements. If the condition is false, the item is completely absent from the compiled output — the compiler never sees it, as if you never wrote it. So in the following:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb76"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="at">#[</span>cfg<span class="at">(</span>debug_assertions<span class="at">)]</span></span>
 <span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> DebugStats <span class="op">{</span></span>
 <span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a>    call_count<span class="op">:</span> <span class="dt">u32</span><span class="op">,</span></span>
@@ -2388,8 +2385,6 @@ window.Quarto = {
 </section>
 <section id="common-macros" class="level3">
 <h3 class="anchored" data-anchor-id="common-macros">Common Macros</h3>
-<section id="procedural" class="level4">
-<h4 class="anchored" data-anchor-id="procedural">Procedural</h4>
 <p>Common macros you will use regularly:</p>
 <table class="caption-top table">
 <colgroup>
@@ -2453,7 +2448,6 @@ window.Quarto = {
 <span id="cb80-5"><a href="#cb80-5" aria-hidden="true" tabindex="-1"></a><span class="pp">println!</span>(<span class="st">"{:?}"</span><span class="op">,</span> p)<span class="op">;</span>    <span class="co">// Debug formatting</span></span>
 <span id="cb80-6"><a href="#cb80-6" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> p2 <span class="op">=</span> p<span class="op">.</span>clone()<span class="op">;</span>     <span class="co">// Clone</span></span>
 <span id="cb80-7"><a href="#cb80-7" aria-hidden="true" tabindex="-1"></a><span class="pp">assert_eq!</span>(p<span class="op">,</span> p2)<span class="op">;</span>      <span class="co">// PartialEq</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
 </section>
 <section id="homemade-macros" class="level3">
 <h3 class="anchored" data-anchor-id="homemade-macros">Homemade Macros</h3>
@@ -2651,7 +2645,7 @@ Tip
 </section>
 <section id="formatting" class="level3">
 <h3 class="anchored" data-anchor-id="formatting">Formatting</h3>
-<p>I am a prehistoric man. I assumed that <code>eprint!</code>, <code>eprintln</code>, <code>format!</code>, <code>println</code> would all live together and essentially use the same formatting code. But, if they do, it’s not immediately apparent from looking at the source. Let’s comare <code>format!</code> and <code>println</code>:</p>
+<p>I am a prehistoric man. I assumed that <code>eprint!</code>, <code>eprintln!</code>, <code>format!</code>, <code>println!</code> would all live together and essentially use the same formatting code. But, if they do, it’s not immediately apparent from looking at the source. Let’s compare <code>format!</code> and <code>println!</code>:</p>
 <p><code>format!</code>’s location: <code>/lib/rustlib/src/rust/library/alloc/src/macros.rs</code></p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb87"><pre class="sourceCode rust code-with-copy"><code class="sourceCode rust"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="at">#[</span>macro_export<span class="at">]</span></span>
 <span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a><span class="at">#[</span>stable<span class="at">(</span>feature <span class="op">=</span> <span class="st">"rust1"</span><span class="op">,</span> since <span class="op">=</span> <span class="st">"1.0.0"</span><span class="at">)]</span></span>
@@ -2677,7 +2671,7 @@ Tip
 <span id="cb88-10"><a href="#cb88-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">$</span><span class="pp">crate::io::</span>_print(<span class="op">$</span><span class="pp">crate::format_args_nl!</span>(<span class="op">$</span>(<span class="op">$</span>arg)<span class="op">*</span>))<span class="op">;</span></span>
 <span id="cb88-11"><a href="#cb88-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">}};</span></span>
 <span id="cb88-12"><a href="#cb88-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>First we notice that they are in entirely different locations. <code>println!</code> is part of the standard library, whereas <code>format!</code> doesn’t appear to be? Strange. And they are calling into two entirely different crates. I hoped to see to what extent they are birds of similar feather, but that’s not happening. Let’s just stick the the format specification and save the rest for when we are smarter.</p>
+<p>First we notice that they are in entirely different locations. <code>println!</code> is part of the standard library, whereas <code>format!</code> doesn’t appear to be? Strange. And they are calling into two entirely different crates. I hoped to see to what extent they are birds of similar feather, but that’s not happening. Let’s just stick to the format specification and save the rest for when we are smarter.</p>
 <section id="positional-parameters" class="level4">
 <h4 class="anchored" data-anchor-id="positional-parameters">Positional Parameters</h4>
 <p>Each formatting argument (<code>{}</code>) is allowed to specify which value argument it’s referencing, and if omitted it is assumed to be “the next argument”. For example, the format string <code>{} {} {}</code> would take three parameters, and they would be formatted in the same order as they’re given. The format string <code>{2} {1} {0}</code>, however, would format arguments in reverse order. It’s rare to see format specifiers with positions in them. And for a good reason which is that they also support names.</p>
@@ -6028,7 +6022,7 @@ Tip
 </section>
 <section id="environment-variables" class="level3">
 <h3 class="anchored" data-anchor-id="environment-variables">Environment Variables</h3>
-<p>Cargo sets and reads a number of <a href="https://doc.rust-lang.org/cargo/reference/environment-variables.html" target="_blank">environment variables</a> which you (in your code) can detect or override by setting. The list is long so the lists here are super subsets. See the official documentation (which I think is <a href="https://doc.rust-lang.org/cargo/reference/environment-variables.html" target="_blank">The Cargo Book</a>).</p>
+<p>Cargo sets and reads a number of <a href="https://doc.rust-lang.org/cargo/reference/environment-variables.html" target="_blank">environment variables</a> which you (in your code) can detect or override by setting. The list is long so the lists here are subsets. See the official documentation (which I think is <a href="https://doc.rust-lang.org/cargo/reference/environment-variables.html" target="_blank">The Cargo Book</a>).</p>
 <section id="cargo-sets" class="level4">
 <h4 class="anchored" data-anchor-id="cargo-sets">Cargo Sets</h4>
 <table class="caption-top table">
@@ -6290,7 +6284,7 @@ Tip
 <section id="crates-1" class="level2">
 <h2 class="anchored" data-anchor-id="crates-1">Crates</h2>
 <div class="subheading">
-<p>A few fellas that I have have taken a liking to</p>
+<p>A few fellas that I have taken a liking to</p>
 </div>
 <p>A crate comes in two flavors: <em>executables</em> and <em>libraries</em>. Library crates don’t have a <code>main</code> function, and they don’t compile to an executable. Instead, they define functionality intended to be shared with multiple projects. And when you feel like sharing your brilliance with the world, you can version and publish your library crate to crates.io where it will be hosted for others to pull down.</p>
 <p>This little section briefly covers some published crates that I can use help with. Starting with <code>clap</code>.</p>

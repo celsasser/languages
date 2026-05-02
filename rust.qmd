@@ -938,7 +938,7 @@ See [Common Programming Concepts](https://doc.rust-lang.org/book/ch03-00-common-
 I use this guy frequently, and I frequently forget how to use him.
 :::
 
-I described `Option<T>` as a pointer and AI got defensive. He's right, it's more than just a pointer. It's an impenetrable fortress built up around a pointer. In the late 90s, just when Java was becomming popular and .NET was a twinkle in Microsft's eye, a commonly quoted statistic was floating around, "90% of C/C++ bugs have to do with memory management". I don't know how accurate it is, but having been a C/C++ developer for many years at the time, I have no doubt that memory management is the primary culprit of all C/C++ bugs.
+I described `Option<T>` as a pointer and AI got defensive. He's right, it's more than just a pointer. It's an impenetrable fortress built up around a pointer. In the late 90s, just when Java was becoming popular and .NET was a twinkle in Microsft's eye, a commonly quoted statistic was floating around, "90% of C/C++ bugs have to do with memory management". I don't know how accurate it is, but having been a C/C++ developer for many years at the time, I have no doubt that memory management is the primary culprit of all C/C++ bugs.
 
 So what is it about Rust that makes him different? Rust does not have `null`s. It has `None` but no `NULL`. And he has a wicked enum - `Option<T>` - that can encode the concept of a value being present or absent. `Option<T>` is defined by the [standard library](https://doc.rust-lang.org/std/option/enum.Option.html) as follows:
 
@@ -954,7 +954,7 @@ Because `Option<T>` is an enum, you can never accidentally use a value that migh
 ::: {.explanation data-label="What makes him a Beautiful Beast?"}
 - **Safety Over Pointers**: `Option<T>` is an `enum` used to force safe handling of empty cases, unlike raw pointers in other languages.
 - **Pointer Optimization**: For types that cannot be `null` (like references `&T` or [`Box<T>`](#smart-pointers)), Rust optimizes `Option<T>` to eliminate the tag overhead. Thus, `Option<&T>` is just a pointer, where `0x0` is `None`.
-- **Memory Layout**: While `Option<&T>` is pointer-sized, `Option<T>` (for non-pointer types) contains the payload $T$ and a tag byte, making it larger than `T`.
+- **Memory Layout**: `Option<&T>` is often pointer-sized, but for other `T` the representation is an implementation detail. Conceptually, Rust may need extra state to distinguish `Some(T)` from `None`, though the exact layout and size depend on the type and any compiler optimizations.
 - **Optional Boxed Value**: `Option<Box<T>>` represents a pointer to a heap-allocated `T` that might be absent, often used for recursive data structures.
 :::
 
@@ -1321,7 +1321,8 @@ fn debug_only_check() { }
 
 `#[cfg(...)]` and `#[derive(...)]` are both attribute syntax, but `derive` is its own subtype. Everything else with `#[...]` that isn't `derive` is an attribute macro.
 
-**Function-like macros** — look like declarative macros (called with `!`) but are implemented as procedural code. Used when the pattern-matching of `macro_rules!` is not expressive enough.
+**Function-like macros** — look like declarative macros (called with `!`) but are implemented as procedural code. Used when the pattern-matching of `macro_rules!` is not expressive enough. The `sql!` macro from the `sqlx` crate is a well-known example: it parses and validates a SQL query string against your actual database schema at compile time, turning a runtime error into a compile error.
+
 
 ```rust
 let query = sql!(SELECT * FROM users WHERE id = 1);
@@ -1337,16 +1338,16 @@ You are unlikely to write function-like macros early on, but you will use them f
 | Declarative | `name!(...)` | `macro_rules!` | `vec!`, `println!`, `assert!` |
 | Derive | `#[derive(Name)]` | procedural crate | `Debug`, `Clone`, `Parser` |
 | Attribute | `#[name]` or `#[name(...)]` | procedural crate | `#[test]`, `#[cfg(...)]`, `#[tokio::main]` |
-| Function-like (procedural) | `name!(...)` | procedural crate | `sql!`, `html!` |
+| Function-like (procedural) | `name!(...)` | procedural crate | `sql!::query!`, `html!` |
 
 ### Conditional Compilation
 ::: {.subheading}
 Runner up title was "debugging"
 :::
 
-If you've been a C developer, then you are very familiar with conditional compilation. The same capability exists in Rust. And there are lots of ways of going about it. We are just going to look at the attribute macro `#[cfg(debug_assertions)]` and his inverse `#[cfg(not(debug_assertions))]`.
+If you've been a C developer, then you are very familiar with conditional compilation. The same capability exists in Rust. And there are lots of ways of going about it. We are just going to look at the built-in attribute `#[cfg(debug_assertions)]` and its inverse `#[cfg(not(debug_assertions))]`.
 
-`#[cfg(debug_assertions)]` is a built-in attribute macro, and it can be applied to any item: structs, enums, functions, impl blocks, use statements, modules, individual statements. If the condition is false, the item is completely absent from the compiled output — the compiler never sees it, as if you never wrote it. So in the following:
+`#[cfg(debug_assertions)]` is a built-in attribute evaluated by the compiler, and it can be applied to any item: structs, enums, functions, impl blocks, use statements, modules, individual statements. If the condition is false, the item is completely absent from the compiled output — the compiler never sees it, as if you never wrote it. So in the following:
 
 ```rust
 #[cfg(debug_assertions)]
@@ -1387,7 +1388,6 @@ cmd.stderr(Stdio::null());
 ```
 
 ### Common Macros
-#### Procedural
 Common macros you will use regularly:
 
 | Macro              | Purpose                                                             |
@@ -1585,7 +1585,7 @@ See  [Macros](https://doc.rust-lang.org/book/ch20-05-macros.html){target="_blank
 :::
 
 ### Formatting
-I am a prehistoric man. I assumed that `eprint!`, `eprintln`, `format!`, `println` would all live together and essentially use the same formatting code. But, if they do, it's not immediately apparent from looking at the source. Let's comare `format!` and `println`:
+I am a prehistoric man. I assumed that `eprint!`, `eprintln!`, `format!`, `println!` would all live together and essentially use the same formatting code. But, if they do, it's not immediately apparent from looking at the source. Let's compare `format!` and `println!`:
 
 `format!`'s location: `/lib/rustlib/src/rust/library/alloc/src/macros.rs`
 ```rust
@@ -1618,7 +1618,7 @@ macro_rules! println {
 }
 ```
 
-First we notice that they are in entirely different locations. `println!` is part of the standard library, whereas `format!` doesn't appear to be? Strange. And they are calling into two entirely different crates. I hoped to see to what extent they are birds of similar feather, but that's not happening. Let's just stick the the format specification and save the rest for when we are smarter.
+First we notice that they are in entirely different locations. `println!` is part of the standard library, whereas `format!` doesn't appear to be? Strange. And they are calling into two entirely different crates. I hoped to see to what extent they are birds of similar feather, but that's not happening. Let's just stick to the format specification and save the rest for when we are smarter.
 
 #### Positional Parameters
 Each formatting argument (`{}`) is allowed to specify which value argument it’s referencing, and if omitted it is assumed to be “the next argument”. For example, the format string `{} {} {}` would take three parameters, and they would be formatted in the same order as they’re given. The format string `{2} {1} {0}`, however, would format arguments in reverse order. It's rare to see format specifiers with positions in them. And for a good reason which is that they also support names.
@@ -4877,7 +4877,7 @@ debug     = true    # keep symbols for profiling
 ```
 
 ### Environment Variables
-Cargo sets and reads a number of [environment variables](https://doc.rust-lang.org/cargo/reference/environment-variables.html){target="_blank"} which you (in your code) can detect or override by setting. The list is long so the lists here are super subsets. See the official documentation (which I think is [The Cargo Book](https://doc.rust-lang.org/cargo/reference/environment-variables.html){target="_blank"}).
+Cargo sets and reads a number of [environment variables](https://doc.rust-lang.org/cargo/reference/environment-variables.html){target="_blank"} which you (in your code) can detect or override by setting. The list is long so the lists here are subsets. See the official documentation (which I think is [The Cargo Book](https://doc.rust-lang.org/cargo/reference/environment-variables.html){target="_blank"}).
 
 #### Cargo Sets
 
@@ -4940,7 +4940,7 @@ See [Packages, Crates, and Modules](https://doc.rust-lang.org/book/ch07-00-manag
 
 ## Crates
 ::: {.subheading}
-A few fellas that I have have taken a liking to
+A few fellas that I have taken a liking to
 :::
 
 A crate comes in two flavors: *executables* and *libraries*. Library crates don’t have a `main` function, and they don’t compile to an executable. Instead, they define functionality intended to be shared with multiple projects. And when you feel like sharing your brilliance with the world, you can version and publish your library crate to crates.io where it will be hosted for others to pull down.
