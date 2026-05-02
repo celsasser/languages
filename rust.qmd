@@ -938,7 +938,7 @@ See [Common Programming Concepts](https://doc.rust-lang.org/book/ch03-00-common-
 I use this guy frequently, and I frequently forget how to use him.
 :::
 
-I described `Option<T>` as a pointer and AI got defensive. He's right, it's more than just a pointer. It's an impenetrable fortress built up around a pointer. In the late 90s, just when Java was becoming popular and .NET was a twinkle in Microsft's eye, a commonly quoted statistic was floating around, "90% of C/C++ bugs have to do with memory management". I don't know how accurate it is, but having been a C/C++ developer for many years at the time, I have no doubt that memory management is the primary culprit of all C/C++ bugs.
+I described `Option<T>` as a pointer and AI got defensive. He's right, it's more than just a pointer. It's an impenetrable fortress built up around a pointer. In the late 90s, just when Java was becoming popular and .NET was a twinkle in Microsoft's eye, a commonly quoted statistic was floating around, "90% of C/C++ bugs have to do with memory management". I don't know how accurate it is, but having been a C/C++ developer for many years at the time, I have no doubt that memory management is the primary culprit of all C/C++ bugs.
 
 So what is it about Rust that makes him different? Rust does not have `null`s. It has `None` but no `NULL`. And he has a wicked enum - `Option<T>` - that can encode the concept of a value being present or absent. `Option<T>` is defined by the [standard library](https://doc.rust-lang.org/std/option/enum.Option.html) as follows:
 
@@ -2596,7 +2596,7 @@ See [Enums and Pattern Matching](https://doc.rust-lang.org/book/ch06-00-enums.ht
 :::
 
 ### Traits
-Traits are Rust's answer to interfaces. A trait defines behaviour; structs implement it.
+Traits are Rust's answer to interfaces. A trait defines behavior; structs implement it.
 
 ```rust
 trait Describe {
@@ -4877,7 +4877,57 @@ debug     = true    # keep symbols for profiling
 ```
 
 ### Environment Variables
-Cargo sets and reads a number of [environment variables](https://doc.rust-lang.org/cargo/reference/environment-variables.html){target="_blank"} which you (in your code) can detect or override by setting. The list is long so the lists here are subsets. See the official documentation (which I think is [The Cargo Book](https://doc.rust-lang.org/cargo/reference/environment-variables.html){target="_blank"}).
+Cargo manages a well-known list of [environment variables](https://doc.rust-lang.org/cargo/reference/environment-variables.html){target="_blank"}. They fall into to major categories:
+
+1. **Variables Cargo sets**: these are variables that Cargo prepares for our consumption during compilation.
+2. **Variables Cargo reads**: these are variables that Cargo consumes during compilation.
+
+::: {.panel data-label="Environment Variable I/O"}
+##### `env` the Function
+Rust includes the [`env`](https://doc.rust-lang.org/stable/std/env/){target="_blank"} module as part of the standard library. It includes functions to read and write environment variables.
+
+###### Examples
+```rust
+use std::env;
+
+let key = "HOME";
+match env::var(key) {
+    Ok(val) => println!("{key}: {val:?}"),
+    Err(e) => println!("couldn't interpret {key}: {e}"),
+}
+```
+
+```rust
+use std::env;
+
+let key = "KEY";
+unsafe {
+    env::set_var(key, "VALUE");
+}
+assert_eq!(env::var(key), Ok("VALUE".to_string()));
+```
+
+But the *super-cool* way of reading an environment variable is the `env!` macro.
+
+##### `env!` the Macro
+
+`env!` inspects an environment variable at *compile time*. This macro will expand to the value of the named environment variable at compile time, yielding an expression of type `&'static str`. If the environment variable is not defined, then a compilation error will be emitted. To not emit a compile error, use the `option_env!` macro instead.
+
+###### Examples
+```rust
+let path: &'static str = env!("PATH");
+println!("the $PATH variable at the time of compiling was: {path}");
+```
+
+You can customize the error message by passing a string as the second parameter:
+
+```rust
+let doc: &'static str = env!("documentation", "what's that?!");
+```
+:::
+
+
+Cargo's environment variable list is very long, so we've picked out some fan favorites as a sampler platter. See the official documentation (which I think is): [The Cargo Book](https://doc.rust-lang.org/cargo/reference/environment-variables.html){target="_blank"}.
 
 #### Cargo Sets
 
@@ -5399,7 +5449,7 @@ Quick Reference
 | `#include`                     | `use`                                  |
 | Header files                   | No headers — modules handle visibility |
 | Manual `free` / `delete`       | Automatic via ownership                |
-| Undefined behaviour on misuse  | Compile error on misuse                |
+| Undefined behavior on misuse  | Compile error on misuse                |
 | `printf`                       | `println!("{}",  val)`                 |
 
 ## Where to Go Next
